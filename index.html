@@ -107,9 +107,9 @@
             canvas.height = window.innerHeight;
         });
 
-        // Three-Body Problem using Verlet Integration
-        const G = 50; // Gravitational constant
-        const dt = 0.008; // Time step (smaller for better stability)
+        const G = 50;
+        const dt = 0.001; // 极小的时间步长，防止数值爆炸
+        const subSteps = 15; // 每一帧进行 15 次物理计算
         let showTrails = true;
         const trailLength = 150;
 
@@ -117,8 +117,8 @@
             constructor(x, y, vx, vy, mass, color) {
                 this.x = x;
                 this.y = y;
-                this.oldX = x - vx * dt;
-                this.oldY = y - vy * dt;
+                this.vx = vx; // 显式追踪速度
+                this.vy = vy;
                 this.ax = 0;
                 this.ay = 0;
                 this.mass = mass;
@@ -129,16 +129,14 @@
             updateAcceleration(bodies) {
                 this.ax = 0;
                 this.ay = 0;
-
                 for (let other of bodies) {
                     if (other === this) continue;
-
                     const dx = other.x - this.x;
                     const dy = other.y - this.y;
                     const distSq = dx * dx + dy * dy;
                     const dist = Math.sqrt(distSq);
 
-                    if (dist > 1) {
+                    if (dist > 0.5) { // 引力软化，防止距离过近时计算崩溃
                         const force = G * other.mass / distSq;
                         this.ax += force * dx / dist;
                         this.ay += force * dy / dist;
@@ -146,15 +144,7 @@
                 }
             }
 
-            verletIntegrate() {
-                const newX = 2 * this.x - this.oldX + this.ax * dt * dt;
-                const newY = 2 * this.y - this.oldY + this.ay * dt * dt;
-
-                this.oldX = this.x;
-                this.oldY = this.y;
-                this.x = newX;
-                this.y = newY;
-
+            recordTrail() {
                 if (showTrails) {
                     this.trail.push({ x: this.x, y: this.y });
                     if (this.trail.length > trailLength) {
@@ -164,11 +154,10 @@
             }
 
             draw() {
-                // Draw trail
                 if (showTrails && this.trail.length > 1) {
                     ctx.strokeStyle = this.color;
-                    ctx.lineWidth = 1;
-                    ctx.globalAlpha = 0.3;
+                    ctx.lineWidth = 1.5;
+                    ctx.globalAlpha = 0.4;
                     ctx.beginPath();
                     ctx.moveTo(this.trail[0].x, this.trail[0].y);
                     for (let i = 1; i < this.trail.length; i++) {
@@ -178,13 +167,11 @@
                     ctx.globalAlpha = 1;
                 }
 
-                // Draw body
                 ctx.fillStyle = this.color;
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, Math.sqrt(this.mass) * 2, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Draw glow
                 const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, Math.sqrt(this.mass) * 4);
                 gradient.addColorStop(0, this.color + '80');
                 gradient.addColorStop(1, this.color + '00');
@@ -201,19 +188,21 @@
             const cx = canvas.width / 2;
             const cy = canvas.height / 2;
             const radius = 150;
+            const mass = 30;
 
-            // Lagrange equilateral triangle configuration
-            // Three equal masses in circular orbit around their center of mass
-            const v = Math.sqrt(G / radius); // Orbital velocity for stable circular orbit
+            // 正确的等边三角形稳定轨道速度公式
+            const v = Math.sqrt((G * mass) / (Math.sqrt(3) * radius));
 
             bodies = [
-                // Body 1 - right
-                new Body(cx + radius, cy, 0, v, 30, '#ff6b6b'),
-                // Body 2 - bottom left
-                new Body(cx - radius / 2, cy + radius * Math.sqrt(3) / 2, -v * Math.sqrt(3) / 2, -v / 2, 30, '#4ecdc4'),
-                // Body 3 - top left
-                new Body(cx - radius / 2, cy - radius * Math.sqrt(3) / 2, v * Math.sqrt(3) / 2, -v / 2, 30, '#ffe66d')
+                new Body(cx + radius, cy, 0, v, mass, '#ff6b6b'),
+                new Body(cx - radius / 2, cy + radius * Math.sqrt(3) / 2, -v * Math.sqrt(3) / 2, -v / 2, mass, '#4ecdc4'),
+                new Body(cx - radius / 2, cy - radius * Math.sqrt(3) / 2, v * Math.sqrt(3) / 2, -v / 2, mass, '#ffe66d')
             ];
+
+            // 初始化时，提前计算好第一帧的加速度 (Velocity Verlet 必备)
+            for (let body of bodies) {
+                body.updateAcceleration(bodies);
+            }
         }
 
         function resetSimulation() {
@@ -228,17 +217,38 @@
         }
 
         function animate() {
-            ctx.fillStyle = 'rgba(10, 10, 10, 0.1)';
+            ctx.fillStyle = 'rgba(10, 10, 10, 0.2)'; // 尾迹拖影效果
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Update accelerations
-            for (let body of bodies) {
-                body.updateAcceleration(bodies);
+            // 核心物理引擎：子步进 (Sub-stepping) 与 Velocity Verlet 算法
+            for (let step = 0; step < subSteps; step++) {
+                // 第一步：根据当前速度和加速度，推算新的位置
+                for (let body of bodies) {
+                    body.x += body.vx * dt + 0.5 * body.ax * dt * dt;
+                    body.y += body.vy * dt + 0.5 * body.ay * dt * dt;
+                }
+
+                // 第二步：备份旧的加速度
+                for (let body of bodies) {
+                    body.oldAx = body.ax;
+                    body.oldAy = body.ay;
+                }
+
+                // 第三步：在新位置上重新计算引力造成的加速度
+                for (let body of bodies) {
+                    body.updateAcceleration(bodies);
+                }
+
+                // 第四步：使用新旧加速度的平均值，计算真正的速度
+                for (let body of bodies) {
+                    body.vx += 0.5 * (body.oldAx + body.ax) * dt;
+                    body.vy += 0.5 * (body.oldAy + body.ay) * dt;
+                }
             }
 
-            // Integrate and draw
+            // 渲染阶段
             for (let body of bodies) {
-                body.verletIntegrate();
+                body.recordTrail();
                 body.draw();
             }
 
