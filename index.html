@@ -108,10 +108,10 @@
         });
 
         // Three-Body Problem using Verlet Integration
-        const G = 100; // Gravitational constant
-        const dt = 0.016; // Time step
+        const G = 50; // Gravitational constant
+        const dt = 0.008; // Time step (smaller for better stability)
         let showTrails = true;
-        const trailLength = 100;
+        const trailLength = 150;
 
         class Body {
             constructor(x, y, vx, vy, mass, color) {
@@ -139,9 +139,9 @@
                     const dist = Math.sqrt(distSq);
 
                     if (dist > 1) {
-                        const force = G * this.mass * other.mass / distSq;
-                        this.ax += force * dx / (dist * this.mass);
-                        this.ay += force * dy / (dist * this.mass);
+                        const force = G * other.mass / distSq;
+                        this.ax += force * dx / dist;
+                        this.ay += force * dy / dist;
                     }
                 }
             }
@@ -200,12 +200,19 @@
         function initBodies() {
             const cx = canvas.width / 2;
             const cy = canvas.height / 2;
-            const radius = 100;
+            const radius = 150;
+
+            // Lagrange equilateral triangle configuration
+            // Three equal masses in circular orbit around their center of mass
+            const v = Math.sqrt(G / radius); // Orbital velocity for stable circular orbit
 
             bodies = [
-                new Body(cx + radius, cy, 0, 50, 20, '#ff6b6b'),
-                new Body(cx - radius / 2, cy + radius * Math.sqrt(3) / 2, -43.3, -25, 20, '#4ecdc4'),
-                new Body(cx - radius / 2, cy - radius * Math.sqrt(3) / 2, 43.3, -25, 20, '#ffe66d')
+                // Body 1 - right
+                new Body(cx + radius, cy, 0, v, 30, '#ff6b6b'),
+                // Body 2 - bottom left
+                new Body(cx - radius / 2, cy + radius * Math.sqrt(3) / 2, -v * Math.sqrt(3) / 2, -v / 2, 30, '#4ecdc4'),
+                // Body 3 - top left
+                new Body(cx - radius / 2, cy - radius * Math.sqrt(3) / 2, v * Math.sqrt(3) / 2, -v / 2, 30, '#ffe66d')
             ];
         }
 
