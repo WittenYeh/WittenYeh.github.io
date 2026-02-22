@@ -107,9 +107,9 @@
             canvas.height = window.innerHeight;
         });
 
-        const G = 50;
+        const G = 5000;
         const dt = 0.001; // 极小的时间步长，防止数值爆炸
-        const subSteps = 15; // 每一帧进行 15 次物理计算
+        const subSteps = 8; // 每一帧进行 8 次物理计算
         let showTrails = true;
         const trailLength = 150;
 
