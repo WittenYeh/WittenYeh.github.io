@@ -54,45 +54,6 @@ const BioSection: React.FC = () => {
         <SimpleGrid columns={[1, 1, 2]} spacing={[5, 6, 8]} mt={[6, 7]} pt={[5, 6]} borderTop="1px dashed" borderColor={lineColor}>
           <VStack align="stretch" spacing={3}>
             <Heading size="xs" color={textColor} textTransform="uppercase" letterSpacing="wider" fontSize="2xs">
-              {research.sectionTitle}
-            </Heading>
-            {research.currentResearch.map((item) => {
-              const logo = institutionLogos[item.lab]
-              return (
-                <Link key={item.lab} href={item.link} isExternal _hover={{ textDecoration: 'none' }}>
-                  <HStack
-                    spacing={4}
-                    p={3}
-                    minH="88px"
-                    bg={cardBg}
-                    border="1px solid"
-                    borderColor={cardBorder}
-                    borderRadius="md"
-                    transition="all 0.2s"
-                    _hover={{ bg: hoverBg, borderColor: 'cyan.500', transform: 'translateY(-1px)' }}
-                  >
-                    <Flex w="72px" h="58px" align="center" justify="center" flexShrink={0} overflow="hidden" borderRadius="sm">
-                      {logo ? (
-                        <Image src={withBase(logo)} alt={`${item.lab} logo`} w="full" h="full" objectFit="contain" />
-                      ) : (
-                        <Flex w="full" h="full" align="center" justify="center" bg={fallbackBg}>
-                          <Text fontSize="xl">{item.emoji}</Text>
-                        </Flex>
-                      )}
-                    </Flex>
-                    <VStack align="start" spacing={1} flex={1}>
-                      <Text fontSize="sm" fontWeight="semibold" color={headingColor}>{item.lab}</Text>
-                      <Text fontSize="xs" color={textColor} lineHeight="tall">{item.focus}</Text>
-                      {item.advisor && <Text fontSize="2xs" color="cyan.400" fontFamily="mono">with {item.advisor}</Text>}
-                    </VStack>
-                  </HStack>
-                </Link>
-              )
-            })}
-          </VStack>
-
-          <VStack align="stretch" spacing={3}>
-            <Heading size="xs" color={textColor} textTransform="uppercase" letterSpacing="wider" fontSize="2xs">
               Education
             </Heading>
             {experience.education.courses.map((item) => {
@@ -128,6 +89,45 @@ const BioSection: React.FC = () => {
                     <Text fontSize="2xs" color="cyan.400" fontFamily="mono">{item.year}</Text>
                   </VStack>
                 </HStack>
+              )
+            })}
+          </VStack>
+
+          <VStack align="stretch" spacing={3}>
+            <Heading size="xs" color={textColor} textTransform="uppercase" letterSpacing="wider" fontSize="2xs">
+              {research.sectionTitle}
+            </Heading>
+            {research.currentResearch.map((item) => {
+              const logo = institutionLogos[item.lab]
+              return (
+                <Link key={item.lab} href={item.link} isExternal _hover={{ textDecoration: 'none' }}>
+                  <HStack
+                    spacing={4}
+                    p={3}
+                    minH="88px"
+                    bg={cardBg}
+                    border="1px solid"
+                    borderColor={cardBorder}
+                    borderRadius="md"
+                    transition="all 0.2s"
+                    _hover={{ bg: hoverBg, borderColor: 'cyan.500', transform: 'translateY(-1px)' }}
+                  >
+                    <Flex w="72px" h="58px" align="center" justify="center" flexShrink={0} overflow="hidden" borderRadius="sm">
+                      {logo ? (
+                        <Image src={withBase(logo)} alt={`${item.lab} logo`} w="full" h="full" objectFit="contain" />
+                      ) : (
+                        <Flex w="full" h="full" align="center" justify="center" bg={fallbackBg}>
+                          <Text fontSize="xl">{item.emoji}</Text>
+                        </Flex>
+                      )}
+                    </Flex>
+                    <VStack align="start" spacing={1} flex={1}>
+                      <Text fontSize="sm" fontWeight="semibold" color={headingColor}>{item.lab}</Text>
+                      <Text fontSize="xs" color={textColor} lineHeight="tall">{item.focus}</Text>
+                      {item.advisor && <Text fontSize="2xs" color="cyan.400" fontFamily="mono">with {item.advisor}</Text>}
+                    </VStack>
+                  </HStack>
+                </Link>
               )
             })}
           </VStack>
