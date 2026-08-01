@@ -90,6 +90,7 @@ const educationCourses = experienceTimelineData.map((entry) => ({
   course: entry.title,
   institution: entry.company,
   year: `${formatExperienceDate(entry.start)} – ${formatExperienceDate(entry.end)}`,
+  url: entry.companyUrl,
 }))
 
 const enData = {

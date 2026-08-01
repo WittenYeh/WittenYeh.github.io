@@ -97,17 +97,31 @@ const BioSection: React.FC = () => {
             </Heading>
             {experience.education.courses.map((item) => {
               const logo = institutionLogos[item.institution]
+              const logoElement = (
+                <Flex w="44px" h="44px" align="center" justify="center" flexShrink={0} overflow="hidden">
+                  {logo ? (
+                    <Image src={withBase(logo)} alt={`${item.institution} crest`} w="full" h="full" objectFit="contain" />
+                  ) : (
+                    <Flex w="full" h="full" borderRadius="sm" bg={fallbackBg} align="center" justify="center">
+                      <Text fontSize="sm" fontWeight="bold" color="blue.500">{item.institution.charAt(0)}</Text>
+                    </Flex>
+                  )}
+                </Flex>
+              )
               return (
                 <HStack key={`${item.course}-${item.year}`} spacing={3} p={2.5} minH="64px" borderRadius="md">
-                  <Flex w="44px" h="44px" align="center" justify="center" flexShrink={0} overflow="hidden">
-                    {logo ? (
-                      <Image src={withBase(logo)} alt={`${item.institution} crest`} w="full" h="full" objectFit="contain" />
-                    ) : (
-                      <Flex w="full" h="full" borderRadius="sm" bg={fallbackBg} align="center" justify="center">
-                        <Text fontSize="sm" fontWeight="bold" color="blue.500">{item.institution.charAt(0)}</Text>
-                      </Flex>
-                    )}
-                  </Flex>
+                  {item.url ? (
+                    <Link
+                      href={item.url}
+                      isExternal
+                      aria-label={`Visit ${item.institution} website`}
+                      borderRadius="sm"
+                      transition="all 0.2s"
+                      _hover={{ opacity: 0.82, transform: 'scale(1.04)' }}
+                    >
+                      {logoElement}
+                    </Link>
+                  ) : logoElement}
                   <VStack align="start" spacing={0.5} flex={1}>
                     <Text fontSize="sm" fontWeight="medium" color={headingColor}>{item.course}</Text>
                     <Text fontSize="2xs" color={textColor} lineHeight="short">{item.institution}</Text>

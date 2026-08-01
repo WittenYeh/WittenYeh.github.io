@@ -43,6 +43,7 @@ export interface Experience {
       course: string
       institution: string
       year: string
+      url?: string
     }[]
   }
   professional: {

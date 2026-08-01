@@ -63,7 +63,7 @@ const formatExperienceDate = (value = 'Present') => {
 const educationHtml = experience.timeline.map((item) => `
   <article class="seo-card">
     <h3>${escapeHtml(item.title)}</h3>
-    <p>${escapeHtml(item.company)}</p>
+    <p>${item.companyUrl ? `<a href="${escapeHtml(item.companyUrl)}">${escapeHtml(item.company)}</a>` : escapeHtml(item.company)}</p>
     <p class="seo-meta">${escapeHtml(formatExperienceDate(item.start))} – ${escapeHtml(formatExperienceDate(item.end))}</p>
   </article>`).join('')
 

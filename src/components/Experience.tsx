@@ -261,13 +261,18 @@ const Experience: React.FC = () => {
             <VStack align="stretch" spacing={1.5} pl={1}>
               {education.map(edu => {
                 const logo = institutionLogos[edu.institution]
+                const logoElement = logo ? (
+                  <Image src={logo} alt={`${edu.institution} crest`} w="16px" h="16px" borderRadius="sm" objectFit="contain" flexShrink={0} />
+                ) : (
+                  <Box w="16px" h="16px" borderRadius="sm" bg={`${termCommand}20`} flexShrink={0} />
+                )
                 return (
                   <HStack key={edu.course} fontSize="xs" spacing={2}>
-                    {logo ? (
-                      <Image src={logo} alt="" w="16px" h="16px" borderRadius="sm" objectFit="contain" flexShrink={0} />
-                    ) : (
-                      <Box w="16px" h="16px" borderRadius="sm" bg={`${termCommand}20`} flexShrink={0} />
-                    )}
+                    {edu.url ? (
+                      <Link href={edu.url} isExternal aria-label={`Visit ${edu.institution} website`}>
+                        {logoElement}
+                      </Link>
+                    ) : logoElement}
                     <Text color={termText} fontWeight="medium">{edu.course}</Text>
                     <Text color={termSecondary}>·</Text>
                     <Text color={termCommand}>{edu.institution}</Text>

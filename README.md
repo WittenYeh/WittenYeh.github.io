@@ -85,6 +85,7 @@ Write your English biography here.
 
 - `title`：职位或学位名称。
 - `company`：学校、学院或机构。
+- `companyUrl`：对应学校、学院或机构官网；首页校徽会链接到这里。
 - `start`、`end`：使用 `YYYY-MM`；当前经历的 `end` 填写 `Present`。
 - `summary`：首页 Experience 时间线中的说明。
 
