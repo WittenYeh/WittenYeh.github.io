@@ -2,11 +2,6 @@
   "education": {
     "courses": [
       {
-        "course": "Turing Class",
-        "institution": "School of Information, Renmin University of China",
-        "year": "Sep 2021 – Jun 2025"
-      },
-      {
         "course": "Research Assistant",
         "institution": "College of Computing and Data Science, Nanyang Technological University",
         "year": "Sep 2025 – Present"
@@ -14,7 +9,12 @@
       {
         "course": "PhD Student",
         "institution": "College of Computing and Data Science, Nanyang Technological University",
-        "year": "Aug 2026 – Present"
+        "year": "Aug 2025 – Present"
+      },
+      {
+        "course": "Turing Class",
+        "institution": "School of Information, Renmin University of China",
+        "year": "Sep 2021 – Jun 2025"
       }
     ]
   },
@@ -25,7 +25,7 @@
       "company": "College of Computing and Data Science, Nanyang Technological University",
       "companyUrl": "https://www.ntu.edu.sg/computing",
       "location": "Singapore",
-      "start": "2026-08",
+      "start": "2025-08",
       "end": "Present",
       "category": "academic",
       "roleType": "research",
