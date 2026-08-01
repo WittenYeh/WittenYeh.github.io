@@ -35,6 +35,9 @@ function App() {
                   {features.projects && pages.projects && (
                     <Route path="/projects" element={<pages.projects />} />
                   )}
+                  {features.projects && pages.mvrDatasetsDocs && (
+                    <Route path="/projects/mvr-datasets" element={<pages.mvrDatasetsDocs />} />
+                  )}
                   {features.articles && pages.articles && (
                     <Route path="/articles" element={<pages.articles />} />
                   )}

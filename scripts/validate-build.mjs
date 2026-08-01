@@ -48,13 +48,16 @@ for (const signal of requiredHomepageSignals) {
   }
 }
 
-for (const route of ['publications', 'projects', 'cv', 'benchmarks']) {
+for (const route of ['publications', 'projects', 'projects/mvr-datasets', 'cv', 'benchmarks']) {
   const routePath = resolve(root, `dist/${route}/index.html`)
   if (!existsSync(routePath)) throw new Error(`SEO validation failed: missing ${routePath}`)
 
   const routeHtml = readFileSync(routePath, 'utf8')
   if (!routeHtml.includes(`<link rel="canonical" href="https://wittenyeh.github.io/${route}/" />`)) {
     throw new Error(`SEO validation failed: ${route} has no route-specific canonical URL`)
+  }
+  if (route === 'projects/mvr-datasets' && !routeHtml.includes('<h2>Source guide</h2>')) {
+    throw new Error('SEO validation failed: the MVR-Datasets documentation body is missing')
   }
 }
 

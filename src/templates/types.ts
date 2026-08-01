@@ -35,6 +35,7 @@ export interface TemplatePages {
   benchmarks?: React.ComponentType
   guide?: React.ComponentType
   guideDocs?: React.ComponentType
+  mvrDatasetsDocs?: React.ComponentType
 }
 
 /**

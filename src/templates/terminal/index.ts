@@ -33,6 +33,7 @@ const Cv = lazy(() => import('../../components/Cv'))
 const Benchmarks = lazy(() => import('../../components/Benchmarks'))
 const GuideLanding = lazy(() => import('../../components/GuideLanding'))
 const GuideDocs = lazy(() => import('../../components/GuideDocs'))
+const MvrDatasetsDocs = lazy(() => import('../../components/MvrDatasetsDocs'))
 
 const terminalTemplate: TemplateConfig = {
   id: 'terminal',
@@ -52,6 +53,7 @@ const terminalTemplate: TemplateConfig = {
     benchmarks: Benchmarks,
     guide: GuideLanding,
     guideDocs: GuideDocs,
+    mvrDatasetsDocs: MvrDatasetsDocs,
   },
   slots: {
     navbar: Navbar,

@@ -183,7 +183,8 @@ const FlowNode: React.FC<{
             {/* Links + Expand button row */}
             <HStack spacing={1.5} flexWrap="wrap">
               {res.map(r => (
-                <Link key={r.url} href={r.url} isExternal
+                <Link key={r.url} href={r.url}
+                  isExternal={!r.url.startsWith('/')}
                   onClick={e => e.stopPropagation()} _hover={{ textDecoration: 'none' }}>
                   <HStack spacing={1.5} px={2.5} py={1} borderRadius="sm"
                     border="1px solid" borderColor={termBorder}

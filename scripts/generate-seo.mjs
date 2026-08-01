@@ -29,6 +29,10 @@ const aboutHtml = marked.parse(aboutMarkdown.trim())
   .replace('Prof. Siqiang Luo', '<a href="https://siqiangluo.com/">Prof. Siqiang Luo</a>')
   .replace('Prof. Feng Zhang', '<a href="https://fengzhangcs.github.io/">Prof. Feng Zhang</a>')
 
+const mvrDatasetsSource = readFileSync(resolve(root, 'content/mvr-datasets.md'), 'utf8')
+const { content: mvrDatasetsMarkdown } = matter(mvrDatasetsSource)
+const mvrDatasetsHtml = marked.parse(mvrDatasetsMarkdown.trim())
+
 const publicationDir = resolve(root, 'content/publications')
 const publications = readdirSync(publicationDir)
   .filter((file) => file.endsWith('.md'))
@@ -124,6 +128,12 @@ const routeConfigs = {
     description: 'Research and systems projects by Weitang Ye.',
     index: false,
     content: '<main id="seo-static-content"><h1>Projects by Weitang Ye</h1><p>Project information will be added here.</p></main>',
+  },
+  'projects/mvr-datasets': {
+    title: 'MVR-Datasets Documentation | Weitang Ye',
+    description: 'A concise guide to creating, reading, validating, and packaging raw and embedded multi-vector retrieval datasets.',
+    index: true,
+    content: `<main id="seo-static-content"><h1>MVR-Datasets</h1><p>Usage and source guide for the MVR Dataset Format.</p><article>${mvrDatasetsHtml}</article></main>`,
   },
   cv: {
     title: 'CV | Weitang Ye',

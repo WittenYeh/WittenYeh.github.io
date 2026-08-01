@@ -24,6 +24,11 @@ const routeMetadata: Record<string, { title: string; description: string; index:
     description: 'Research and systems projects by Weitang Ye.',
     index: false,
   },
+  '/projects/mvr-datasets': {
+    title: 'MVR-Datasets Documentation | Weitang Ye',
+    description: 'A concise guide to creating, reading, validating, and packaging raw and embedded multi-vector retrieval datasets.',
+    index: true,
+  },
   '/cv': {
     title: 'CV | Weitang Ye',
     description: 'Curriculum vitae of Weitang Ye.',
