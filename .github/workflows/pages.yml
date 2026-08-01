@@ -38,10 +38,14 @@ jobs:
         env:
           BASE_URL: /
 
-      - name: Ensure SPA fallback and .nojekyll
+      - name: Ensure SPA entry points, fallback, and .nojekyll
         run: |
           cp dist/index.html dist/404.html
           touch dist/.nojekyll
+          for route in research publications projects experience news cv benchmarks contact; do
+            mkdir -p "dist/$route"
+            cp dist/index.html "dist/$route/index.html"
+          done
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
