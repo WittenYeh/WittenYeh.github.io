@@ -26,6 +26,7 @@ export interface NewsItem {
 }
 
 export interface Research {
+  sectionTitle: string
   currentResearch: {
     lab: string
     emoji: string

@@ -99,7 +99,7 @@ const homeStaticContent = `${staticStyle}
     </header>
     <section aria-labelledby="seo-about"><h2 id="seo-about">About</h2>${aboutHtml}</section>
     <div class="seo-grid">
-      <section aria-labelledby="seo-research"><h2 id="seo-research">Current Research</h2>${researchHtml}</section>
+      <section aria-labelledby="seo-research"><h2 id="seo-research">${escapeHtml(research.sectionTitle)}</h2>${researchHtml}</section>
       <section aria-labelledby="seo-education"><h2 id="seo-education">Education</h2>${educationHtml}</section>
     </div>
     <section aria-labelledby="seo-news"><h2 id="seo-news">Recent Updates</h2>${newsHtml}</section>

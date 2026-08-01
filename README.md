@@ -41,6 +41,8 @@ npm run build
 | Benchmark 入口卡片 | `content/benchmarks.json` |
 | 头像和内容图片 | `content/images/` |
 
+`content/research.json` 中的 `sectionTitle` 控制首页研究项目栏目的标题，并会自动同步到 SEO 内容。
+
 ### 姓名、学校、邮箱和社交链接
 
 编辑 `content/site.json`：

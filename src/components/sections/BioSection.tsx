@@ -54,7 +54,7 @@ const BioSection: React.FC = () => {
         <SimpleGrid columns={[1, 1, 2]} spacing={[5, 6, 8]} mt={[6, 7]} pt={[5, 6]} borderTop="1px dashed" borderColor={lineColor}>
           <VStack align="stretch" spacing={3}>
             <Heading size="xs" color={textColor} textTransform="uppercase" letterSpacing="wider" fontSize="2xs">
-              Current Research
+              {research.sectionTitle}
             </Heading>
             {research.currentResearch.map((item) => {
               const logo = institutionLogos[item.lab]
