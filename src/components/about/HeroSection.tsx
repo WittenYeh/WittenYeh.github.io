@@ -133,7 +133,7 @@ const HeroSection = ({ title, avatar, research = [], researchLogos = {}, educati
               <Text color="yellow.400" fontSize={["xs", "sm"]}>$</Text>
               <Text fontSize={["xs", "sm"]} color={textColor}>{t('hero.sometimesI')}</Text>
               <Text color="cyan.400" fontWeight="bold" fontSize={["xs", "sm"]} fontFamily="mono">
-                {siteOwner.rotatingSubtitles.join(' · ')}
+                {siteOwner.rotatingSubtitles.join(' → ')}
               </Text>
             </HStack>
 

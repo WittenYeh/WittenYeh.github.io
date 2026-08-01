@@ -23,16 +23,17 @@ const Footer: React.FC = () => {
         <VStack spacing={[3, 4]} textAlign="center">
           {/* Logo */}
           <Link
-            href="https://github.com/H-Freax/TermHub"
-            isExternal
+            href="/"
             _hover={{ opacity: 0.85, transform: 'translateY(-1px)' }}
             transition="all 0.2s"
           >
             <Image
-              src={`${import.meta.env.BASE_URL}logo.svg`}
-              alt="TermHub"
-              h={["40px", "48px"]}
-              objectFit="contain"
+              src={`${import.meta.env.BASE_URL}images/mikasa.jpg`}
+              alt={`${siteOwner.name.display} logo`}
+              h={["48px", "56px"]}
+              w={["48px", "56px"]}
+              borderRadius="full"
+              objectFit="cover"
             />
           </Link>
 

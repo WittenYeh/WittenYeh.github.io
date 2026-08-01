@@ -42,7 +42,7 @@ jobs:
         run: |
           cp dist/index.html dist/404.html
           touch dist/.nojekyll
-          for route in research publications projects experience news cv benchmarks contact; do
+          for route in publications projects cv benchmarks contact; do
             mkdir -p "dist/$route"
             cp dist/index.html "dist/$route/index.html"
           done

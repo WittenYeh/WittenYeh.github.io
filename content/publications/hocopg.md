@@ -22,6 +22,7 @@ links:
 specialBadges:
   - Demo
 emoji: "📝"
+featuredImage: "/images/publications/hocopg-architecture.png"
 ---
 
 HocoPG integrates homomorphic compression into PostgreSQL so that text operations can run directly on compressed data. It supports composable text queries and includes an administration tool that helps users compare compression schemes and choose an appropriate configuration for their workloads.

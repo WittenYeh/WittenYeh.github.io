@@ -2,7 +2,7 @@
   "_comment": "Edit this file to add your English profile details. See README.md for a complete map.",
   "template": "terminal",
   "components": {},
-  "sections": ["hero", "bio", "footer"],
+  "sections": ["hero", "bio", "newsDisplay", "journey", "selectedPublications", "footer"],
   "name": {
     "full": "Weitang Ye",
     "first": "Weitang",
@@ -11,12 +11,12 @@
     "display": "Weitang Ye",
     "authorVariants": ["Weitang Ye"]
   },
-  "title": "Academic Homepage",
+  "title": "Weitang's Homepage",
   "tagline": "Research profile, publications and projects.",
   "avatar": "mikasa.jpg",
   "terminal": {
     "username": "researcher",
-    "rotatingSubtitles": ["research", "build systems", "study math"],
+    "rotatingSubtitles": ["chat with AI", "think", "prove theorems", "build systems", "write papers"],
     "skills": [],
     "timezone": "Asia/Singapore"
   },
@@ -30,7 +30,7 @@
     "github": "https://github.com/WittenYeh",
     "linkedin": "",
     "medium": "",
-    "googleScholar": "",
+    "googleScholar": "https://scholar.google.com/citations?user=Ob-F7bAAAAAJ",
     "twitter": "",
     "youtube": "",
     "bilibili": "",
@@ -40,12 +40,12 @@
   },
   "pets": [],
   "features": {
-    "research": true,
+    "research": false,
     "publications": true,
     "projects": true,
     "articles": false,
-    "experience": true,
-    "news": true,
+    "experience": false,
+    "news": false,
     "cv": true,
     "benchmarks": true,
     "contact": true,
@@ -53,5 +53,5 @@
     "guide": false
   },
   "heroSocialIcons": [],
-  "selectedPublicationIds": []
+  "selectedPublicationIds": ["hocopg"]
 }

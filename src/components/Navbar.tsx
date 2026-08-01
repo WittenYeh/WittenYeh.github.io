@@ -54,20 +54,22 @@ const Navbar: React.FC = () => {
           />
         </Box>
 
-        {/* Desktop: logo left */}
+        {/* Site logo */}
         <ChakraLink
           as={Link}
           to="/"
-          display={{ base: 'none', lg: 'flex' }}
+          display="flex"
           alignItems="center"
           _hover={{ opacity: 0.85 }}
           transition="opacity 0.15s"
         >
           <Image
-            src={`${import.meta.env.BASE_URL}logo-icon.svg`}
-            alt="TermHub"
-            h="28px"
-            w="28px"
+            src={`${import.meta.env.BASE_URL}images/mikasa.jpg`}
+            alt={`${siteOwner.name.display} logo`}
+            h={{ base: '32px', lg: '36px' }}
+            w={{ base: '32px', lg: '36px' }}
+            borderRadius="full"
+            objectFit="cover"
           />
         </ChakraLink>
 

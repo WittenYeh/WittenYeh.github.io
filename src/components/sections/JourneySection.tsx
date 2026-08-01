@@ -1,4 +1,4 @@
-import { Box, Container, VStack, HStack, Text, Heading, Flex, Link, useColorModeValue } from '@chakra-ui/react'
+import { Box, Container, VStack, HStack, Text, Heading, Flex, useColorModeValue } from '@chakra-ui/react'
 import { useTranslation } from 'react-i18next'
 import { useLocalizedData } from '@/hooks/useLocalizedData'
 
@@ -15,7 +15,7 @@ const renderBoldText = (text: string, color: string, boldColor: string) => {
 
 const JourneySection: React.FC = () => {
   const { t } = useTranslation()
-  const { about } = useLocalizedData()
+  const { experienceTimeline } = useLocalizedData()
   const textColor = useColorModeValue('gray.500', 'gray.400')
   const boldColor = useColorModeValue('gray.700', 'gray.200')
   const headingColor = useColorModeValue('gray.800', 'gray.100')
@@ -24,7 +24,12 @@ const JourneySection: React.FC = () => {
   const dotBg = useColorModeValue('white', 'gray.800')
   const tagBg = useColorModeValue('gray.100', 'gray.800')
 
-  if (!about.journeyPhases || about.journeyPhases.length === 0) return null
+  if (!experienceTimeline || experienceTimeline.length === 0) return null
+
+  const formatPeriod = (start: string, end?: string) => {
+    const formatDate = (date: string) => date === 'Present' ? date : date.replace('-', '.')
+    return `${formatDate(start)} – ${formatDate(end || 'Present')}`
+  }
 
   return (
     <Box w="full">
@@ -39,30 +44,30 @@ const JourneySection: React.FC = () => {
           <Box position="absolute" left={["7px", "7px", "7px"]} top="12px" bottom="12px" w="1px" bg={lineColor} />
 
           <VStack spacing={0} align="stretch">
-            {about.journeyPhases.map((phase, index) => (
-              <Flex key={index} gap={[3, 4]} align="start" py={3} position="relative">
+            {experienceTimeline.map((phase) => (
+              <Flex key={`${phase.title}-${phase.start}`} gap={[3, 4]} align="start" py={3} position="relative">
                 <Box flexShrink={0} mt="6px">
                   <Box
                     w="14px" h="14px" borderRadius="full" border="2px solid"
-                    borderColor={index === about.journeyPhases!.length - 1 ? 'cyan.400' : dotBorder}
-                    bg={index === about.journeyPhases!.length - 1 ? 'cyan.400' : dotBg}
+                    borderColor={phase.isCurrent ? 'cyan.400' : dotBorder}
+                    bg={phase.isCurrent ? 'cyan.400' : dotBg}
                   />
                 </Box>
                 <Box flex={1} pb={2}>
                   <HStack spacing={2} mb={1} flexWrap="wrap">
                     <Text fontSize="2xs" fontFamily="mono" color="cyan.400" fontWeight="semibold" textTransform="uppercase" letterSpacing="wide">
-                      {phase.period}
+                      {formatPeriod(phase.start, phase.end)}
                     </Text>
                     <Text fontSize="2xs" color={useColorModeValue('gray.400', 'gray.600')}>/</Text>
-                    <Text fontSize="2xs" fontFamily="mono" color={useColorModeValue('gray.400', 'gray.500')}>{phase.org}</Text>
+                    <Text fontSize="2xs" fontFamily="mono" color={useColorModeValue('gray.400', 'gray.500')}>{phase.company}</Text>
                   </HStack>
                   <Text fontSize="sm" fontWeight="semibold" color={headingColor} mb={1}>{phase.title}</Text>
                   <Text fontSize="xs" lineHeight="tall" mb={2}>
-                    {renderBoldText(phase.description, textColor, boldColor)}
+                    {renderBoldText(phase.summary || '', textColor, boldColor)}
                   </Text>
-                  {phase.tags && (
+                  {(phase.location || phase.category) && (
                     <HStack spacing={1.5} flexWrap="wrap">
-                      {phase.tags.map((tag) => (
+                      {[phase.location, phase.category].filter(Boolean).map((tag) => (
                         <Text key={tag} fontSize="2xs" fontFamily="mono" color={textColor} px={1.5} py={0.5} bg={tagBg} borderRadius="sm">
                           {tag}
                         </Text>
@@ -72,18 +77,6 @@ const JourneySection: React.FC = () => {
                 </Box>
               </Flex>
             ))}
-            {/* View all link */}
-            <Flex gap={[3, 4]} align="start" py={3} position="relative">
-              <Box flexShrink={0} mt="6px">
-                <Box w="14px" h="14px" borderRadius="full" border="2px dashed" borderColor={dotBorder} />
-              </Box>
-              <Link href="/experience" _hover={{ textDecoration: 'none' }}>
-                <HStack spacing={2} color={textColor} fontSize="xs" fontFamily="mono" transition="all 0.15s" _hover={{ color: 'cyan.400' }} mt="3px">
-                  <Text>{t('about.viewAllExperience')}</Text>
-                  <Text>→</Text>
-                </HStack>
-              </Link>
-            </Flex>
           </VStack>
         </Box>
       </Container>

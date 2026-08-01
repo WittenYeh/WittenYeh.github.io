@@ -4,7 +4,7 @@
 
 <https://wittenyeh.github.io/>
 
-页面包含 About、Research、Publications、Projects、Experience、News、CV、Benchmarks 和 Contact。个人资料目前使用空数据与通用占位图，不包含模板原有的示例人物或虚构成果。
+首页包含 About、News、Experience 和 Selected Publications；独立页面包含 Publications、Projects、CV、Benchmarks 和 Contact。
 
 ## 本地预览
 
@@ -60,7 +60,7 @@ npm run build
 "avatar": "profile.jpg"
 ```
 
-当前的 `content/images/avatar.svg` 是通用占位图，可以直接替换。
+当前头像为 `content/images/mikasa.jpg`，可以直接替换该文件，或在 `site.json` 中改用其他文件名。
 
 ### 个人简介
 
