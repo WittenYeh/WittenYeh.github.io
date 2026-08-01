@@ -127,6 +127,7 @@ const HeroSection = ({ title, avatar }: HeroSectionProps) => {
                 display="flex"
                 alignItems="center"
                 gap={1}
+                ml={[1, 2, 3]}
               >
                 <MotionText
                   as="span"
