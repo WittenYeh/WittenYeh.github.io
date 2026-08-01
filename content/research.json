@@ -1,3 +1,12 @@
 {
-  "currentResearch": []
+  "currentResearch": [
+    {
+      "lab": "ARTEA",
+      "emoji": "🌿",
+      "advisor": "Prof. Siqiang Luo",
+      "focus": "Theory-guided hierarchical graph indexing for high-performance approximate nearest neighbor search.",
+      "link": "https://github.com/NTU-Siqiang-Group/Artea",
+      "institution": "Nanyang Technological University"
+    }
+  ]
 }

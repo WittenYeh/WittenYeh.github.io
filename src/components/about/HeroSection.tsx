@@ -1,4 +1,4 @@
-import { Box, VStack, Text, useColorModeValue, Image, HStack, Container, Stack, Link, Flex, SimpleGrid, Heading, Tooltip } from '@chakra-ui/react'
+import { Box, VStack, Text, useColorModeValue, Image, HStack, Container, Stack, Link, Flex, Tooltip } from '@chakra-ui/react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { withBase } from '@/utils/asset'
@@ -34,15 +34,13 @@ interface HeroSectionProps {
   educationLogos?: Record<string, string>
 }
 
-const HeroSection = ({ title, avatar, research = [], researchLogos = {}, education = [], educationLogos = {} }: HeroSectionProps) => {
+const HeroSection = ({ title, avatar }: HeroSectionProps) => {
   const { t } = useTranslation()
   const { siteOwner, siteConfig } = useLocalizedData()
   const headingColor = useColorModeValue('gray.800', 'white')
   const textColor = useColorModeValue('gray.600', 'gray.400')
   const bg = useColorModeValue('gray.50', 'gray.900')
-  const accentBg = useColorModeValue('blue.50', 'blue.900')
   const dividerColor = useColorModeValue('gray.200', 'gray.700')
-  const researchHoverBg = useColorModeValue('gray.100', 'gray.700')
   const socialIconColor = useColorModeValue('gray.400', 'gray.500')
   const subtitleCount = siteOwner.rotatingSubtitles.length
   const [subtitleIndex, setSubtitleIndex] = useState(0)
@@ -181,68 +179,6 @@ const HeroSection = ({ title, avatar, research = [], researchLogos = {}, educati
               </Box>
             </HStack>
 
-
-            <Box w="full" borderTop="1px dashed" borderColor={dividerColor} />
-
-            {/* Research & Education compact section */}
-            {(research.length > 0 || education.length > 0) && (
-              <SimpleGrid columns={[1, 1, 2]} spacing={[3, 3, 4]} w="full">
-                {research.length > 0 && (
-                  <VStack align="start" spacing={2}>
-                    <Heading size="xs" color={textColor} textTransform="uppercase" letterSpacing="wider" fontSize="2xs">
-                      Current Research
-                    </Heading>
-                    {research.map((item, index) => {
-                      const logo = researchLogos[item.lab]
-                      return (
-                        <Link key={index} href={item.link} isExternal _hover={{ textDecoration: 'none' }} w="full">
-                          <HStack spacing={2.5} p={2} borderRadius="md" transition="all 0.2s" _hover={{ bg: researchHoverBg }}>
-                            {logo ? (
-                              <Image src={logo} alt={item.lab} w="28px" h="28px" borderRadius="sm" objectFit="contain" flexShrink={0} />
-                            ) : (
-                              <Flex w="28px" h="28px" borderRadius="sm" bg={accentBg} align="center" justify="center" flexShrink={0}>
-                                <Text fontSize="sm">{item.emoji}</Text>
-                              </Flex>
-                            )}
-                            <VStack align="start" spacing={0} flex={1}>
-                              <Text fontSize={["xs", "sm"]} fontWeight="medium" lineHeight="short" color={headingColor}>{item.lab}</Text>
-                              <Text fontSize="2xs" color={textColor} lineHeight="short" noOfLines={1}>
-                                {item.advisor ? `w/ ${item.advisor}` : item.focus}
-                              </Text>
-                            </VStack>
-                          </HStack>
-                        </Link>
-                      )
-                    })}
-                  </VStack>
-                )}
-                {education.length > 0 && (
-                  <VStack align="start" spacing={2}>
-                    <Heading size="xs" color={textColor} textTransform="uppercase" letterSpacing="wider" fontSize="2xs">
-                      Education
-                    </Heading>
-                    {education.map((item, index) => {
-                      const logo = educationLogos[item.institution]
-                      return (
-                        <HStack key={index} spacing={2.5} p={2} borderRadius="md" w="full">
-                          {logo ? (
-                            <Image src={logo} alt={item.institution} w="28px" h="28px" borderRadius="sm" objectFit="contain" flexShrink={0} />
-                          ) : (
-                            <Flex w="28px" h="28px" borderRadius="sm" bg={accentBg} align="center" justify="center" flexShrink={0}>
-                              <Text fontSize="sm" fontWeight="bold" color="blue.500">{item.institution.charAt(0)}</Text>
-                            </Flex>
-                          )}
-                          <VStack align="start" spacing={0} flex={1}>
-                            <Text fontSize={["xs", "sm"]} fontWeight="medium" lineHeight="short" color={headingColor}>{item.course}</Text>
-                            <Text fontSize="2xs" color={textColor} lineHeight="short">{item.institution} · {item.year}</Text>
-                          </VStack>
-                        </HStack>
-                      )
-                    })}
-                  </VStack>
-                )}
-              </SimpleGrid>
-            )}
 
             <Box w="full" borderTop="1px dashed" borderColor={dividerColor} />
 

@@ -1,1 +1,19 @@
-[]
+[
+  {
+    "type": "publication",
+    "badge": "VLDB 2027 · Revision",
+    "icon": "FaFileAlt",
+    "iconColor": "cyan.400",
+    "title": "ARTEA enters the VLDB 2027 revision round",
+    "description": "ARTEA, our work on a theoretically guaranteed hierarchical graph index, has advanced to the VLDB 2027 revision round after receiving three minor-revision recommendations.",
+    "date": "Aug 2026",
+    "sortDate": "2026-08-01",
+    "links": [
+      {
+        "text": "Code",
+        "url": "https://github.com/NTU-Siqiang-Group/Artea",
+        "icon": "FaGithub"
+      }
+    ]
+  }
+]

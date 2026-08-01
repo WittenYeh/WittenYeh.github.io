@@ -1,18 +1,14 @@
 import { Box, VStack, Flex, Heading, Badge, Container, useColorModeValue } from '@chakra-ui/react'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { institutionLogos } from '../data'
 import { useLocalizedData } from '@/hooks/useLocalizedData'
 import { useSlot } from '@/templates/context'
 import { DEFAULT_SECTIONS } from '@/templates/slots'
 import type { SlotName } from '@/templates/slots'
 
-const researchLogos = institutionLogos
-const universityLogos = institutionLogos
-
 function About() {
   const { t } = useTranslation()
-  const { research, experience, news, siteConfig } = useLocalizedData()
+  const { news, siteConfig } = useLocalizedData()
   const lineColor = useColorModeValue('gray.200', 'gray.700')
 
   const cfg = siteConfig as Record<string, unknown>
@@ -49,10 +45,6 @@ function About() {
             key={key}
             title={siteConfig.title}
             avatar={siteConfig.avatar}
-            research={research.currentResearch}
-            researchLogos={researchLogos}
-            education={experience.education.courses}
-            educationLogos={universityLogos}
           />
         )
       case 'newsDisplay':
