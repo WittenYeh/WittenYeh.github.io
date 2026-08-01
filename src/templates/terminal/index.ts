@@ -1,22 +1,12 @@
 // SPDX-FileCopyrightText: 2026 Yaoyao(Freax) Qian <limyoonaxi@gmail.com>
 // SPDX-License-Identifier: GPL-3.0-only
 
+import { lazy } from 'react'
 import type { TemplateConfig } from '../types'
 import theme from '../../theme'
 
 import Layout from '../../components/Layout'
 import Home from '../../components/Home'
-import Publications from '../../components/Publications'
-import Research from '../../components/Research'
-import Projects from '../../components/Projects'
-import Articles from '../../components/Articles'
-import Experience from '../../components/Experience'
-import News from '../../components/News'
-import Cv from '../../components/Cv'
-import Benchmarks from '../../components/Benchmarks'
-import Contact from '../../components/Contact'
-import GuideLanding from '../../components/GuideLanding'
-import GuideDocs from '../../components/GuideDocs'
 
 import Navbar from '../../components/Navbar'
 import HeroSection from '../../components/about/HeroSection'
@@ -32,6 +22,18 @@ import SelectedPublicationsSection from '../../components/sections/SelectedPubli
 import TalksSection from '../../components/sections/TalksSection'
 import TeachingSection from '../../components/sections/TeachingSection'
 import ContactSection from '../../components/sections/ContactSection'
+
+const Publications = lazy(() => import('../../components/Publications'))
+const Research = lazy(() => import('../../components/Research'))
+const Projects = lazy(() => import('../../components/Projects'))
+const Articles = lazy(() => import('../../components/Articles'))
+const Experience = lazy(() => import('../../components/Experience'))
+const News = lazy(() => import('../../components/News'))
+const Cv = lazy(() => import('../../components/Cv'))
+const Benchmarks = lazy(() => import('../../components/Benchmarks'))
+const Contact = lazy(() => import('../../components/Contact'))
+const GuideLanding = lazy(() => import('../../components/GuideLanding'))
+const GuideDocs = lazy(() => import('../../components/GuideDocs'))
 
 const terminalTemplate: TemplateConfig = {
   id: 'terminal',

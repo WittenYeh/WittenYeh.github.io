@@ -163,6 +163,26 @@ git push origin main
 
 GitHub Actions 会安装依赖、构建并发布 `dist/`。可在仓库的 Actions 页面查看部署状态。
 
+## SEO 与搜索引擎收录
+
+网站构建时会自动生成搜索引擎可直接读取的静态内容、独立页面 metadata 和 canonical URL：
+
+- 首页 metadata 与 `ProfilePage` / `Person` JSON-LD：`index.html`
+- Sitemap：`public/sitemap.xml`
+- 爬虫规则：`public/robots.txt`
+- 静态 SEO 页面生成逻辑：`scripts/generate-seo.mjs`
+- 构建产物 SEO 校验：`scripts/validate-build.mjs`
+
+姓名、简介、经历、研究项目、News 和论文仍然只需修改 `content/` 中对应文件；运行 `npm run build` 时，静态 SEO 内容会自动同步。
+
+部署后，在 Google Search Console 中验证 `https://wittenyeh.github.io/`，并提交：
+
+```text
+https://wittenyeh.github.io/sitemap.xml
+```
+
+Google 提供的 HTML 验证文件可以直接放在 `public/`，验证 meta tag 也可以加入 `index.html`。
+
 ## 模板更新
 
 本站基于 TermHub，许可证为 GPL-3.0-only。若要同步上游模板更新，建议先建立独立分支并提交自己的改动，再执行：

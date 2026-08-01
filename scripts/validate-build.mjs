@@ -1,12 +1,14 @@
 // SPDX-FileCopyrightText: 2026 Yaoyao(Freax) Qian <limyoonaxi@gmail.com>
 // SPDX-License-Identifier: GPL-3.0-only
 
-import { readFileSync, readdirSync } from 'fs'
+import { existsSync, readFileSync, readdirSync } from 'fs'
 import { resolve } from 'path'
 import matter from 'gray-matter'
 
 const root = resolve(import.meta.dirname, '..')
 const site = JSON.parse(readFileSync(resolve(root, 'content/site.json'), 'utf8'))
+const distIndexPath = resolve(root, 'dist/index.html')
+const distIndex = readFileSync(distIndexPath, 'utf8')
 
 if (site.sections?.includes('bio')) {
   const { content } = matter(readFileSync(resolve(root, 'content/about.md'), 'utf8'))
@@ -30,3 +32,37 @@ if (site.sections?.includes('bio')) {
 
   console.log('✓ Biography is present in the production bundle')
 }
+
+const requiredHomepageSignals = [
+  '<title>Weitang Ye | PhD Student at NTU</title>',
+  '<link rel="canonical" href="https://wittenyeh.github.io/" />',
+  'type="application/ld+json"',
+  '"@type": "ProfilePage"',
+  '<main id="seo-static-content">',
+  'I am a PhD student at the College of Computing and Data Science',
+]
+
+for (const signal of requiredHomepageSignals) {
+  if (!distIndex.includes(signal)) {
+    throw new Error(`SEO validation failed: dist/index.html is missing ${signal}`)
+  }
+}
+
+for (const route of ['publications', 'projects', 'cv', 'benchmarks', 'contact']) {
+  const routePath = resolve(root, `dist/${route}/index.html`)
+  if (!existsSync(routePath)) throw new Error(`SEO validation failed: missing ${routePath}`)
+
+  const routeHtml = readFileSync(routePath, 'utf8')
+  if (!routeHtml.includes(`<link rel="canonical" href="https://wittenyeh.github.io/${route}/" />`)) {
+    throw new Error(`SEO validation failed: ${route} has no route-specific canonical URL`)
+  }
+}
+
+const sitemapPath = resolve(root, 'dist/sitemap.xml')
+const robotsPath = resolve(root, 'dist/robots.txt')
+if (!existsSync(sitemapPath)) throw new Error('SEO validation failed: dist/sitemap.xml is missing')
+if (!readFileSync(robotsPath, 'utf8').includes('Sitemap: https://wittenyeh.github.io/sitemap.xml')) {
+  throw new Error('SEO validation failed: robots.txt does not declare the sitemap')
+}
+
+console.log('✓ Static content, canonical URLs, structured data, robots.txt, and sitemap.xml validated')

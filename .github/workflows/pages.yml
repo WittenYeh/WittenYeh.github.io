@@ -38,13 +38,14 @@ jobs:
         env:
           BASE_URL: /
 
-      - name: Ensure SPA entry points, fallback, and .nojekyll
+      - name: Verify generated route entry points and Pages files
         run: |
-          cp dist/index.html dist/404.html
           touch dist/.nojekyll
+          test -f dist/404.html
+          test -f dist/sitemap.xml
+          test -f dist/robots.txt
           for route in publications projects cv benchmarks contact; do
-            mkdir -p "dist/$route"
-            cp dist/index.html "dist/$route/index.html"
+            test -f "dist/$route/index.html"
           done
 
       - name: Upload Pages artifact
