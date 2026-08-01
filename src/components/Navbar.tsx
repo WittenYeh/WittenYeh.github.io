@@ -8,7 +8,8 @@ import { Link, useLocation } from 'react-router-dom'
 import { FaGithub, FaLinkedin, FaMedium, FaEnvelope } from 'react-icons/fa'
 import { SiGooglescholar } from 'react-icons/si'
 import { useTranslation } from 'react-i18next'
-import { navItems, siteOwner } from '@/site.config'
+import { navItems, siteConfig, siteOwner } from '@/site.config'
+import { withBase } from '@/utils/asset'
 
 const Navbar: React.FC = () => {
   const { colorMode, toggleColorMode } = useColorMode()
@@ -64,7 +65,7 @@ const Navbar: React.FC = () => {
           transition="opacity 0.15s"
         >
           <Image
-            src={`${import.meta.env.BASE_URL}images/mikasa.jpg`}
+            src={withBase(`images/${siteConfig.avatar}`)}
             alt={`${siteOwner.name.display} logo`}
             h={{ base: '32px', lg: '36px' }}
             w={{ base: '32px', lg: '36px' }}

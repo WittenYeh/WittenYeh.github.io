@@ -2,10 +2,11 @@ import React from 'react'
 import { Box, Container, VStack, HStack, Text, Link, Image, useColorModeValue } from '@chakra-ui/react'
 import { useTranslation } from 'react-i18next'
 import { useLocalizedData } from '@/hooks/useLocalizedData'
+import { withBase } from '@/utils/asset'
 
 const Footer: React.FC = () => {
   const { t } = useTranslation()
-  const { siteOwner } = useLocalizedData()
+  const { siteOwner, siteConfig } = useLocalizedData()
   const footerBg = useColorModeValue('gray.50', 'gray.900')
   const textColor = useColorModeValue('gray.600', 'gray.400')
 
@@ -28,7 +29,7 @@ const Footer: React.FC = () => {
             transition="all 0.2s"
           >
             <Image
-              src={`${import.meta.env.BASE_URL}images/mikasa.jpg`}
+              src={withBase(`images/${siteConfig.avatar}`)}
               alt={`${siteOwner.name.display} logo`}
               h={["48px", "56px"]}
               w={["48px", "56px"]}

@@ -1,5 +1,6 @@
 import { Box, VStack, Text, useColorModeValue, Image, HStack, Container, Stack, Link, Flex, SimpleGrid, Heading, Tooltip } from '@chakra-ui/react'
-import { motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
+import { useEffect, useState } from 'react'
 import { withBase } from '@/utils/asset'
 import DynamicIcon from '../DynamicIcon'
 import { useTranslation } from 'react-i18next'
@@ -43,6 +44,25 @@ const HeroSection = ({ title, avatar, research = [], researchLogos = {}, educati
   const dividerColor = useColorModeValue('gray.200', 'gray.700')
   const researchHoverBg = useColorModeValue('gray.100', 'gray.700')
   const socialIconColor = useColorModeValue('gray.400', 'gray.500')
+  const subtitleCount = siteOwner.rotatingSubtitles.length
+  const [subtitleIndex, setSubtitleIndex] = useState(0)
+
+  useEffect(() => {
+    setSubtitleIndex(0)
+    if (subtitleCount <= 1) return
+
+    const interval = window.setInterval(() => {
+      setSubtitleIndex((current) => (current + 1) % subtitleCount)
+    }, 2000)
+
+    return () => window.clearInterval(interval)
+  }, [subtitleCount])
+
+  const currentSubtitle = siteOwner.rotatingSubtitles[subtitleIndex] ?? ''
+  const nextSubtitle = subtitleCount > 1
+    ? siteOwner.rotatingSubtitles[(subtitleIndex + 1) % subtitleCount]
+    : ''
+  const subtitlePair = nextSubtitle ? `${currentSubtitle} → ${nextSubtitle}` : currentSubtitle
 
   return (
     <Box
@@ -132,9 +152,33 @@ const HeroSection = ({ title, avatar, research = [], researchLogos = {}, educati
             >
               <Text color="yellow.400" fontSize={["xs", "sm"]}>$</Text>
               <Text fontSize={["xs", "sm"]} color={textColor}>{t('hero.sometimesI')}</Text>
-              <Text color="cyan.400" fontWeight="bold" fontSize={["xs", "sm"]} fontFamily="mono">
-                {siteOwner.rotatingSubtitles.join(' → ')}
-              </Text>
+              <Box
+                h={["18px", "20px", "24px"]}
+                w={["250px", "280px", "320px"]}
+                position="relative"
+                overflow="hidden"
+              >
+                <AnimatePresence initial={false}>
+                  <MotionText
+                    key={subtitleIndex}
+                    position="absolute"
+                    inset={0}
+                    initial={{ y: '100%', opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: '-100%', opacity: 0 }}
+                    transition={{ duration: 0.35, ease: 'easeInOut' }}
+                    color="cyan.400"
+                    fontWeight="bold"
+                    fontSize={["xs", "sm"]}
+                    fontFamily="mono"
+                    lineHeight={["18px", "20px", "24px"]}
+                    whiteSpace="nowrap"
+                    textAlign={["center", "center", "left"]}
+                  >
+                    {subtitlePair}
+                  </MotionText>
+                </AnimatePresence>
+              </Box>
             </HStack>
 
 

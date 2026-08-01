@@ -81,7 +81,7 @@ const enData = {
   projects: collectMd(projectMdsEn).map(mdToProject),
   articles: collectMd(articleMdsEn).map(mdToProject),
   publications: collectMd(publicationMdsEn).map(mdToPublication),
-  about: mdToAbout(Object.values(aboutMdEn)[0]?.default ?? {}),
+  about: mdToAbout(collectMd(aboutMdEn)[0] ?? {}),
   research: researchJsonEn as Research,
   experience: { ...experienceJsonEn, professional: [], academic: [] } as Experience,
   experienceTimeline: experienceJsonEn.timeline as ExperienceEntry[],
