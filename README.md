@@ -4,7 +4,7 @@
 
 <https://wittenyeh.github.io/>
 
-首页包含 About、News、Experience 和 Selected Publications；独立页面包含 Publications、Projects、CV、Benchmarks 和 Contact。
+首页包含 About、News、Experience 和 Selected Publications；独立页面包含 Publications、Projects、CV 和 Benchmarks。
 
 ## 本地预览
 

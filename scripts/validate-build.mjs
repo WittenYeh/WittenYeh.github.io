@@ -48,7 +48,7 @@ for (const signal of requiredHomepageSignals) {
   }
 }
 
-for (const route of ['publications', 'projects', 'cv', 'benchmarks', 'contact']) {
+for (const route of ['publications', 'projects', 'cv', 'benchmarks']) {
   const routePath = resolve(root, `dist/${route}/index.html`)
   if (!existsSync(routePath)) throw new Error(`SEO validation failed: missing ${routePath}`)
 

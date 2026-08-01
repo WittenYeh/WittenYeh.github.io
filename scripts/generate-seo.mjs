@@ -9,7 +9,6 @@ import { marked } from 'marked'
 const root = resolve(import.meta.dirname, '..')
 const distDir = resolve(root, 'dist')
 const baseHtml = readFileSync(resolve(distDir, 'index.html'), 'utf8')
-const site = JSON.parse(readFileSync(resolve(root, 'content/site.json'), 'utf8'))
 const experience = JSON.parse(readFileSync(resolve(root, 'content/experience.json'), 'utf8'))
 const research = JSON.parse(readFileSync(resolve(root, 'content/research.json'), 'utf8'))
 const news = JSON.parse(readFileSync(resolve(root, 'content/news.json'), 'utf8'))
@@ -123,12 +122,6 @@ const routeConfigs = {
     description: cv.description,
     index: cv.available === true,
     content: `<main id="seo-static-content"><h1>Curriculum Vitae — Weitang Ye</h1><p>${escapeHtml(cv.description)}</p></main>`,
-  },
-  contact: {
-    title: 'Contact | Weitang Ye',
-    description: 'Contact Weitang Ye at Nanyang Technological University.',
-    index: false,
-    content: `<main id="seo-static-content"><h1>Contact Weitang Ye</h1><p>Email: <a href="mailto:${escapeHtml(site.contact.email)}">${escapeHtml(site.contact.email)}</a></p></main>`,
   },
 }
 

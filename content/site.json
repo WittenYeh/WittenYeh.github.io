@@ -48,7 +48,6 @@
     "news": false,
     "cv": true,
     "benchmarks": true,
-    "contact": true,
     "pets": false,
     "guide": false
   },

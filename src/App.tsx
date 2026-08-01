@@ -50,9 +50,6 @@ function App() {
                   {features.benchmarks && pages.benchmarks && (
                     <Route path="/benchmarks" element={<pages.benchmarks />} />
                   )}
-                  {features.contact && pages.contact && (
-                    <Route path="/contact" element={<pages.contact />} />
-                  )}
                   {features.guide !== false && pages.guide && (
                     <Route path="/guide" element={<pages.guide />} />
                   )}

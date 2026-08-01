@@ -31,7 +31,6 @@ const Experience = lazy(() => import('../../components/Experience'))
 const News = lazy(() => import('../../components/News'))
 const Cv = lazy(() => import('../../components/Cv'))
 const Benchmarks = lazy(() => import('../../components/Benchmarks'))
-const Contact = lazy(() => import('../../components/Contact'))
 const GuideLanding = lazy(() => import('../../components/GuideLanding'))
 const GuideDocs = lazy(() => import('../../components/GuideDocs'))
 
@@ -51,7 +50,6 @@ const terminalTemplate: TemplateConfig = {
     news: News,
     cv: Cv,
     benchmarks: Benchmarks,
-    contact: Contact,
     guide: GuideLanding,
     guideDocs: GuideDocs,
   },

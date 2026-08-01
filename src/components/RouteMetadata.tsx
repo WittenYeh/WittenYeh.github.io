@@ -29,11 +29,6 @@ const routeMetadata: Record<string, { title: string; description: string; index:
     description: 'Curriculum vitae of Weitang Ye.',
     index: false,
   },
-  '/contact': {
-    title: 'Contact | Weitang Ye',
-    description: 'Contact Weitang Ye at Nanyang Technological University.',
-    index: false,
-  },
 }
 
 const setMeta = (selector: string, attribute: string, value: string) => {

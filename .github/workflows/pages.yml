@@ -44,7 +44,7 @@ jobs:
           test -f dist/404.html
           test -f dist/sitemap.xml
           test -f dist/robots.txt
-          for route in publications projects cv benchmarks contact; do
+          for route in publications projects cv benchmarks; do
             test -f "dist/$route/index.html"
           done
 

@@ -33,7 +33,6 @@ export interface TemplatePages {
   news?: React.ComponentType
   cv?: React.ComponentType
   benchmarks?: React.ComponentType
-  contact?: React.ComponentType
   guide?: React.ComponentType
   guideDocs?: React.ComponentType
 }
