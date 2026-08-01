@@ -77,6 +77,17 @@ version:
 Write your English biography here.
 ```
 
+### Education 与 Experience
+
+两处展示共用 `content/experience.json` 中的 `timeline`，每条经历只需维护一次：
+
+- `title`：职位或学位名称。
+- `company`：学校、学院或机构。
+- `start`、`end`：使用 `YYYY-MM`；当前经历的 `end` 填写 `Present`。
+- `summary`：首页 Experience 时间线中的说明。
+
+首页 Education、Experience 时间线和构建生成的 SEO 内容都会自动从这份数据同步。
+
 ### 论文
 
 每篇论文使用一个 Markdown 文件：

@@ -52,11 +52,19 @@ const staticStyle = `
     @media(max-width:700px){#seo-static-content{padding:24px 16px}#seo-static-content .seo-grid{grid-template-columns:1fr}}
   </style>`
 
-const educationHtml = experience.education.courses.map((item) => `
+const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+const formatExperienceDate = (value = 'Present') => {
+  if (value.toLowerCase() === 'present') return 'Present'
+  const match = value.match(/^(\d{4})-(\d{2})$/)
+  if (!match) return value
+  const month = monthNames[Number(match[2]) - 1]
+  return month ? `${month} ${match[1]}` : value
+}
+const educationHtml = experience.timeline.map((item) => `
   <article class="seo-card">
-    <h3>${escapeHtml(item.course)}</h3>
-    <p>${escapeHtml(item.institution)}</p>
-    <p class="seo-meta">${escapeHtml(item.year)}</p>
+    <h3>${escapeHtml(item.title)}</h3>
+    <p>${escapeHtml(item.company)}</p>
+    <p class="seo-meta">${escapeHtml(formatExperienceDate(item.start))} – ${escapeHtml(formatExperienceDate(item.end))}</p>
   </article>`).join('')
 
 const researchHtml = research.currentResearch.map((item) => `

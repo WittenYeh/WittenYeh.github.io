@@ -1,23 +1,4 @@
 {
-  "education": {
-    "courses": [
-      {
-        "course": "PhD Student",
-        "institution": "College of Computing and Data Science, Nanyang Technological University",
-        "year": "Aug 2025 – Present"
-      },
-      {
-        "course": "Research Assistant",
-        "institution": "College of Computing and Data Science, Nanyang Technological University",
-        "year": "Sep 2025 – Present"
-      },
-      {
-        "course": "Bachelor Degree",
-        "institution": "School of Information, Renmin University of China",
-        "year": "Sep 2021 – Jun 2025"
-      }
-    ]
-  },
   "reviewing": [],
   "timeline": [
     {

@@ -77,14 +77,34 @@ import teachingJsonEn from '@content/teaching.json'
 
 // ── Build the content dataset ──
 
+const experienceTimelineData = experienceJsonEn.timeline as ExperienceEntry[]
+const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+const formatExperienceDate = (value?: string) => {
+  if (!value || value.toLowerCase() === 'present') return 'Present'
+  const match = value.match(/^(\d{4})-(\d{2})$/)
+  if (!match) return value
+  const month = monthNames[Number(match[2]) - 1]
+  return month ? `${month} ${match[1]}` : value
+}
+const educationCourses = experienceTimelineData.map((entry) => ({
+  course: entry.title,
+  institution: entry.company,
+  year: `${formatExperienceDate(entry.start)} – ${formatExperienceDate(entry.end)}`,
+}))
+
 const enData = {
   projects: collectMd(projectMdsEn).map(mdToProject),
   articles: collectMd(articleMdsEn).map(mdToProject),
   publications: collectMd(publicationMdsEn).map(mdToPublication),
   about: mdToAbout(collectMd(aboutMdEn)[0] ?? {}),
   research: researchJsonEn as Research,
-  experience: { ...experienceJsonEn, professional: [], academic: [] } as Experience,
-  experienceTimeline: experienceJsonEn.timeline as ExperienceEntry[],
+  experience: {
+    education: { courses: educationCourses },
+    reviewing: experienceJsonEn.reviewing,
+    professional: [],
+    academic: [],
+  } as Experience,
+  experienceTimeline: experienceTimelineData,
   news: newsJsonEn as NewsItem[],
   awards: awardsJsonEn as Award[],
   talks: talksJsonEn as Talk[],
