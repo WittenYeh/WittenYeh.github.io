@@ -489,7 +489,7 @@ const PublicationsTerminal: React.FC = () => {
                       {pub.emoji && emojiIconMap[pub.emoji] && (
                         <Icon as={emojiIconMap[pub.emoji]} boxSize="14px" color={venueColors[pub.venueType].fg} mr={1} flexShrink={0} />
                       )}
-                      <Text fontWeight="medium" flex="1">
+                      <Text fontSize="md" fontWeight="medium" flex="1">
                         {pub.title}
                       </Text>
                     </HStack>
@@ -499,7 +499,7 @@ const PublicationsTerminal: React.FC = () => {
                       <Badge
                         bg={venueColors[pub.venueType].bg}
                         color={venueColors[pub.venueType].fg}
-                        fontSize="xs"
+                        fontSize="sm"
                         px={2}
                         py={0.5}
                         fontWeight="bold"

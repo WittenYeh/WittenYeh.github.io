@@ -32,7 +32,7 @@ const PublicationCard = ({ pub }: { pub: any }) => {
     <Box p={[4, 5, 6]} bg={useColorModeValue('white', 'gray.800')} borderRadius="md" border="1px solid" borderColor={borderColor} transition="all 0.2s" _hover={{ borderColor: useColorModeValue('cyan.300', 'cyan.600') }}>
       <Flex direction={["column", "column", "row"]} gap={[4, 4, 6]} align="stretch">
         {pub.featuredImage && (
-          <Box flexShrink={0} w={["full", "full", "300px"]} minH={["200px", "220px", "auto"]}
+          <Box flexShrink={0} w={["full", "full", "260px"]} minH={["180px", "200px", "auto"]}
             role="button" tabIndex={0} onClick={onImageOpen}
             onKeyDown={(e: React.KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onImageOpen() } }}
             cursor="zoom-in" overflow="hidden" borderRadius="sm"
@@ -43,12 +43,12 @@ const PublicationCard = ({ pub }: { pub: any }) => {
         <VStack align="start" spacing={2.5} flex={1} justify="center">
           <HStack spacing={2} flexWrap="wrap" align="center">
             <Box h="2px" w="16px" bg="cyan.400" borderRadius="full" />
-            <Text fontSize="xs" fontFamily="mono" color="cyan.400" fontWeight="semibold" letterSpacing="wide" textTransform="uppercase">
+            <Text fontSize="sm" fontFamily="mono" color="cyan.400" fontWeight="semibold" letterSpacing="wide" textTransform="uppercase">
               {pub.venue && String(pub.year) && pub.venue.includes(String(pub.year)) ? pub.venue : `${pub.venue} ${pub.year}`}
             </Text>
             {pub.venueType && <Text fontSize="2xs" color={useColorModeValue('gray.400', 'gray.500')} fontFamily="mono">/ {pub.venueType}</Text>}
           </HStack>
-          <Heading size="sm" lineHeight="tall" fontWeight="semibold" color={useColorModeValue('gray.800', 'gray.100')}>{pub.title}</Heading>
+          <Heading size="md" lineHeight="tall" fontWeight="semibold" color={useColorModeValue('gray.800', 'gray.100')}>{pub.title}</Heading>
           <VStack align="start" spacing={1.5} w="full">
             <Text fontSize="xs" color={useColorModeValue('gray.500', 'gray.400')} lineHeight="base" noOfLines={2}>
               {pub.authors.map((author: string, idx: number) => {
