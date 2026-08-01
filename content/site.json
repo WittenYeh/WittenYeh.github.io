@@ -1,0 +1,57 @@
+{
+  "_comment": "Edit this file to add your English profile details. See README.md for a complete map.",
+  "template": "terminal",
+  "components": {},
+  "sections": ["hero", "bio", "footer"],
+  "name": {
+    "full": "",
+    "first": "",
+    "nickname": "",
+    "last": "",
+    "display": "",
+    "authorVariants": []
+  },
+  "title": "Academic Homepage",
+  "tagline": "Research profile, publications, projects, and benchmark results.",
+  "avatar": "avatar.svg",
+  "terminal": {
+    "username": "researcher",
+    "rotatingSubtitles": ["research", "build systems", "study data"],
+    "skills": [],
+    "timezone": "Asia/Singapore"
+  },
+  "contact": {
+    "email": "",
+    "academicEmail": "",
+    "hiringEmail": "",
+    "location": ""
+  },
+  "social": {
+    "github": "",
+    "linkedin": "",
+    "medium": "",
+    "googleScholar": "",
+    "twitter": "",
+    "youtube": "",
+    "bilibili": "",
+    "zhihu": "",
+    "csdn": "",
+    "blog": ""
+  },
+  "pets": [],
+  "features": {
+    "research": true,
+    "publications": true,
+    "projects": true,
+    "articles": false,
+    "experience": true,
+    "news": true,
+    "cv": true,
+    "benchmarks": true,
+    "contact": true,
+    "pets": false,
+    "guide": false
+  },
+  "heroSocialIcons": [],
+  "selectedPublicationIds": []
+}

@@ -1,0 +1,16 @@
+{
+  "title": "GDSE Benchmarks",
+  "description": "Interactive latency results for the Graph Database Storage Engine benchmark, covering structural workloads and batch-size sensitivity.",
+  "updated": "2026-02-23",
+  "systems": ["ArangoDB", "Aster", "JanusGraph", "Neo4j", "OrientDB", "Sqlg"],
+  "items": [
+    { "id": "cit-patents", "kind": "performance", "title": "cit-Patents structural workload", "dataset": "cit-Patents_medium_structural", "file": "gdse-benchmarks/performance_cit-Patents_medium_structural_workload.html" },
+    { "id": "coauthors-dblp", "kind": "performance", "title": "coAuthorsDBLP structural workload", "dataset": "coAuthorsDBLP_medium_structural", "file": "gdse-benchmarks/performance_coAuthorsDBLP_medium_structural_workload.html" },
+    { "id": "delaunay-n13", "kind": "performance", "title": "delaunay_n13 structural workload", "dataset": "delaunay_n13_small_structural", "file": "gdse-benchmarks/performance_delaunay_n13_small_structural_workload.html" },
+    { "id": "delaunay-n21", "kind": "performance", "title": "delaunay_n21 structural workload", "dataset": "delaunay_n21_medium_structural", "file": "gdse-benchmarks/performance_delaunay_n21_medium_structural_workload.html" },
+    { "id": "movielens-small", "kind": "performance", "title": "MovieLens structural workload", "dataset": "movielens-small_small_structural", "file": "gdse-benchmarks/performance_movielens-small_small_structural_workload.html" },
+    { "id": "osm-singapore", "kind": "performance", "title": "OSM Singapore structural workload", "dataset": "osm-singapore_small_structural", "file": "gdse-benchmarks/performance_osm-singapore_small_structural_workload.html" },
+    { "id": "add-edge-batch", "kind": "batchsize", "title": "ADD_EDGE batch-size analysis", "dataset": "coAuthorsDBLP_ADD", "file": "gdse-benchmarks/batchsize_coAuthorsDBLP_ADD_EDGE.html" },
+    { "id": "add-vertex-batch", "kind": "batchsize", "title": "ADD_VERTEX batch-size analysis", "dataset": "coAuthorsDBLP_ADD", "file": "gdse-benchmarks/batchsize_coAuthorsDBLP_ADD_VERTEX.html" }
+  ]
+}
