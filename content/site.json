@@ -4,37 +4,37 @@
   "components": {},
   "sections": ["hero", "bio", "footer"],
   "name": {
-    "full": "",
-    "first": "",
+    "full": "Weitang Ye",
+    "first": "Weitang",
     "nickname": "",
-    "last": "",
-    "display": "",
-    "authorVariants": []
+    "last": "Ye",
+    "display": "Weitang Ye",
+    "authorVariants": ["Weitang Ye"]
   },
   "title": "Academic Homepage",
-  "tagline": "Research profile, publications, projects, and benchmark results.",
-  "avatar": "avatar.svg",
+  "tagline": "Research profile, publications and projects.",
+  "avatar": "mikasa.jpg",
   "terminal": {
     "username": "researcher",
-    "rotatingSubtitles": ["research", "build systems", "study data"],
+    "rotatingSubtitles": ["research", "build systems", "study math"],
     "skills": [],
     "timezone": "Asia/Singapore"
   },
   "contact": {
-    "email": "",
+    "email": "weitang.ye@ntu.edu.sg",
     "academicEmail": "",
     "hiringEmail": "",
     "location": ""
   },
   "social": {
-    "github": "",
+    "github": "https://github.com/WittenYeh",
     "linkedin": "",
     "medium": "",
     "googleScholar": "",
     "twitter": "",
     "youtube": "",
     "bilibili": "",
-    "zhihu": "",
+    "zhihu": "https://www.zhihu.com/people/chi-xin-5-10",
     "csdn": "",
     "blog": ""
   },

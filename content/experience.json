@@ -1,5 +1,63 @@
 {
-  "education": { "courses": [] },
+  "education": {
+    "courses": [
+      {
+        "course": "Turing Class",
+        "institution": "School of Information, Renmin University of China",
+        "year": "Sep 2021 – Jun 2025"
+      },
+      {
+        "course": "Research Assistant",
+        "institution": "College of Computing and Data Science, Nanyang Technological University",
+        "year": "Sep 2025 – Present"
+      },
+      {
+        "course": "PhD Student",
+        "institution": "College of Computing and Data Science, Nanyang Technological University",
+        "year": "Aug 2026 – Present"
+      }
+    ]
+  },
   "reviewing": [],
-  "timeline": []
+  "timeline": [
+    {
+      "title": "PhD Student",
+      "company": "College of Computing and Data Science, Nanyang Technological University",
+      "companyUrl": "https://www.ntu.edu.sg/computing",
+      "location": "Singapore",
+      "start": "2026-08",
+      "end": "Present",
+      "category": "academic",
+      "roleType": "research",
+      "summary": "Doctoral study in vector search, multi-vector retrieval, and high-performance data systems.",
+      "highlights": [],
+      "isCurrent": true
+    },
+    {
+      "title": "Research Assistant",
+      "company": "College of Computing and Data Science, Nanyang Technological University",
+      "companyUrl": "https://www.ntu.edu.sg/computing",
+      "location": "Singapore",
+      "start": "2025-09",
+      "end": "Present",
+      "category": "research",
+      "roleType": "research",
+      "summary": "Research in data systems under the supervision of Prof. Siqiang Luo.",
+      "highlights": [],
+      "isCurrent": true
+    },
+    {
+      "title": "Turing Class",
+      "company": "School of Information, Renmin University of China",
+      "companyUrl": "https://info.ruc.edu.cn/",
+      "location": "Beijing, China",
+      "start": "2021-09",
+      "end": "2025-06",
+      "category": "academic",
+      "roleType": "research",
+      "summary": "Bachelor’s degree under the supervision of Prof. Feng Zhang.",
+      "highlights": [],
+      "isCurrent": false
+    }
+  ]
 }
