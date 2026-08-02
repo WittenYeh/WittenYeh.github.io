@@ -18,11 +18,10 @@ npm run dev
 提交前建议运行：
 
 ```bash
-npm run benchmarks:style
-npm run validate
-npm run lint
-npm run build
+npm run check
 ```
+
+Codex 和其他代码 Agent 在修改仓库前必须阅读根目录的英文规范 [`AGENTS.md`](AGENTS.md)。该文件概括了内容结构、安全约束、项目文档扩展方式和统一部署流程。
 
 ## 去哪里修改主页内容
 
@@ -252,15 +251,30 @@ https://wittenyeh.github.io/gdse-benchmarks/
 Settings → Pages → Build and deployment → Source → GitHub Actions
 ```
 
-以后每次更新只需：
+仓库根目录提供统一部署命令。它会依次执行完整校验、提交已暂存的文件、推送 `main`、等待 GitHub Pages workflow，并将线上路由和项目图片与本地 `dist/` 进行哈希对比。
+
+只做本地检查、不提交或联网：
 
 ```bash
-git add .
-git commit -m "Update academic homepage"
-git push origin main
+npm run deploy -- --dry-run
 ```
 
-GitHub Actions 会安装依赖、构建并发布 `dist/`。可在仓库的 Actions 页面查看部署状态。
+更新并部署时，建议只暂存本次任务涉及的文件：
+
+```bash
+git add <changed-files>
+npm run deploy -- --message "Update academic homepage"
+```
+
+只有确认工作区内全部改动都属于本次部署时，才使用：
+
+```bash
+npm run deploy -- --all --message "Update academic homepage"
+```
+
+若工作区干净，直接运行 `npm run deploy` 会验证并部署当前 `HEAD`。脚本仅允许从 `main` 发布；任何未暂存文件、冲突、校验失败、Pages workflow 失败或线上文件不一致都会停止流程。公开仓库可直接查询 GitHub API；如果遇到 API rate limit，可设置 `GITHUB_TOKEN`。
+
+在受限的 Codex 环境中，只需对 `npm run deploy` 申请一次可复用授权；该调用内部已经包含 `git push`、GitHub Actions 状态轮询和线上 HTTP 校验，不应再逐项申请。
 
 ## SEO 与搜索引擎收录
 
