@@ -5,7 +5,7 @@
   "description": "An Arrow-based runtime organization, interchange format, and Python toolkit for multi-vector retrieval data.",
   "repository": "https://github.com/WittenYeh/MVR-Data",
   "repositoryLabel": "View MVR-Data on GitHub",
-  "updated": "2026-08-02",
+  "updated": "2026-08-03",
   "badges": [
     { "label": "Format v1.0", "colorScheme": "green" },
     { "label": "Python 3.10+", "colorScheme": "blue" },

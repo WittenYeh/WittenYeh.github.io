@@ -62,7 +62,7 @@ may be absolute on your machine.
 It does not add base objects, queries, vectors, or ground truth.
 
 ```command
-$ mvrdata init raw-example --kind raw --data-id example/raw --top-k 10
+$ mvrdata init raw-example --kind raw --data-name example/raw --top-k 10
 ```
 
 ```output
@@ -70,7 +70,7 @@ raw-example
 ```
 
 ```command
-$ mvrdata init embedded-example --kind embedded --data-id example/embedded \
+$ mvrdata init embedded-example --kind embedded --data-name example/embedded \
     --dimension 128 --dtype float32 --scoring-scheme chamfer --top-k 10
 ```
 
@@ -78,13 +78,17 @@ $ mvrdata init embedded-example --kind embedded --data-id example/embedded \
 embedded-example
 ```
 
+`--data-name` sets the collection name stored in `manifest.yaml`. Raw and
+Embedded packages for the same collection should use the same `data_name` and
+`data_version`.
+
 Embedded packages require a vector dimension, numeric dtype, and scoring
 scheme. Raw packages store ordered content components instead.
 
 ### 2. Inspect package metadata
 
 `inspect` reads the manifest and shards without modifying them. It summarizes
-the data identity, kind, row and shard counts, and vector settings.
+the data name, kind, row and shard counts, and vector settings.
 
 ```command
 $ mvrdata inspect embedded-example
@@ -179,7 +183,7 @@ from mvr_data import EmbeddedDataWriter
 
 with EmbeddedDataWriter(
     "tiny-mvr",
-    data_id="example/tiny",
+    data_name="example/tiny",
     dimension=2,
     dtype="float32",
     scoring={"scheme": "chamfer"},

@@ -15,7 +15,10 @@ Validation errors include the failing manifest path, making CLI reports actionab
 
 ## Creating manifests
 
-`empty_manifest()` initializes the three table declarations with zero rows and no shards, plus the ground-truth configuration. Embedded packages must provide `dimension`, `dtype`, and `scoring`; raw packages reject embedded-only scoring settings.
+`empty_manifest()` records the required `data_name` and `data_version`, then
+initializes the three table declarations with zero rows and no shards plus the
+ground-truth configuration. Embedded packages must provide `dimension`,
+`dtype`, and `scoring`; raw packages reject embedded-only scoring settings.
 
 `canonical_manifest_dtype()` ensures aliases such as `float` are recorded with a stable spelling such as `float32`.
 
