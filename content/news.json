@@ -1,5 +1,22 @@
 [
   {
+    "type": "release",
+    "badge": "Open Source · Ongoing",
+    "icon": "FaStar",
+    "iconColor": "green.400",
+    "title": "awesome-multi-vectors-retrieval is now live",
+    "description": "I released awesome-multi-vectors-retrieval, a comprehensive and continuously updated collection of papers covering topics in multi-vector retrieval. Stars and contributions are welcome.",
+    "date": "Aug 2026",
+    "sortDate": "2026-08-02",
+    "links": [
+      {
+        "text": "Star & Contribute",
+        "url": "https://github.com/WittenYeh/awesome-multi-vectors-retrieval",
+        "icon": "FaGithub"
+      }
+    ]
+  },
+  {
     "type": "publication",
     "badge": "VLDB 2027 · Revision",
     "icon": "FaFileAlt",
