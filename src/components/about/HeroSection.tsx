@@ -1,4 +1,4 @@
-import { Box, VStack, Text, useColorModeValue, Image, HStack, Container, Link, Tooltip } from '@chakra-ui/react'
+import { Box, VStack, Text, useColorModeValue, Image, HStack, Container, Link, Tooltip, Stack, Flex, Heading } from '@chakra-ui/react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { withBase } from '@/utils/asset'
@@ -40,6 +40,7 @@ const HeroSection = ({ title, avatar }: HeroSectionProps) => {
   const headingColor = useColorModeValue('gray.800', 'white')
   const textColor = useColorModeValue('gray.600', 'gray.400')
   const bg = useColorModeValue('gray.50', 'gray.900')
+  const dividerColor = useColorModeValue('gray.200', 'gray.700')
   const socialIconColor = useColorModeValue('gray.400', 'gray.500')
   const subtitleCount = siteOwner.rotatingSubtitles.length
   const [subtitleIndex, setSubtitleIndex] = useState(0)
@@ -88,115 +89,125 @@ const HeroSection = ({ title, avatar }: HeroSectionProps) => {
       mt={[2, 3, 4]}
     >
       <Container maxW={["full", "full", "7xl"]} px={[2, 4, 8]}>
-        <Box w="full">
-          <MotionText
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8 }}
-            as="h1"
-            fontSize={["lg", "xl", "3xl"]}
-            fontWeight="bold"
-            color={headingColor}
-            lineHeight="shorter"
-            mb={[1, 2, 3]}
-            display="flex"
-            alignItems="center"
-            gap={[1, 2]}
-            flexWrap={["wrap", "wrap", "nowrap"]}
-            textAlign={["center", "center", "left"]}
+        <Stack
+          direction={['column', 'column', 'row']}
+          spacing={[4, 5, 8]}
+          align={['center', 'center', 'flex-start']}
+          justify="space-between"
+        >
+          <VStack
+            spacing={[3, 4]}
+            align={['center', 'center', 'flex-start']}
+            justify="center"
+            flex="1"
+            minH={["auto", "auto", "220px"]}
             w="full"
-            sx={{ justifyContent: ["center", "center", "flex-start"] }}
           >
             <MotionText
-              as="span"
-              color="yellow.400"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.3 }}
-            >
-              $
-            </MotionText>
-            <MotionText
-              as="span"
-              initial={{ width: 0 }}
-              animate={{ width: "auto" }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              overflow="hidden"
-              whiteSpace="nowrap"
-              display="inline-block"
-            >
-              {t('hero.greeting')}{' '}
-            </MotionText>
-            <MotionText
-              as="span"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.2, delay: 0.6 }}
-              color="cyan.400"
-              fontFamily="mono"
+              transition={{ duration: 0.8 }}
+              as="h1"
+              fontSize={["xl", "2xl", "4xl"]}
+              fontWeight="bold"
+              color={headingColor}
+              lineHeight="shorter"
               display="flex"
               alignItems="center"
-              gap={1}
-              ml={[1, 2, 3]}
+              gap={[1, 2]}
+              flexWrap={["wrap", "wrap", "nowrap"]}
+              textAlign={["center", "center", "left"]}
+              w="full"
+              sx={{ justifyContent: ["center", "center", "flex-start"] }}
             >
+              <MotionText
+                as="span"
+                color="yellow.400"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3 }}
+              >
+                $
+              </MotionText>
               <MotionText
                 as="span"
                 initial={{ width: 0 }}
                 animate={{ width: "auto" }}
-                transition={{ duration: 0.3, delay: 0.7 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
                 overflow="hidden"
                 whiteSpace="nowrap"
+                display="inline-block"
               >
-                {siteOwner.name.display || t('hero.defaultName')}
+                {t('hero.greeting')}{' '}
+              </MotionText>
+              <MotionText
+                as="span"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.2, delay: 0.6 }}
+                color="cyan.400"
+                fontFamily="mono"
+                display="flex"
+                alignItems="center"
+                gap={1}
+                ml={[1, 2, 3]}
+              >
+                <MotionText
+                  as="span"
+                  initial={{ width: 0 }}
+                  animate={{ width: "auto" }}
+                  transition={{ duration: 0.3, delay: 0.7 }}
+                  overflow="hidden"
+                  whiteSpace="nowrap"
+                >
+                  {siteOwner.name.display || t('hero.defaultName')}
+                </MotionText>
               </MotionText>
             </MotionText>
-          </MotionText>
 
-          <HStack
-            spacing={[1, 2]}
-            mb={[3, 4]}
-            justify={['center', 'center', 'flex-start']}
-            flexWrap="wrap"
-            w="full"
-          >
-            <Text color="yellow.400" fontSize={["xs", "sm"]}>$</Text>
-            <Text fontSize={["xs", "sm"]} color={textColor}>{t('hero.sometimesI')}</Text>
-            <Box
-              h={["18px", "20px", "24px"]}
-              w={["250px", "280px", "320px"]}
-              position="relative"
-              overflow="hidden"
+            <HStack
+              spacing={[1, 2]}
+              justify={['center', 'center', 'flex-start']}
+              flexWrap="wrap"
+              w="full"
             >
-              <AnimatePresence initial={false}>
-                <MotionText
-                  key={subtitleIndex}
-                  position="absolute"
-                  inset={0}
-                  initial={{ y: '100%', opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  exit={{ y: '-100%', opacity: 0 }}
-                  transition={{ duration: 0.35, ease: 'easeInOut' }}
-                  color="cyan.400"
-                  fontWeight="bold"
-                  fontSize={["xs", "sm"]}
-                  fontFamily="mono"
-                  lineHeight={["18px", "20px", "24px"]}
-                  whiteSpace="nowrap"
-                  textAlign={["center", "center", "left"]}
-                >
-                  {subtitlePair}
-                </MotionText>
-              </AnimatePresence>
-            </Box>
-          </HStack>
+              <Text color="yellow.400" fontSize={["xs", "sm"]}>$</Text>
+              <Text fontSize={["xs", "sm"]} color={textColor}>{t('hero.sometimesI')}</Text>
+              <Box
+                h={["18px", "20px", "24px"]}
+                w={["250px", "280px", "320px"]}
+                position="relative"
+                overflow="hidden"
+              >
+                <AnimatePresence initial={false}>
+                  <MotionText
+                    key={subtitleIndex}
+                    position="absolute"
+                    inset={0}
+                    initial={{ y: '100%', opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: '-100%', opacity: 0 }}
+                    transition={{ duration: 0.35, ease: 'easeInOut' }}
+                    color="cyan.400"
+                    fontWeight="bold"
+                    fontSize={["xs", "sm"]}
+                    fontFamily="mono"
+                    lineHeight={["18px", "20px", "24px"]}
+                    whiteSpace="nowrap"
+                    textAlign={["center", "center", "left"]}
+                  >
+                    {subtitlePair}
+                  </MotionText>
+                </AnimatePresence>
+              </Box>
+            </HStack>
+          </VStack>
 
           <MotionBox
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5 }}
-            float={["none", "none", "right"]}
-            ml={[0, 0, 6]}
-            mb={[4, 4, 3]}
+            flexShrink={0}
           >
             <VStack spacing={[2, 3]}>
               <Image
@@ -246,15 +257,23 @@ const HeroSection = ({ title, avatar }: HeroSectionProps) => {
               )}
             </VStack>
           </MotionBox>
+        </Stack>
 
-          <Box textAlign="left">
+        <Box mt={[5, 6, 8]}>
+          <Flex align="center" gap={3} mb={[3, 4]}>
+            <Box h="2px" w="20px" bg="cyan.400" borderRadius="full" flexShrink={0} />
+            <Heading size="md" fontWeight="semibold">
+              {t('about.bio', 'About')}
+            </Heading>
+            <Box flex="1" h="1px" bg={dividerColor} />
+          </Flex>
+          <VStack align="stretch" spacing={[3, 4]} textAlign="left">
             {about.journey.split(/\n+/).filter(Boolean).map((paragraph, index) => (
-              <Text key={index} fontSize="sm" lineHeight="tall" color={textColor} mb={index === 0 ? 3 : 0}>
+              <Text key={index} fontSize={["md", "md", "lg"]} lineHeight="tall" color={textColor}>
                 {renderLinkedText(paragraph)}
               </Text>
             ))}
-          </Box>
-          <Box sx={{ clear: 'both' }} />
+          </VStack>
         </Box>
       </Container>
     </Box>
