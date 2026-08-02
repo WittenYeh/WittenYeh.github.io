@@ -1,12 +1,10 @@
 import {
   Box, Flex, IconButton, useColorMode, HStack, Link as ChakraLink, Image,
   useDisclosure, Drawer, DrawerOverlay, DrawerContent, DrawerHeader, DrawerBody,
-  VStack, Divider
+  VStack
 } from '@chakra-ui/react'
 import { MoonIcon, SunIcon, HamburgerIcon, CloseIcon } from '@chakra-ui/icons'
 import { Link, useLocation } from 'react-router-dom'
-import { FaGithub, FaLinkedin, FaMedium, FaEnvelope } from 'react-icons/fa'
-import { SiGooglescholar } from 'react-icons/si'
 import { useTranslation } from 'react-i18next'
 import { navItems, siteConfig, siteOwner } from '@/site.config'
 import { withBase } from '@/utils/asset'
@@ -16,14 +14,6 @@ const Navbar: React.FC = () => {
   const location = useLocation()
   const { isOpen, onOpen, onClose } = useDisclosure()
   const { t } = useTranslation()
-
-  const socialLinks = [
-    { icon: FaEnvelope, href: `mailto:${siteOwner.contact.email}`, label: 'Email' },
-    { icon: FaGithub, href: siteOwner.social.github, label: 'GitHub' },
-    { icon: FaLinkedin, href: siteOwner.social.linkedin, label: 'LinkedIn' },
-    { icon: FaMedium, href: siteOwner.social.medium, label: 'Medium' },
-    { icon: SiGooglescholar, href: siteOwner.social.googleScholar, label: 'Google Scholar' },
-  ].filter(link => link.href)
 
   return (
     <Box
@@ -103,30 +93,7 @@ const Navbar: React.FC = () => {
             )
           })}
         </HStack>
-        <HStack spacing={3} display={{ base: 'none', lg: 'flex' }}>
-          {socialLinks.map((link) => (
-            <ChakraLink
-              key={link.label}
-              href={link.href}
-              isExternal
-              color="var(--secondary-text)"
-              p={1.5}
-              borderRadius="md"
-              _hover={{
-                color: 'var(--accent-color)',
-                transform: 'translateY(-2px)',
-                ...(link.label === 'LinkedIn' || link.label === 'Email'
-                  ? { bg: 'var(--hover-color)' }
-                  : {})
-              }}
-              transition="all 0.2s"
-            >
-              <Box
-                as={link.icon}
-                fontSize="1.2rem"
-              />
-            </ChakraLink>
-          ))}
+        <HStack spacing={3}>
           <IconButton
             aria-label={t('aria.toggleColorMode')}
             icon={colorMode === 'dark' ? <SunIcon /> : <MoonIcon />}
@@ -165,33 +132,6 @@ const Navbar: React.FC = () => {
                   </ChakraLink>
                 )
               })}
-
-              <Divider borderColor="var(--border-color)" my={2} />
-
-              <VStack align="stretch" spacing={2}>
-                {socialLinks.map((link) => (
-                  <ChakraLink
-                    key={link.label}
-                    href={link.href}
-                    isExternal
-                    color="var(--secondary-text)"
-                    _hover={{ color: 'var(--accent-color)' }}
-                  >
-                    <Box as={link.icon} mr={2} display="inline-block" /> {link.label}
-                  </ChakraLink>
-                ))}
-              </VStack>
-
-              <Divider borderColor="var(--border-color)" my={2} />
-
-              <IconButton
-                aria-label={t('aria.toggleColorMode')}
-                icon={colorMode === 'dark' ? <SunIcon /> : <MoonIcon />}
-                onClick={toggleColorMode}
-                variant="outline"
-                color="var(--text-color)"
-                alignSelf="start"
-              />
             </VStack>
           </DrawerBody>
         </DrawerContent>

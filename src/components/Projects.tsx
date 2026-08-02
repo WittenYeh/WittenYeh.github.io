@@ -128,29 +128,27 @@ const FlowNode: React.FC<{
           </Text>
         </HStack>
 
-        {/* Title */}
-        <Text fontSize={['sm', 'md']} fontWeight="semibold" lineHeight="tall"
-          color={termText} mb={1}
-          cursor={hasExpandable ? 'pointer' : undefined}
-          transition="color 0.15s"
-          _hover={hasExpandable ? { color: ct.color } : undefined}
-          onClick={hasExpandable ? () => setExpanded(p => !p) : undefined}>
-          {item.title}
-          {item.featured && (
-            <Text as="span" ml={2} fontSize="xs" color={hlc.num}>★</Text>
-          )}
-        </Text>
-
-        {/* Badges */}
-        {item.badge && (
-          <HStack spacing={1.5} mb={2} flexWrap="wrap">
-            <Text fontSize="2xs" fontFamily="mono" px={2} py={0.5} borderRadius="sm"
+        {/* Title + status badge */}
+        <Flex align="center" gap={2} mb={2} flexWrap="wrap">
+          <Text fontSize={['sm', 'md']} fontWeight="semibold" lineHeight="tall"
+            color={termText}
+            cursor={hasExpandable ? 'pointer' : undefined}
+            transition="color 0.15s"
+            _hover={hasExpandable ? { color: ct.color } : undefined}
+            onClick={hasExpandable ? () => setExpanded(p => !p) : undefined}>
+            {item.title}
+            {item.featured && (
+              <Text as="span" ml={2} fontSize="xs" color={hlc.num}>★</Text>
+            )}
+          </Text>
+          {item.badge && (
+            <Text flexShrink={0} fontSize="2xs" fontFamily="mono" px={2} py={0.5} borderRadius="sm"
               border={`1px solid ${ct.border}`} color={ct.color}
               bg={isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)'}>
               {item.badge}
             </Text>
-          </HStack>
-        )}
+          )}
+        </Flex>
 
         {/* Body: image left + summary right */}
         <Flex direction={['column', 'column', hasImg ? 'row' : 'column']}

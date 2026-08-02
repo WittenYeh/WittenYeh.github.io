@@ -1,10 +1,9 @@
-import { Box, VStack, Text, useColorModeValue, Image, HStack, Container, Link, Tooltip, Stack, Flex, Heading } from '@chakra-ui/react'
+import { Box, VStack, Text, useColorModeValue, Image, HStack, Container, Link, Stack, Flex, Heading } from '@chakra-ui/react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { withBase } from '@/utils/asset'
 import DynamicIcon from '../DynamicIcon'
 import { useTranslation } from 'react-i18next'
-import { heroSocialIcons } from '@/site.config'
 import { useLocalizedData } from '@/hooks/useLocalizedData'
 
 const MotionBox = motion(Box)
@@ -61,6 +60,13 @@ const HeroSection = ({ title, avatar }: HeroSectionProps) => {
     ? siteOwner.rotatingSubtitles[(subtitleIndex + 1) % subtitleCount]
     : ''
   const subtitlePair = nextSubtitle ? `${currentSubtitle} → ${nextSubtitle}` : currentSubtitle
+  const profileLinks = [
+    { icon: 'FaEnvelope', href: siteOwner.contact.email ? `mailto:${siteOwner.contact.email}` : '', label: 'Email' },
+    { icon: 'FaGithub', href: siteOwner.social.github, label: 'GitHub' },
+    { icon: 'FaLinkedin', href: siteOwner.social.linkedin, label: 'LinkedIn' },
+    { icon: 'FaMedium', href: siteOwner.social.medium, label: 'Medium' },
+    { icon: 'SiGooglescholar', href: siteOwner.social.googleScholar, label: 'Google Scholar' },
+  ].filter((item) => item.href)
 
   const renderLinkedText = (text: string) => {
     const links = about.links ?? []
@@ -201,6 +207,44 @@ const HeroSection = ({ title, avatar }: HeroSectionProps) => {
                 </AnimatePresence>
               </Box>
             </HStack>
+
+            {profileLinks.length > 0 && (
+              <HStack
+                spacing={2}
+                flexWrap="wrap"
+                justify={['center', 'center', 'flex-start']}
+                w="full"
+              >
+                {profileLinks.map((item) => (
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    isExternal={!item.href.startsWith('mailto:')}
+                    aria-label={item.label}
+                    color={socialIconColor}
+                    border="1px solid"
+                    borderColor={dividerColor}
+                    borderRadius="sm"
+                    px={2.5}
+                    py={1.5}
+                    fontFamily="mono"
+                    fontSize="xs"
+                    transition="all 0.2s"
+                    _hover={{
+                      color: 'cyan.400',
+                      borderColor: 'cyan.400',
+                      textDecoration: 'none',
+                      transform: 'translateY(-1px)',
+                    }}
+                  >
+                    <HStack spacing={1.5}>
+                      <DynamicIcon name={item.icon} boxSize={3.5} />
+                      <Text>{item.label}</Text>
+                    </HStack>
+                  </Link>
+                ))}
+              </HStack>
+            )}
           </VStack>
 
           <MotionBox
@@ -217,26 +261,6 @@ const HeroSection = ({ title, avatar }: HeroSectionProps) => {
                 boxSize={["150px", "180px", "220px"]}
                 objectFit="cover"
               />
-              {/* Social icons row below avatar */}
-              {heroSocialIcons.length > 0 && (
-                <HStack spacing={[1, 1.5]} justify="center">
-                  {heroSocialIcons.map((item) => (
-                    <Tooltip key={item.label} label={item.label} fontSize="xs" hasArrow placement="bottom" openDelay={200} fontFamily="mono">
-                      <Link href={item.href} isExternal _hover={{ textDecoration: 'none' }}>
-                        <Box
-                          p={1.5}
-                          cursor="pointer"
-                          color={socialIconColor}
-                          transition="all 0.2s"
-                          _hover={{ color: item.color, transform: 'scale(1.2)' }}
-                        >
-                          <DynamicIcon name={item.icon} boxSize={[3, 3.5]} />
-                        </Box>
-                      </Link>
-                    </Tooltip>
-                  ))}
-                </HStack>
-              )}
               {((siteConfig.pets ?? []) as { name: string; emoji: string; image: string }[]).length > 0 && (
                 <HStack spacing={[4, 5]} justify="center">
                   {((siteConfig.pets ?? []) as { name: string; emoji: string; image: string }[]).map((pet) => (
@@ -269,7 +293,7 @@ const HeroSection = ({ title, avatar }: HeroSectionProps) => {
           </Flex>
           <VStack align="stretch" spacing={[3, 4]} textAlign="left">
             {about.journey.split(/\n+/).filter(Boolean).map((paragraph, index) => (
-              <Text key={index} fontSize={["md", "md", "lg"]} lineHeight="tall" color={textColor}>
+              <Text key={index} fontSize={["0.9375rem", "0.9375rem", "1.0625rem"]} lineHeight="tall" color={textColor}>
                 {renderLinkedText(paragraph)}
               </Text>
             ))}
