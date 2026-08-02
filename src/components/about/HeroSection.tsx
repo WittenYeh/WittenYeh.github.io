@@ -66,6 +66,7 @@ const HeroSection = ({ title, avatar }: HeroSectionProps) => {
     { icon: 'FaLinkedin', href: siteOwner.social.linkedin, label: 'LinkedIn' },
     { icon: 'FaMedium', href: siteOwner.social.medium, label: 'Medium' },
     { icon: 'SiGooglescholar', href: siteOwner.social.googleScholar, label: 'Google Scholar' },
+    { icon: 'SiZhihu', href: siteOwner.social.zhihu, label: '知乎' },
   ].filter((item) => item.href)
 
   const renderLinkedText = (text: string) => {
@@ -293,7 +294,7 @@ const HeroSection = ({ title, avatar }: HeroSectionProps) => {
           </Flex>
           <VStack align="stretch" spacing={[3, 4]} textAlign="left">
             {about.journey.split(/\n+/).filter(Boolean).map((paragraph, index) => (
-              <Text key={index} fontSize={["0.9375rem", "0.9375rem", "1.0625rem"]} lineHeight="tall" color={textColor}>
+              <Text key={index} fontSize={["0.875rem", "0.875rem", "1rem"]} lineHeight="tall" color={textColor}>
                 {renderLinkedText(paragraph)}
               </Text>
             ))}
