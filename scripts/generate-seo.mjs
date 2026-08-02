@@ -5,6 +5,7 @@ import { mkdirSync, readFileSync, readdirSync, writeFileSync } from 'fs'
 import { resolve } from 'path'
 import matter from 'gray-matter'
 import { marked } from 'marked'
+import { loadProjectDocs } from './project-docs.mjs'
 
 const root = resolve(import.meta.dirname, '..')
 const distDir = resolve(root, 'dist')
@@ -15,6 +16,7 @@ const news = JSON.parse(readFileSync(resolve(root, 'content/news.json'), 'utf8')
 const benchmarks = JSON.parse(readFileSync(resolve(root, 'content/benchmarks.json'), 'utf8'))
 const cv = JSON.parse(readFileSync(resolve(root, 'content/cv.json'), 'utf8'))
 const baseUrl = 'https://wittenyeh.github.io'
+const projectDocs = loadProjectDocs(root)
 
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;')
@@ -28,10 +30,6 @@ const { content: aboutMarkdown } = matter(aboutSource)
 const aboutHtml = marked.parse(aboutMarkdown.trim())
   .replace('Prof. Siqiang Luo', '<a href="https://siqiangluo.com/">Prof. Siqiang Luo</a>')
   .replace('Prof. Feng Zhang', '<a href="https://fengzhangcs.github.io/">Prof. Feng Zhang</a>')
-
-const mvrDatasetsSource = readFileSync(resolve(root, 'content/mvr-datasets.md'), 'utf8')
-const { content: mvrDatasetsMarkdown } = matter(mvrDatasetsSource)
-const mvrDatasetsHtml = marked.parse(mvrDatasetsMarkdown.trim())
 
 const publicationDir = resolve(root, 'content/publications')
 const publications = readdirSync(publicationDir)
@@ -110,6 +108,20 @@ const homeStaticContent = `${staticStyle}
     <section aria-labelledby="seo-publications"><h2 id="seo-publications">Selected Publications</h2>${publicationHtml}</section>
   </main>`
 
+const projectDocRouteConfigs = Object.fromEntries(projectDocs.flatMap((project) =>
+  project.chapters.map((chapter, chapterIndex) => [
+    chapter.route,
+    {
+      title: chapterIndex === 0
+        ? `${project.title} Documentation | Weitang Ye`
+        : `${chapter.title} | ${project.title} | Weitang Ye`,
+      description: chapter.description,
+      index: true,
+      content: `<main id="seo-static-content"><p><a href="/projects/">Projects</a> / ${escapeHtml(project.title)}</p><h1>${escapeHtml(chapter.title)}</h1><p>${escapeHtml(chapter.description)}</p><article>${marked.parse(chapter.markdown)}</article></main>`,
+    },
+  ]),
+))
+
 const routeConfigs = {
   publications: {
     title: 'Publications | Weitang Ye',
@@ -129,18 +141,13 @@ const routeConfigs = {
     index: false,
     content: '<main id="seo-static-content"><h1>Projects by Weitang Ye</h1><p>Project information will be added here.</p></main>',
   },
-  'projects/mvr-datasets': {
-    title: 'MVR-Datasets Documentation | Weitang Ye',
-    description: 'A concise guide to creating, reading, validating, and packaging raw and embedded multi-vector retrieval datasets.',
-    index: true,
-    content: `<main id="seo-static-content"><h1>MVR-Datasets</h1><p>Usage and source guide for the MVR Dataset Format.</p><article>${mvrDatasetsHtml}</article></main>`,
-  },
   cv: {
     title: 'CV | Weitang Ye',
     description: cv.description,
     index: cv.available === true,
     content: `<main id="seo-static-content"><h1>Curriculum Vitae — Weitang Ye</h1><p>${escapeHtml(cv.description)}</p></main>`,
   },
+  ...projectDocRouteConfigs,
 }
 
 const replaceMetadata = (html, { title, description, canonical, index, type = 'website' }) => html
@@ -181,6 +188,18 @@ for (const [route, config] of Object.entries(routeConfigs)) {
   const routeDir = resolve(distDir, route)
   mkdirSync(routeDir, { recursive: true })
   writeFileSync(resolve(routeDir, 'index.html'), html)
+}
+
+const sitemapPath = resolve(distDir, 'sitemap.xml')
+const projectDocSitemapEntries = projectDocs.flatMap((project) =>
+  project.chapters.map((chapter) => `  <url>
+    <loc>${baseUrl}/${chapter.route}/</loc>
+    ${project.updated ? `<lastmod>${escapeHtml(project.updated)}</lastmod>` : ''}
+  </url>`),
+).join('\n')
+if (projectDocSitemapEntries) {
+  const sitemap = readFileSync(sitemapPath, 'utf8')
+  writeFileSync(sitemapPath, sitemap.replace('</urlset>', `${projectDocSitemapEntries}\n</urlset>`))
 }
 
 const notFound = replaceMetadata(removeProfileJsonLd(baseHtml), {

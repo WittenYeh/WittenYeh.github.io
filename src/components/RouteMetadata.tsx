@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
+import { resolveProjectDocMetadataRoute } from '@/data/projectDocMetadata'
 
 const baseUrl = 'https://wittenyeh.github.io'
 
@@ -24,11 +25,6 @@ const routeMetadata: Record<string, { title: string; description: string; index:
     description: 'Research and systems projects by Weitang Ye.',
     index: false,
   },
-  '/projects/mvr-datasets': {
-    title: 'MVR-Datasets Documentation | Weitang Ye',
-    description: 'A concise guide to creating, reading, validating, and packaging raw and embedded multi-vector retrieval datasets.',
-    index: true,
-  },
   '/cv': {
     title: 'CV | Weitang Ye',
     description: 'Curriculum vitae of Weitang Ye.',
@@ -45,7 +41,15 @@ const RouteMetadata: React.FC = () => {
 
   useEffect(() => {
     const normalizedPath = pathname.length > 1 ? pathname.replace(/\/$/, '') : pathname
-    const metadata = routeMetadata[normalizedPath] ?? {
+    const projectDocRoute = resolveProjectDocMetadataRoute(normalizedPath)
+    const projectDocMetadata = projectDocRoute ? {
+      title: projectDocRoute.chapterIndex === 0
+        ? `${projectDocRoute.project.title} Documentation | Weitang Ye`
+        : `${projectDocRoute.chapter.title} | ${projectDocRoute.project.title} | Weitang Ye`,
+      description: projectDocRoute.chapter.description,
+      index: true,
+    } : undefined
+    const metadata = routeMetadata[normalizedPath] ?? projectDocMetadata ?? {
       title: 'Page Not Found | Weitang Ye',
       description: 'The requested page could not be found.',
       index: false,

@@ -11,6 +11,7 @@
 import { readFileSync, existsSync, readdirSync } from 'fs'
 import { resolve, dirname } from 'path'
 import { fileURLToPath } from 'url'
+import { loadProjectDocs } from './project-docs.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = resolve(__dirname, '..')
@@ -215,6 +216,18 @@ if (benchmarks?.items && Array.isArray(benchmarks.items)) {
   } else {
     fail(`Missing benchmark target(s): ${missingTargets.join(', ')}`)
   }
+}
+
+// ---------------------------------------------------------------------------
+// 8. Project documentation structure
+// ---------------------------------------------------------------------------
+
+try {
+  const projectDocs = loadProjectDocs(ROOT)
+  const chapterCount = projectDocs.reduce((total, project) => total + project.chapters.length, 0)
+  pass(`${projectDocs.length} project documentation set(s), ${chapterCount} chapter(s) valid`)
+} catch (error) {
+  fail(error.message)
 }
 
 // ---------------------------------------------------------------------------

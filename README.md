@@ -134,6 +134,74 @@ isOpenSource: true
 - 项目亮点二
 ```
 
+### 为项目添加多页文档
+
+项目文档使用统一的内容驱动结构。不要为单个项目创建专用 React 组件；所有项目共用 `src/components/ProjectDocs.tsx`，路由、侧边栏、上一章/下一章、SEO 页面和 sitemap 均根据内容配置自动生成。
+
+每个带文档的项目使用以下目录：
+
+```text
+content/project-docs/<project-slug>/
+├── project.json
+├── welcome.md
+├── module-one.md
+└── module-two.md
+```
+
+`<project-slug>` 必须使用小写 kebab-case，并与 `project.json` 中的 `slug` 完全一致。`project.json` 示例：
+
+```json
+{
+  "slug": "my-project",
+  "title": "My Project",
+  "description": "A short project description.",
+  "repository": "https://github.com/user/my-project",
+  "repositoryLabel": "View repository",
+  "updated": "2026-08-01",
+  "badges": [
+    { "label": "Python 3.10+", "colorScheme": "blue" }
+  ],
+  "chapters": [
+    {
+      "slug": "welcome",
+      "title": "Welcome & Usage",
+      "shortTitle": "Welcome",
+      "file": "welcome.md",
+      "description": "Install and use the project."
+    },
+    {
+      "slug": "implementation",
+      "title": "Implementation",
+      "file": "implementation.md",
+      "description": "How the main module works."
+    }
+  ]
+}
+```
+
+编写规则：
+
+1. `chapters` 数组顺序就是侧边栏和上一篇/下一篇的顺序。
+2. 第一章发布在 `/projects/<project-slug>/`；后续章节发布在 `/projects/<project-slug>/<chapter-slug>/`。
+3. 章节的 `slug` 和 Markdown 文件名必须使用小写 kebab-case，并且在项目内唯一。
+4. 每个 Markdown 文件只写一个小章节的正文；页面标题和说明来自 `project.json`，正文建议从 `##` 开始。
+5. 目录中的每个 Markdown 文件都必须在 `chapters` 中登记；缺失文件、重复 slug、未登记文件会使 `npm run validate` 或构建失败。
+6. 在 `content/projects/<project-slug>.md` 的 `extraLinks` 中加入文档入口：
+
+```yaml
+extraLinks:
+  - label: Documentation
+    url: /projects/my-project
+```
+
+新增项目文档不需要修改 `App.tsx`、模板组件或 SEO 脚本。完成后运行：
+
+```bash
+npm run validate
+npm run lint
+npm run build
+```
+
 ## 更新 CV
 
 1. 将 PDF 保存为 `public/cv.pdf`。

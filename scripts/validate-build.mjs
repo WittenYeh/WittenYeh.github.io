@@ -4,11 +4,14 @@
 import { existsSync, readFileSync, readdirSync } from 'fs'
 import { resolve } from 'path'
 import matter from 'gray-matter'
+import { loadProjectDocs } from './project-docs.mjs'
 
 const root = resolve(import.meta.dirname, '..')
 const site = JSON.parse(readFileSync(resolve(root, 'content/site.json'), 'utf8'))
 const distIndexPath = resolve(root, 'dist/index.html')
 const distIndex = readFileSync(distIndexPath, 'utf8')
+const projectDocs = loadProjectDocs(root)
+const projectDocRoutes = projectDocs.flatMap((project) => project.chapters.map((chapter) => chapter.route))
 
 if (site.sections?.includes('bio')) {
   const { content } = matter(readFileSync(resolve(root, 'content/about.md'), 'utf8'))
@@ -48,7 +51,7 @@ for (const signal of requiredHomepageSignals) {
   }
 }
 
-for (const route of ['publications', 'projects', 'projects/mvr-datasets', 'cv', 'benchmarks']) {
+for (const route of ['publications', 'projects', 'cv', 'benchmarks', ...projectDocRoutes]) {
   const routePath = resolve(root, `dist/${route}/index.html`)
   if (!existsSync(routePath)) throw new Error(`SEO validation failed: missing ${routePath}`)
 
@@ -56,14 +59,17 @@ for (const route of ['publications', 'projects', 'projects/mvr-datasets', 'cv', 
   if (!routeHtml.includes(`<link rel="canonical" href="https://wittenyeh.github.io/${route}/" />`)) {
     throw new Error(`SEO validation failed: ${route} has no route-specific canonical URL`)
   }
-  if (route === 'projects/mvr-datasets' && !routeHtml.includes('<h2>Source guide</h2>')) {
-    throw new Error('SEO validation failed: the MVR-Datasets documentation body is missing')
-  }
 }
 
 const sitemapPath = resolve(root, 'dist/sitemap.xml')
 const robotsPath = resolve(root, 'dist/robots.txt')
 if (!existsSync(sitemapPath)) throw new Error('SEO validation failed: dist/sitemap.xml is missing')
+const sitemap = readFileSync(sitemapPath, 'utf8')
+for (const route of projectDocRoutes) {
+  if (!sitemap.includes(`<loc>https://wittenyeh.github.io/${route}/</loc>`)) {
+    throw new Error(`SEO validation failed: sitemap is missing ${route}`)
+  }
+}
 if (!readFileSync(robotsPath, 'utf8').includes('Sitemap: https://wittenyeh.github.io/sitemap.xml')) {
   throw new Error('SEO validation failed: robots.txt does not declare the sitemap')
 }

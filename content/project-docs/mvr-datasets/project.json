@@ -1,0 +1,71 @@
+{
+  "slug": "mvr-datasets",
+  "title": "MVR-Datasets",
+  "description": "A versioned, Arrow-based interchange format and Python toolkit for raw and embedded multi-vector retrieval benchmarks.",
+  "repository": "https://github.com/WittenYeh/MVR-Datasets",
+  "repositoryLabel": "View MVR-Datasets on GitHub",
+  "updated": "2026-08-01",
+  "badges": [
+    { "label": "Format v1.0", "colorScheme": "green" },
+    { "label": "Python 3.10+", "colorScheme": "blue" },
+    { "label": "Apache Arrow", "colorScheme": "purple" }
+  ],
+  "chapters": [
+    {
+      "slug": "welcome",
+      "title": "Welcome Page & How to Use MVR-Datasets",
+      "shortTitle": "Welcome & Usage",
+      "file": "welcome.md",
+      "description": "Install the toolkit, create raw or embedded datasets, read them, validate them, and prepare archives for distribution."
+    },
+    {
+      "slug": "schema",
+      "title": "Schema Implementation",
+      "file": "schema.md",
+      "description": "How schema.py defines the canonical Arrow representation for objects, vectors, components, and ranked ground truth."
+    },
+    {
+      "slug": "manifest",
+      "title": "Manifest Implementation",
+      "file": "manifest.md",
+      "description": "How manifest.py creates, normalizes, validates, loads, and atomically writes package metadata."
+    },
+    {
+      "slug": "writer",
+      "title": "Writer Implementation",
+      "file": "writer.md",
+      "description": "How writer.py constructs safe raw and embedded packages while enforcing IDs, vector shapes, sharding, and ground-truth invariants."
+    },
+    {
+      "slug": "reader",
+      "title": "Reader Implementation",
+      "file": "reader.md",
+      "description": "How reader.py resolves trusted shard paths and streams schema-checked Arrow record batches."
+    },
+    {
+      "slug": "validation",
+      "title": "Validation Implementation",
+      "file": "validation.md",
+      "description": "How validation.py reports structural, semantic, referential, ranking, and optional deep-integrity errors."
+    },
+    {
+      "slug": "checksums",
+      "title": "Checksum Implementation",
+      "file": "checksums.md",
+      "description": "How checksums.py creates and verifies deterministic whole-package SHA-256 integrity records."
+    },
+    {
+      "slug": "packaging",
+      "title": "Packaging Implementation",
+      "file": "packaging.md",
+      "description": "How packaging.py creates reproducible tar.zst archives and rejects unsafe content during extraction."
+    },
+    {
+      "slug": "cli-public-api",
+      "title": "CLI & Public API Implementation",
+      "shortTitle": "CLI & Public API",
+      "file": "cli-public-api.md",
+      "description": "How cli.py, __init__.py, and pyproject.toml expose the reference implementation to scripts and terminal workflows."
+    }
+  ]
+}

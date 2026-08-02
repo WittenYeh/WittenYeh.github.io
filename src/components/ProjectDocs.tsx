@@ -11,52 +11,31 @@ import {
   Text,
   useColorMode,
 } from '@chakra-ui/react'
-import { useEffect, useState } from 'react'
-import { Link as RouterLink } from 'react-router-dom'
-import { FaArrowLeft, FaGithub } from 'react-icons/fa'
-import mvrDatasetsDoc from '@content/mvr-datasets.md'
+import { Navigate, Link as RouterLink, useParams } from 'react-router-dom'
+import { FaArrowLeft, FaArrowRight, FaGithub } from 'react-icons/fa'
+import { getProjectDocs } from '@/data/projectDocs'
 import { terminalPalette } from '@/config/theme'
+import { siteOwner } from '@/site.config'
 
-const sections = [
-  { id: 'overview', title: 'Overview' },
-  { id: 'install', title: 'Install' },
-  { id: 'create-an-embedded-dataset', title: 'Create an embedded dataset' },
-  { id: 'create-a-raw-dataset', title: 'Create a raw dataset' },
-  { id: 'read-a-dataset', title: 'Read a dataset' },
-  { id: 'inspect-validate-and-distribute', title: 'Inspect, validate, and distribute' },
-  { id: 'package-layout', title: 'Package layout' },
-  { id: 'cli-reference', title: 'CLI reference' },
-  { id: 'source-guide', title: 'Source guide' },
-  { id: 'further-reference', title: 'Further reference' },
-] as const
-
-const documentationHtml = sections.reduce(
-  (html, section) => html.replace(
-    `<h2>${section.title}</h2>`,
-    `<h2 id="${section.id}">${section.title}</h2>`,
-  ),
-  mvrDatasetsDoc.body,
-)
-
-const MvrDatasetsDocs: React.FC = () => {
+const ProjectDocs: React.FC = () => {
+  const { projectSlug = '', chapterSlug } = useParams()
   const isDark = useColorMode().colorMode === 'dark'
   const tc = terminalPalette.colors(isDark)
-  const [activeSection, setActiveSection] = useState<string>(sections[0].id)
+  const project = getProjectDocs(projectSlug)
 
-  useEffect(() => {
-    const updateActiveSection = () => {
-      let current: string = sections[0].id
-      for (const section of sections) {
-        const heading = document.getElementById(section.id)
-        if (heading && heading.getBoundingClientRect().top <= 140) current = section.id
-      }
-      setActiveSection(current)
-    }
+  if (!project) return <Navigate to="/projects" replace />
+  if (chapterSlug === project.chapters[0].slug) {
+    return <Navigate to={`/projects/${project.slug}`} replace />
+  }
 
-    updateActiveSection()
-    window.addEventListener('scroll', updateActiveSection, { passive: true })
-    return () => window.removeEventListener('scroll', updateActiveSection)
-  }, [])
+  const chapterIndex = chapterSlug
+    ? project.chapters.findIndex((chapter) => chapter.slug === chapterSlug)
+    : 0
+  if (chapterIndex < 0) return <Navigate to={`/projects/${project.slug}`} replace />
+
+  const chapter = project.chapters[chapterIndex]
+  const previous = project.chapters[chapterIndex - 1]
+  const next = project.chapters[chapterIndex + 1]
 
   return (
     <Box w="full" minH="100vh" bg={isDark ? 'gray.900' : 'gray.50'} py={[6, 8, 10]}>
@@ -76,10 +55,10 @@ const MvrDatasetsDocs: React.FC = () => {
           Back to projects
         </Link>
 
-        <Grid templateColumns={{ base: 'minmax(0, 1fr)', lg: '220px minmax(0, 1fr)' }} gap={5} alignItems="start">
+        <Grid templateColumns={{ base: 'minmax(0, 1fr)', lg: '230px minmax(0, 1fr)' }} gap={5} alignItems="start">
           <Box
             as="aside"
-            aria-label="MVR-Datasets documentation sections"
+            aria-label={`${project.title} documentation chapters`}
             position={{ base: 'static', lg: 'sticky' }}
             top={{ lg: '92px' }}
             maxH={{ lg: 'calc(100vh - 112px)' }}
@@ -92,11 +71,11 @@ const MvrDatasetsDocs: React.FC = () => {
             bg={tc.bg}
           >
             <Box px={4} py={3} bg={tc.header} borderBottom="1px solid" borderColor={tc.border}>
-              <Text fontSize="xs" fontWeight="bold" color={tc.text}>
+              <Text fontSize="xs" fontWeight="bold" color={tc.text} isTruncated>
                 <Text as="span" color={tc.prompt}>$ </Text>
-                tree docs
+                tree {project.slug}
               </Text>
-              <Text mt={1} fontSize="2xs" color={tc.muted}>On this page</Text>
+              <Text mt={1} fontSize="2xs" color={tc.muted}>Documentation</Text>
             </Box>
             <Grid
               as="nav"
@@ -104,13 +83,14 @@ const MvrDatasetsDocs: React.FC = () => {
               gap={1}
               p={2}
             >
-              {sections.map((section, index) => {
-                const isActive = activeSection === section.id
+              {project.chapters.map((item, index) => {
+                const isActive = chapter.slug === item.slug
                 return (
                   <Link
-                    key={section.id}
-                    href={`#${section.id}`}
-                    aria-current={isActive ? 'location' : undefined}
+                    key={item.slug}
+                    as={RouterLink}
+                    to={item.path}
+                    aria-current={isActive ? 'page' : undefined}
                     display="flex"
                     alignItems="flex-start"
                     gap={2}
@@ -124,12 +104,11 @@ const MvrDatasetsDocs: React.FC = () => {
                     fontSize="xs"
                     lineHeight="1.45"
                     _hover={{ color: tc.command, bg: tc.touchBar }}
-                    onClick={() => setActiveSection(section.id)}
                   >
                     <Text as="span" color={isActive ? tc.prompt : tc.muted} flexShrink={0}>
                       {String(index + 1).padStart(2, '0')}
                     </Text>
-                    <Text as="span">{section.title}</Text>
+                    <Text as="span">{item.shortTitle ?? item.title}</Text>
                   </Link>
                 )
               })}
@@ -162,9 +141,9 @@ const MvrDatasetsDocs: React.FC = () => {
               borderColor={tc.border}
             >
               <HStack spacing={2} fontSize="xs" color={tc.secondary} minW={0}>
-                <Text color={tc.prompt}>researcher@projects</Text>
+                <Text color={tc.prompt}>{siteOwner.terminalUsername}@projects</Text>
                 <Text>:</Text>
-                <Text color={tc.info} isTruncated>~/mvr-datasets/README.md</Text>
+                <Text color={tc.info} isTruncated>~/{project.slug}/{chapter.file}</Text>
               </HStack>
               <HStack spacing={1.5} flexShrink={0}>
                 <Box w="8px" h="8px" borderRadius="full" bg="#bf616a" />
@@ -175,28 +154,35 @@ const MvrDatasetsDocs: React.FC = () => {
 
             <Box as="header" px={[5, 8, 12]} pt={[8, 10, 12]} pb={[7, 8, 10]} borderBottom="1px solid" borderColor={tc.border}>
               <HStack spacing={2} mb={4} flexWrap="wrap">
-                <Badge colorScheme="green" variant="subtle">Format v1.0</Badge>
-                <Badge colorScheme="blue" variant="subtle">Python 3.10+</Badge>
-                <Badge colorScheme="purple" variant="subtle">Apache Arrow</Badge>
+                {project.badges?.map((badge) => (
+                  <Badge key={badge.label} colorScheme={badge.colorScheme ?? 'blue'} variant="subtle">
+                    {badge.label}
+                  </Badge>
+                ))}
               </HStack>
-              <Heading as="h1" fontSize={['2xl', '3xl', '4xl']} lineHeight="1.2" color={tc.text} mb={4}>
-                MVR-Datasets
-              </Heading>
-              <Text maxW="760px" color={tc.secondary} fontSize={['sm', 'md']} lineHeight="1.8">
-                A concise guide to creating, reading, validating, and packaging multi-vector retrieval datasets.
+              <Text color={tc.prompt} fontSize="xs" mb={2}>
+                Chapter {String(chapterIndex + 1).padStart(2, '0')} / {String(project.chapters.length).padStart(2, '0')}
               </Text>
-              <Link
-                href="https://github.com/WittenYeh/MVR-Datasets"
-                isExternal
-                display="inline-flex"
-                alignItems="center"
-                gap={2}
-                mt={5}
-                fontSize="sm"
-                color={tc.command}
-              >
-                <Icon as={FaGithub} /> View repository
-              </Link>
+              <Heading as="h1" fontSize={['xl', '2xl', '3xl']} lineHeight="1.3" color={tc.text} mb={4}>
+                {chapter.title}
+              </Heading>
+              <Text maxW="780px" color={tc.secondary} fontSize={['sm', 'md']} lineHeight="1.8">
+                {chapter.description}
+              </Text>
+              {project.repository && (
+                <Link
+                  href={project.repository}
+                  isExternal
+                  display="inline-flex"
+                  alignItems="center"
+                  gap={2}
+                  mt={5}
+                  fontSize="sm"
+                  color={tc.command}
+                >
+                  <Icon as={FaGithub} /> {project.repositoryLabel ?? 'View repository'}
+                </Link>
+              )}
             </Box>
 
             <Box
@@ -209,15 +195,16 @@ const MvrDatasetsDocs: React.FC = () => {
                   color: tc.text,
                   fontSize: ['lg', 'xl'],
                   fontWeight: 700,
-                  mt: 12,
+                  mt: 10,
                   mb: 4,
                   pb: 2,
                   borderBottom: `1px solid ${tc.border}`,
                   scrollMarginTop: '96px',
                 },
                 '& h2:first-of-type': { mt: 0 },
+                '& h3': { color: tc.text, fontSize: 'md', fontWeight: 700, mt: 7, mb: 3 },
                 '& p': { mb: 4, lineHeight: 1.85 },
-                '& ul': { mb: 5, pl: 6 },
+                '& ul, & ol': { mb: 5, pl: 6 },
                 '& li': { mb: 2, lineHeight: 1.75 },
                 '& strong': { color: tc.text },
                 '& a': { color: tc.command, textDecoration: 'none' },
@@ -257,8 +244,55 @@ const MvrDatasetsDocs: React.FC = () => {
                 '& th': { color: tc.text, bg: tc.header },
                 '& td:first-of-type': { whiteSpace: 'nowrap' },
               }}
-              dangerouslySetInnerHTML={{ __html: documentationHtml }}
+              dangerouslySetInnerHTML={{ __html: chapter.body }}
             />
+
+            <Grid
+              templateColumns={{ base: '1fr', sm: 'repeat(2, minmax(0, 1fr))' }}
+              gap={3}
+              px={[5, 8, 12]}
+              pb={[8, 10, 12]}
+            >
+              <Box>
+                {previous && (
+                  <Link
+                    as={RouterLink}
+                    to={previous.path}
+                    display="block"
+                    h="full"
+                    p={4}
+                    border="1px solid"
+                    borderColor={tc.border}
+                    borderRadius="md"
+                    color={tc.secondary}
+                    _hover={{ color: tc.command, borderColor: tc.command }}
+                  >
+                    <Text fontSize="2xs" color={tc.muted} mb={1}>PREVIOUS</Text>
+                    <HStack spacing={2}><Icon as={FaArrowLeft} boxSize="10px" /><Text fontSize="xs">{previous.shortTitle ?? previous.title}</Text></HStack>
+                  </Link>
+                )}
+              </Box>
+              <Box>
+                {next && (
+                  <Link
+                    as={RouterLink}
+                    to={next.path}
+                    display="block"
+                    h="full"
+                    p={4}
+                    border="1px solid"
+                    borderColor={tc.border}
+                    borderRadius="md"
+                    color={tc.secondary}
+                    textAlign="right"
+                    _hover={{ color: tc.command, borderColor: tc.command }}
+                  >
+                    <Text fontSize="2xs" color={tc.muted} mb={1}>NEXT</Text>
+                    <HStack spacing={2} justify="flex-end"><Text fontSize="xs">{next.shortTitle ?? next.title}</Text><Icon as={FaArrowRight} boxSize="10px" /></HStack>
+                  </Link>
+                )}
+              </Box>
+            </Grid>
           </Box>
         </Grid>
       </Container>
@@ -266,4 +300,4 @@ const MvrDatasetsDocs: React.FC = () => {
   )
 }
 
-export default MvrDatasetsDocs
+export default ProjectDocs
