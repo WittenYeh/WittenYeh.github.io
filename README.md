@@ -234,7 +234,7 @@ extraLinks:
     url: /projects/my-project
 ```
 
-8. 终端示例应把用户输入写在 <code>```command</code> fenced block 中，把程序输出写在单独的 <code>```output</code> fenced block 中。共享文档组件会自动为两者添加不同标题、颜色和边框；不要再把命令与输出混写在同一个 `console` block 中。
+8. 终端示例应把用户输入写在 <code>```command</code> fenced block 中，把程序输出写在紧随其后的 <code>```output</code> fenced block 中。共享文档组件会把两者拼成一组，以分隔线区分，并在右下角显示不同颜色的 `COMMAND` / `OUTPUT` 标识；不要再把命令与输出混写在同一个 `console` block 中。
 
 若项目改名并更换 slug，应移动项目卡片、文档目录和预览图片，并把旧 slug 加入 `project.json` 的 `legacySlugs`。构建会为旧章节路径生成 `noindex` 页面和新地址的 canonical URL，浏览器访问旧路径时也会自动跳转；sitemap 只保留新路径。
 

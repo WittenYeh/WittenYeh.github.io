@@ -36,9 +36,9 @@ worktree changes.
 Project pages are content-driven. Do not create a project-specific React component. Use `project.json` plus Markdown chapters under `content/project-docs/<project-slug>/`; the shared `src/components/ProjectDocs.tsx` supplies routing, sidebar navigation, previous/next navigation, theming, SEO entry points, and sitemap entries. A README-only project uses one chapter named `README` and can grow into multiple chapters later.
 
 For terminal examples in project documentation, put user input in a
-<code>```command</code> fence and captured output in a separate
-<code>```output</code> fence. The shared renderer labels and colors these blocks
-globally; do not interleave commands and output in one `console` block.
+<code>```command</code> fence and captured output in an immediately following
+<code>```output</code> fence. The shared renderer joins, labels, and colors each
+pair globally; do not interleave commands and output in one `console` block.
 
 When renaming a project-doc slug, move its content directory and project card, update its preview asset and repository links, and list prior slugs in `project.json` under `legacySlugs`. The shared routing and SEO pipeline preserves old chapter URLs as `noindex` compatibility pages that canonicalize and redirect to the current slug.
 
