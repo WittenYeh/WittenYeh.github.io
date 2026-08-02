@@ -1,6 +1,6 @@
 ## Command-line interface
 
-`src/mvr_dataset/cli.py` defines the `mvr` command with `argparse`. `build_parser()` registers six subcommands:
+`src/mvr_dataset/cli.py` defines the `mvrdata` command with `argparse`. `build_parser()` registers six subcommands:
 
 | Command | Implementation behavior |
 | --- | --- |
@@ -30,7 +30,7 @@ It also declares `__version__ = "0.1.0"`. Keeping imports here separates support
 
 ```toml
 [project.scripts]
-mvr = "mvr_dataset.cli:main"
+mvrdata = "mvr_dataset.cli:main"
 ```
 
 The adjacent `src/mvr_dataset_format.egg-info/` directory is generated packaging metadata. It records dependencies, distribution inputs, the console entry point, and the top-level import name; it does not implement dataset behavior.

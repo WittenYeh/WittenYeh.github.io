@@ -46,4 +46,4 @@ export const projectDocs: ProjectDoc[] = projectDocConfigs.map((config) => {
 })
 
 export const getProjectDocs = (slug: string) =>
-  projectDocs.find((project) => project.slug === slug)
+  projectDocs.find((project) => project.slug === slug || project.legacySlugs?.includes(slug))

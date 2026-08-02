@@ -1,4 +1,4 @@
-MVR Dataset Format is a versioned, Arrow-based interchange format for
+MVR-Data is a versioned, Arrow-based interchange format for
 multi-vector retrieval benchmarks. This repository contains the specification,
 Python reference implementation, command-line tools, and synthetic tests. It
 does **not** contain any published dataset.
@@ -47,19 +47,19 @@ python -m pip install -e '.[dev]'
 
 ```bash
 # Create package skeletons
-mvr init raw-example --kind raw --dataset-id example/raw --top-k 10
-mvr init embedded-example --kind embedded --dataset-id example/embedded \
+mvrdata init raw-example --kind raw --dataset-id example/raw --top-k 10
+mvrdata init embedded-example --kind embedded --dataset-id example/embedded \
   --dimension 128 --dtype float32 --scoring-scheme chamfer --top-k 10
 
 # Inspect and validate a populated package
-mvr inspect embedded-example
-mvr validate embedded-example
-mvr validate --deep embedded-example
+mvrdata inspect embedded-example
+mvrdata validate embedded-example
+mvrdata validate --deep embedded-example
 
 # Maintain integrity data and create a transport archive
-mvr checksum --write embedded-example
-mvr pack embedded-example embedded-example.tar.zst
-mvr unpack embedded-example.tar.zst restored-example
+mvrdata checksum --write embedded-example
+mvrdata pack embedded-example embedded-example.tar.zst
+mvrdata unpack embedded-example.tar.zst restored-example
 ```
 
 The initializer creates an empty package. Use the Python writers to populate a
@@ -81,9 +81,9 @@ with EmbeddedDatasetWriter(
     writer.add_ground_truth("query-1", [("doc-1", 0.98)])
 ```
 
-See [the v1 format specification](https://github.com/WittenYeh/MVR-Datasets/blob/main/docs/format-v1.md), the
-[Raw format](https://github.com/WittenYeh/MVR-Datasets/blob/main/docs/raw-dataset.md), and the
-[Embedded format](https://github.com/WittenYeh/MVR-Datasets/blob/main/docs/embedded-dataset.md) for normative details.
+See [the v1 format specification](https://github.com/WittenYeh/MVR-Data/blob/main/docs/format-v1.md), the
+[Raw format](https://github.com/WittenYeh/MVR-Data/blob/main/docs/raw-dataset.md), and the
+[Embedded format](https://github.com/WittenYeh/MVR-Data/blob/main/docs/embedded-dataset.md) for normative details.
 
 ## Python API
 

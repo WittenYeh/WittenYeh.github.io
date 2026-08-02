@@ -47,14 +47,19 @@ const RouteMetadata: React.FC = () => {
         ? `${projectDocRoute.project.title} Documentation | Weitang Ye`
         : `${projectDocRoute.chapter.title} | ${projectDocRoute.project.title} | Weitang Ye`,
       description: projectDocRoute.chapter.description,
-      index: true,
+      index: !projectDocRoute.isLegacy,
     } : undefined
     const metadata = routeMetadata[normalizedPath] ?? projectDocMetadata ?? {
       title: 'Page Not Found | Weitang Ye',
       description: 'The requested page could not be found.',
       index: false,
     }
-    const canonicalUrl = normalizedPath === '/' ? `${baseUrl}/` : `${baseUrl}${normalizedPath}/`
+    const canonicalPath = projectDocRoute
+      ? (projectDocRoute.chapterIndex === 0
+          ? `/projects/${projectDocRoute.project.slug}`
+          : `/projects/${projectDocRoute.project.slug}/${projectDocRoute.chapter.slug}`)
+      : normalizedPath
+    const canonicalUrl = canonicalPath === '/' ? `${baseUrl}/` : `${baseUrl}${canonicalPath}/`
 
     document.title = metadata.title
     setMeta('meta[name="description"]', 'content', metadata.description)

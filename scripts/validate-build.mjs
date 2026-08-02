@@ -12,6 +12,16 @@ const distIndexPath = resolve(root, 'dist/index.html')
 const distIndex = readFileSync(distIndexPath, 'utf8')
 const projectDocs = loadProjectDocs(root)
 const projectDocRoutes = projectDocs.flatMap((project) => project.chapters.map((chapter) => chapter.route))
+const legacyProjectDocRoutes = projectDocs.flatMap((project) =>
+  (project.legacySlugs ?? []).flatMap((legacySlug) =>
+    project.chapters.map((chapter, chapterIndex) => ({
+      route: chapterIndex === 0
+        ? `projects/${legacySlug}`
+        : `projects/${legacySlug}/${chapter.slug}`,
+      canonicalRoute: chapter.route,
+    })),
+  ),
+)
 
 if (site.sections?.includes('bio')) {
   const { content } = matter(readFileSync(resolve(root, 'content/about.md'), 'utf8'))
@@ -61,6 +71,19 @@ for (const route of ['publications', 'projects', 'cv', 'benchmarks', ...projectD
   }
 }
 
+for (const { route, canonicalRoute } of legacyProjectDocRoutes) {
+  const routePath = resolve(root, `dist/${route}/index.html`)
+  if (!existsSync(routePath)) throw new Error(`SEO validation failed: missing legacy route ${routePath}`)
+
+  const routeHtml = readFileSync(routePath, 'utf8')
+  if (!routeHtml.includes(`<link rel="canonical" href="https://wittenyeh.github.io/${canonicalRoute}/" />`)) {
+    throw new Error(`SEO validation failed: ${route} does not canonicalize to ${canonicalRoute}`)
+  }
+  if (!routeHtml.includes('<meta name="robots" content="noindex, follow" />')) {
+    throw new Error(`SEO validation failed: legacy route ${route} must be noindex`)
+  }
+}
+
 const sitemapPath = resolve(root, 'dist/sitemap.xml')
 const robotsPath = resolve(root, 'dist/robots.txt')
 if (!existsSync(sitemapPath)) throw new Error('SEO validation failed: dist/sitemap.xml is missing')
@@ -68,6 +91,11 @@ const sitemap = readFileSync(sitemapPath, 'utf8')
 for (const route of projectDocRoutes) {
   if (!sitemap.includes(`<loc>https://wittenyeh.github.io/${route}/</loc>`)) {
     throw new Error(`SEO validation failed: sitemap is missing ${route}`)
+  }
+}
+for (const { route } of legacyProjectDocRoutes) {
+  if (sitemap.includes(`<loc>https://wittenyeh.github.io/${route}/</loc>`)) {
+    throw new Error(`SEO validation failed: sitemap must not include legacy route ${route}`)
   }
 }
 if (!readFileSync(robotsPath, 'utf8').includes('Sitemap: https://wittenyeh.github.io/sitemap.xml')) {

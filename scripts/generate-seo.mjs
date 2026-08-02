@@ -130,6 +130,26 @@ const projectDocRouteConfigs = Object.fromEntries(projectDocs.flatMap((project) 
   }),
 ))
 
+const legacyProjectDocRouteConfigs = Object.fromEntries(projectDocs.flatMap((project) =>
+  (project.legacySlugs ?? []).flatMap((legacySlug) =>
+    project.chapters.map((chapter, chapterIndex) => {
+      const legacyRoute = chapterIndex === 0
+        ? `projects/${legacySlug}`
+        : `projects/${legacySlug}/${chapter.slug}`
+      return [
+        legacyRoute,
+        {
+          title: `${project.title} Documentation | Weitang Ye`,
+          description: `This documentation moved to /${chapter.route}/.`,
+          index: false,
+          canonical: `${baseUrl}/${chapter.route}/`,
+          content: `<main id="seo-static-content"><h1>${escapeHtml(project.title)} documentation moved</h1><p><a href="/${chapter.route}/">Continue to the current page</a>.</p></main>`,
+        },
+      ]
+    }),
+  ),
+))
+
 const routeConfigs = {
   publications: {
     title: 'Publications | Weitang Ye',
@@ -156,6 +176,7 @@ const routeConfigs = {
     content: `<main id="seo-static-content"><h1>Curriculum Vitae — Weitang Ye</h1><p>${escapeHtml(cv.description)}</p></main>`,
   },
   ...projectDocRouteConfigs,
+  ...legacyProjectDocRouteConfigs,
 }
 
 const replaceMetadata = (html, { title, description, canonical, index, type = 'website' }) => html
@@ -177,7 +198,7 @@ const homepage = replaceRoot(baseHtml, homeStaticContent)
 writeFileSync(resolve(distDir, 'index.html'), homepage)
 
 for (const [route, config] of Object.entries(routeConfigs)) {
-  const canonical = `${baseUrl}/${route}/`
+  const canonical = config.canonical ?? `${baseUrl}/${route}/`
   const pageJsonLd = `<script type="application/ld+json">${JSON.stringify({
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',

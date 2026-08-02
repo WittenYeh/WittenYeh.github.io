@@ -19,7 +19,7 @@ export const loadProjectDocs = (root) => {
   const docsRoot = resolve(root, 'content/project-docs')
   if (!existsSync(docsRoot)) return []
 
-  return readdirSync(docsRoot, { withFileTypes: true })
+  const projects = readdirSync(docsRoot, { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
     .sort((left, right) => left.name.localeCompare(right.name))
     .map((entry) => {
@@ -44,6 +44,21 @@ export const loadProjectDocs = (root) => {
       }
       if (!slugPattern.test(config.slug)) {
         throw new Error(`${configPath}: slug must use lowercase kebab-case`)
+      }
+      const legacySlugs = config.legacySlugs ?? []
+      if (!Array.isArray(legacySlugs)) {
+        throw new Error(`${configPath}: legacySlugs must be an array`)
+      }
+      const uniqueLegacySlugs = new Set()
+      for (const legacySlug of legacySlugs) {
+        requireString(legacySlug, 'legacySlugs entry', configPath)
+        if (!slugPattern.test(legacySlug)) {
+          throw new Error(`${configPath}: legacySlugs entries must use lowercase kebab-case`)
+        }
+        if (legacySlug === config.slug || uniqueLegacySlugs.has(legacySlug)) {
+          throw new Error(`${configPath}: duplicate project docs slug ${legacySlug}`)
+        }
+        uniqueLegacySlugs.add(legacySlug)
       }
       if (!Array.isArray(config.chapters) || config.chapters.length === 0) {
         throw new Error(`${configPath}: chapters must be a non-empty array`)
@@ -101,6 +116,17 @@ export const loadProjectDocs = (root) => {
         throw new Error(`${configPath}: unlisted Markdown file(s): ${unlistedMarkdown.join(', ')}`)
       }
 
-      return { ...config, chapters }
+      return { ...config, legacySlugs, chapters }
     })
+
+  const registeredSlugs = new Map()
+  for (const project of projects) {
+    for (const slug of [project.slug, ...project.legacySlugs]) {
+      const owner = registeredSlugs.get(slug)
+      if (owner) throw new Error(`Project docs slug ${slug} is shared by ${owner} and ${project.slug}`)
+      registeredSlugs.set(slug, project.slug)
+    }
+  }
+
+  return projects
 }

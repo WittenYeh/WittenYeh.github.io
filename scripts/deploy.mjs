@@ -189,6 +189,13 @@ const collectLiveTargets = () => {
   const routes = ['', 'publications', 'projects', 'cv', 'benchmarks']
   const projectDocs = loadProjectDocs(ROOT)
   routes.push(...projectDocs.flatMap((project) => project.chapters.map((chapter) => chapter.route)))
+  routes.push(...projectDocs.flatMap((project) =>
+    (project.legacySlugs ?? []).flatMap((legacySlug) =>
+      project.chapters.map((chapter, chapterIndex) => chapterIndex === 0
+        ? `projects/${legacySlug}`
+        : `projects/${legacySlug}/${chapter.slug}`),
+    ),
+  ))
 
   for (const route of new Set(routes)) {
     const publicPath = route ? `/${route}/` : '/'

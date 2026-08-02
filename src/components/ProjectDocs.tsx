@@ -25,6 +25,12 @@ const ProjectDocs: React.FC = () => {
   const project = getProjectDocs(projectSlug)
 
   if (!project) return <Navigate to="/projects" replace />
+  if (projectSlug !== project.slug) {
+    const legacyChapter = chapterSlug
+      ? project.chapters.find((chapter) => chapter.slug === chapterSlug)
+      : project.chapters[0]
+    return <Navigate to={legacyChapter?.path ?? `/projects/${project.slug}`} replace />
+  }
   if (chapterSlug === project.chapters[0].slug) {
     return <Navigate to={`/projects/${project.slug}`} replace />
   }

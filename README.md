@@ -183,6 +183,7 @@ content/project-docs/<project-slug>/
 ```json
 {
   "slug": "my-project",
+  "legacySlugs": [],
   "title": "My Project",
   "description": "A short project description.",
   "repository": "https://github.com/user/my-project",
@@ -230,6 +231,8 @@ extraLinks:
   - label: Documentation
     url: /projects/my-project
 ```
+
+若项目改名并更换 slug，应移动项目卡片、文档目录和预览图片，并把旧 slug 加入 `project.json` 的 `legacySlugs`。构建会为旧章节路径生成 `noindex` 页面和新地址的 canonical URL，浏览器访问旧路径时也会自动跳转；sitemap 只保留新路径。
 
 新增项目文档不需要修改 `App.tsx`、模板组件或 SEO 脚本。完成后运行：
 

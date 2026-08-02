@@ -20,6 +20,7 @@ export interface ProjectDocAsciiHero {
 
 export interface ProjectDocConfig {
   slug: string
+  legacySlugs?: string[]
   title: string
   description: string
   repository?: string
@@ -48,7 +49,7 @@ export const projectDocConfigs: ProjectDocConfig[] = Object.entries(configModule
 })
 
 export const getProjectDocConfig = (slug: string) =>
-  projectDocConfigs.find((project) => project.slug === slug)
+  projectDocConfigs.find((project) => project.slug === slug || project.legacySlugs?.includes(slug))
 
 export const resolveProjectDocMetadataRoute = (pathname: string) => {
   const parts = pathname.replace(/^\/+|\/+$/g, '').split('/')
@@ -62,5 +63,10 @@ export const resolveProjectDocMetadataRoute = (pathname: string) => {
     : 0
   if (chapterIndex < 0) return undefined
 
-  return { project, chapter: project.chapters[chapterIndex], chapterIndex }
+  return {
+    project,
+    chapter: project.chapters[chapterIndex],
+    chapterIndex,
+    isLegacy: parts[1] !== project.slug,
+  }
 }
