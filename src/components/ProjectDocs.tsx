@@ -10,6 +10,7 @@ import {
   Link,
   Text,
   useColorMode,
+  VisuallyHidden,
 } from '@chakra-ui/react'
 import { Navigate, Link as RouterLink, useParams } from 'react-router-dom'
 import { FaArrowLeft, FaArrowRight, FaGithub } from 'react-icons/fa'
@@ -36,6 +37,7 @@ const ProjectDocs: React.FC = () => {
   const chapter = project.chapters[chapterIndex]
   const previous = project.chapters[chapterIndex - 1]
   const next = project.chapters[chapterIndex + 1]
+  const showAsciiHero = chapter.hideTitle && project.hero?.type === 'ascii'
 
   return (
     <Box w="full" minH="100vh" bg={isDark ? 'gray.900' : 'gray.50'} py={[6, 8, 10]}>
@@ -163,12 +165,37 @@ const ProjectDocs: React.FC = () => {
               <Text color={tc.prompt} fontSize="xs" mb={2}>
                 Chapter {String(chapterIndex + 1).padStart(2, '0')} / {String(project.chapters.length).padStart(2, '0')}
               </Text>
-              <Heading as="h1" fontSize={['xl', '2xl', '3xl']} lineHeight="1.3" color={tc.text} mb={4}>
-                {chapter.title}
-              </Heading>
-              <Text maxW="780px" color={tc.secondary} fontSize={['sm', 'md']} lineHeight="1.8">
-                {chapter.description}
-              </Text>
+              {showAsciiHero ? (
+                <>
+                  <VisuallyHidden as="h1">{project.hero?.ariaLabel ?? project.title}</VisuallyHidden>
+                  <Box
+                    as="pre"
+                    role="img"
+                    aria-label={project.hero?.ariaLabel ?? project.title}
+                    m={0}
+                    p={0}
+                    maxW="full"
+                    overflowX="auto"
+                    bg="transparent"
+                    border="0"
+                    borderRadius="0"
+                    color={tc.command}
+                    fontSize={['5px', '6px', '7px', '8px']}
+                    lineHeight="1.25"
+                  >
+                    {project.hero?.lines.join('\n')}
+                  </Box>
+                </>
+              ) : (
+                <>
+                  <Heading as="h1" fontSize={['xl', '2xl', '3xl']} lineHeight="1.3" color={tc.text} mb={4}>
+                    {chapter.title}
+                  </Heading>
+                  <Text maxW="780px" color={tc.secondary} fontSize={['sm', 'md']} lineHeight="1.8">
+                    {chapter.description}
+                  </Text>
+                </>
+              )}
               {project.repository && (
                 <Link
                   href={project.repository}

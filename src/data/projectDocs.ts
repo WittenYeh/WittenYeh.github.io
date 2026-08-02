@@ -6,6 +6,7 @@ import {
 
 export type {
   ProjectDocBadge,
+  ProjectDocAsciiHero,
   ProjectDocChapterDefinition,
   ProjectDocConfig,
 } from './projectDocMetadata'

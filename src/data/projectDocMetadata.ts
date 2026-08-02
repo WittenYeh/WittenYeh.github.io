@@ -9,6 +9,13 @@ export interface ProjectDocChapterDefinition {
   shortTitle?: string
   file: string
   description: string
+  hideTitle?: boolean
+}
+
+export interface ProjectDocAsciiHero {
+  type: 'ascii'
+  ariaLabel?: string
+  lines: string[]
 }
 
 export interface ProjectDocConfig {
@@ -19,6 +26,7 @@ export interface ProjectDocConfig {
   repositoryLabel?: string
   updated?: string
   badges?: ProjectDocBadge[]
+  hero?: ProjectDocAsciiHero
   chapters: ProjectDocChapterDefinition[]
 }
 

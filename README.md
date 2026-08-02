@@ -161,13 +161,19 @@ content/project-docs/<project-slug>/
   "badges": [
     { "label": "Python 3.10+", "colorScheme": "blue" }
   ],
+  "hero": {
+    "type": "ascii",
+    "ariaLabel": "My Project",
+    "lines": ["ASCII art line 1", "ASCII art line 2"]
+  },
   "chapters": [
     {
       "slug": "welcome",
       "title": "Welcome & Usage",
       "shortTitle": "Welcome",
       "file": "welcome.md",
-      "description": "Install and use the project."
+      "description": "Install and use the project.",
+      "hideTitle": true
     },
     {
       "slug": "implementation",
@@ -186,7 +192,8 @@ content/project-docs/<project-slug>/
 3. 章节的 `slug` 和 Markdown 文件名必须使用小写 kebab-case，并且在项目内唯一。
 4. 每个 Markdown 文件只写一个小章节的正文；页面标题和说明来自 `project.json`，正文建议从 `##` 开始。
 5. 目录中的每个 Markdown 文件都必须在 `chapters` 中登记；缺失文件、重复 slug、未登记文件会使 `npm run validate` 或构建失败。
-6. 在 `content/projects/<project-slug>.md` 的 `extraLinks` 中加入文档入口：
+6. `hero` 是可选配置。若某一章设置 `hideTitle: true`，该项目必须提供 `hero`；页面会隐藏可见的大标题并在相同位置显示 ASCII 字符画，同时保留屏幕阅读器可访问的 `h1`。
+7. 在 `content/projects/<project-slug>.md` 的 `extraLinks` 中加入文档入口：
 
 ```yaml
 extraLinks:

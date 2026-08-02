@@ -51,6 +51,8 @@ const staticStyle = `
     #seo-static-content .seo-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
     #seo-static-content .seo-card{padding:14px;border:1px solid #4c566a;border-radius:6px}
     #seo-static-content .seo-meta{color:#a3be8c;font-size:.8rem}
+    #seo-static-content .seo-visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    #seo-static-content .seo-ascii{margin:8px 0 24px;padding:0;overflow-x:auto;border:0;background:transparent;color:#a3be8c;font-size:8px;line-height:1.25}
     @media(max-width:700px){#seo-static-content{padding:24px 16px}#seo-static-content .seo-grid{grid-template-columns:1fr}}
   </style>`
 
@@ -109,17 +111,23 @@ const homeStaticContent = `${staticStyle}
   </main>`
 
 const projectDocRouteConfigs = Object.fromEntries(projectDocs.flatMap((project) =>
-  project.chapters.map((chapter, chapterIndex) => [
-    chapter.route,
-    {
-      title: chapterIndex === 0
-        ? `${project.title} Documentation | Weitang Ye`
-        : `${chapter.title} | ${project.title} | Weitang Ye`,
-      description: chapter.description,
-      index: true,
-      content: `<main id="seo-static-content"><p><a href="/projects/">Projects</a> / ${escapeHtml(project.title)}</p><h1>${escapeHtml(chapter.title)}</h1><p>${escapeHtml(chapter.description)}</p><article>${marked.parse(chapter.markdown)}</article></main>`,
-    },
-  ]),
+  project.chapters.map((chapter, chapterIndex) => {
+    const showAsciiHero = chapter.hideTitle && project.hero?.type === 'ascii'
+    const heading = showAsciiHero
+      ? `<h1 class="seo-visually-hidden">${escapeHtml(project.hero.ariaLabel ?? project.title)}</h1><pre class="seo-ascii" role="img" aria-label="${escapeHtml(project.hero.ariaLabel ?? project.title)}">${escapeHtml(project.hero.lines.join('\n'))}</pre>`
+      : `<h1>${escapeHtml(chapter.title)}</h1><p>${escapeHtml(chapter.description)}</p>`
+    return [
+      chapter.route,
+      {
+        title: chapterIndex === 0
+          ? `${project.title} Documentation | Weitang Ye`
+          : `${chapter.title} | ${project.title} | Weitang Ye`,
+        description: chapter.description,
+        index: true,
+        content: `<main id="seo-static-content"><p><a href="/projects/">Projects</a> / ${escapeHtml(project.title)}</p>${heading}<article>${marked.parse(chapter.markdown)}</article></main>`,
+      },
+    ]
+  }),
 ))
 
 const routeConfigs = {

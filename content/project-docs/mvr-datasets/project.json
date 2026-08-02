@@ -4,19 +4,32 @@
   "description": "A versioned, Arrow-based interchange format and Python toolkit for raw and embedded multi-vector retrieval benchmarks.",
   "repository": "https://github.com/WittenYeh/MVR-Datasets",
   "repositoryLabel": "View MVR-Datasets on GitHub",
-  "updated": "2026-08-01",
+  "updated": "2026-08-02",
   "badges": [
     { "label": "Format v1.0", "colorScheme": "green" },
     { "label": "Python 3.10+", "colorScheme": "blue" },
     { "label": "Apache Arrow", "colorScheme": "purple" }
   ],
+  "hero": {
+    "type": "ascii",
+    "ariaLabel": "MVR-Datasets",
+    "lines": [
+      "███╗   ███╗██╗   ██╗██████╗       ██████╗  █████╗ ████████╗ █████╗ ███████╗███████╗████████╗███████╗",
+      "████╗ ████║██║   ██║██╔══██╗      ██╔══██╗██╔══██╗╚══██╔══╝██╔══██╗██╔════╝██╔════╝╚══██╔══╝██╔════╝",
+      "██╔████╔██║██║   ██║██████╔╝█████╗██║  ██║███████║   ██║   ███████║███████╗█████╗     ██║   ███████╗",
+      "██║╚██╔╝██║╚██╗ ██╔╝██╔══██╗╚════╝██║  ██║██╔══██║   ██║   ██╔══██║╚════██║██╔══╝     ██║   ╚════██║",
+      "██║ ╚═╝ ██║ ╚████╔╝ ██║  ██║      ██████╔╝██║  ██║   ██║   ██║  ██║███████║███████╗   ██║   ███████║",
+      "╚═╝     ╚═╝  ╚═══╝  ╚═╝  ╚═╝      ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝╚══════╝╚══════╝   ╚═╝   ╚══════╝"
+    ]
+  },
   "chapters": [
     {
       "slug": "welcome",
       "title": "Welcome Page & How to Use MVR-Datasets",
       "shortTitle": "Welcome & Usage",
       "file": "welcome.md",
-      "description": "Install the toolkit, create raw or embedded datasets, read them, validate them, and prepare archives for distribution."
+      "description": "Install the toolkit, create raw or embedded datasets, read them, validate them, and prepare archives for distribution.",
+      "hideTitle": true
     },
     {
       "slug": "schema",

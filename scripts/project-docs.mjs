@@ -48,6 +48,15 @@ export const loadProjectDocs = (root) => {
       if (!Array.isArray(config.chapters) || config.chapters.length === 0) {
         throw new Error(`${configPath}: chapters must be a non-empty array`)
       }
+      if (config.hero !== undefined) {
+        if (config.hero?.type !== 'ascii') {
+          throw new Error(`${configPath}: hero.type must be "ascii"`)
+        }
+        if (!Array.isArray(config.hero.lines) || config.hero.lines.length === 0
+          || config.hero.lines.some((line) => typeof line !== 'string' || !line)) {
+          throw new Error(`${configPath}: hero.lines must be a non-empty string array`)
+        }
+      }
 
       const slugs = new Set()
       const files = new Set()
@@ -57,6 +66,12 @@ export const loadProjectDocs = (root) => {
         requireString(chapter.title, 'title', source)
         requireString(chapter.description, 'description', source)
         requireString(chapter.file, 'file', source)
+        if (chapter.hideTitle !== undefined && typeof chapter.hideTitle !== 'boolean') {
+          throw new Error(`${source}: hideTitle must be a boolean`)
+        }
+        if (chapter.hideTitle && !config.hero) {
+          throw new Error(`${source}: hideTitle requires a project hero`)
+        }
         if (!slugPattern.test(chapter.slug)) {
           throw new Error(`${source}: slug must use lowercase kebab-case`)
         }
