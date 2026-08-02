@@ -62,7 +62,7 @@ const HeroSection = ({ title, avatar }: HeroSectionProps) => {
   const subtitlePair = nextSubtitle ? `${currentSubtitle} → ${nextSubtitle}` : currentSubtitle
   const profileLinks = [
     { icon: 'FaEnvelope', href: siteOwner.contact.email ? `mailto:${siteOwner.contact.email}` : '', label: 'Email' },
-    { icon: 'FaGithub', href: siteOwner.social.github, label: 'GitHub' },
+    { icon: 'FaGithub', href: siteOwner.social.github, label: 'My GitHub' },
     { icon: 'FaGithub', href: siteOwner.social.labGithub, label: 'Lab GitHub' },
     { icon: 'FaLinkedin', href: siteOwner.social.linkedin, label: 'LinkedIn' },
     { icon: 'FaMedium', href: siteOwner.social.medium, label: 'Medium' },
@@ -70,6 +70,8 @@ const HeroSection = ({ title, avatar }: HeroSectionProps) => {
     { icon: 'SiOrcid', href: siteOwner.social.orcid, label: 'ORCID' },
     { icon: 'SiZhihu', href: siteOwner.social.zhihu, label: '知乎' },
   ].filter((item) => item.href)
+  const profileLinkRows = [profileLinks.slice(0, 4), profileLinks.slice(4)]
+    .filter((row) => row.length > 0)
 
   const renderLinkedText = (text: string) => {
     const links = about.links ?? []
@@ -212,41 +214,46 @@ const HeroSection = ({ title, avatar }: HeroSectionProps) => {
             </HStack>
 
             {profileLinks.length > 0 && (
-              <HStack
-                spacing={2}
-                flexWrap="wrap"
-                justify={['center', 'center', 'flex-start']}
-                w="full"
-              >
-                {profileLinks.map((item) => (
-                  <Link
-                    key={item.label}
-                    href={item.href}
-                    isExternal={!item.href.startsWith('mailto:')}
-                    aria-label={item.label}
-                    color={socialIconColor}
-                    border="1px solid"
-                    borderColor={dividerColor}
-                    borderRadius="sm"
-                    px={2.5}
-                    py={1.5}
-                    fontFamily="mono"
-                    fontSize="xs"
-                    transition="all 0.2s"
-                    _hover={{
-                      color: 'cyan.400',
-                      borderColor: 'cyan.400',
-                      textDecoration: 'none',
-                      transform: 'translateY(-1px)',
-                    }}
+              <VStack spacing={2} align={['center', 'center', 'flex-start']} w="full">
+                {profileLinkRows.map((row, rowIndex) => (
+                  <HStack
+                    key={rowIndex}
+                    spacing={2}
+                    flexWrap="wrap"
+                    justify={['center', 'center', 'flex-start']}
+                    w="full"
                   >
-                    <HStack spacing={1.5}>
-                      <DynamicIcon name={item.icon} boxSize={3.5} />
-                      <Text>{item.label}</Text>
-                    </HStack>
-                  </Link>
+                    {row.map((item) => (
+                      <Link
+                        key={item.label}
+                        href={item.href}
+                        isExternal={!item.href.startsWith('mailto:')}
+                        aria-label={item.label}
+                        color={socialIconColor}
+                        border="1px solid"
+                        borderColor={dividerColor}
+                        borderRadius="sm"
+                        px={2.5}
+                        py={1.5}
+                        fontFamily="mono"
+                        fontSize="xs"
+                        transition="all 0.2s"
+                        _hover={{
+                          color: 'cyan.400',
+                          borderColor: 'cyan.400',
+                          textDecoration: 'none',
+                          transform: 'translateY(-1px)',
+                        }}
+                      >
+                        <HStack spacing={1.5}>
+                          <DynamicIcon name={item.icon} boxSize={3.5} />
+                          <Text>{item.label}</Text>
+                        </HStack>
+                      </Link>
+                    ))}
+                  </HStack>
                 ))}
-              </HStack>
+              </VStack>
             )}
           </VStack>
 
