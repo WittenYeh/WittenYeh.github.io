@@ -63,9 +63,11 @@ const HeroSection = ({ title, avatar }: HeroSectionProps) => {
   const profileLinks = [
     { icon: 'FaEnvelope', href: siteOwner.contact.email ? `mailto:${siteOwner.contact.email}` : '', label: 'Email' },
     { icon: 'FaGithub', href: siteOwner.social.github, label: 'GitHub' },
+    { icon: 'FaGithub', href: siteOwner.social.labGithub, label: 'Lab GitHub' },
     { icon: 'FaLinkedin', href: siteOwner.social.linkedin, label: 'LinkedIn' },
     { icon: 'FaMedium', href: siteOwner.social.medium, label: 'Medium' },
     { icon: 'SiGooglescholar', href: siteOwner.social.googleScholar, label: 'Google Scholar' },
+    { icon: 'SiOrcid', href: siteOwner.social.orcid, label: 'ORCID' },
     { icon: 'SiZhihu', href: siteOwner.social.zhihu, label: '知乎' },
   ].filter((item) => item.href)
 
