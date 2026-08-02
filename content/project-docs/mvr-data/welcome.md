@@ -45,25 +45,90 @@ python -m pip install -e '.[dev]'
 
 ## CLI quick start
 
-```bash
-# Create package skeletons
-mvrdata init raw-example --kind raw --dataset-id example/raw --top-k 10
-mvrdata init embedded-example --kind embedded --dataset-id example/embedded \
-  --dimension 128 --dtype float32 --scoring-scheme chamfer --top-k 10
+The following examples show the default human-readable output. Reported paths
+may be absolute on your machine.
 
-# Inspect and validate a populated package
-mvrdata inspect embedded-example
-mvrdata validate embedded-example
-mvrdata validate --deep embedded-example
+### 1. Create an empty package
 
-# Maintain integrity data and create a transport archive
-mvrdata checksum --write embedded-example
-mvrdata pack embedded-example embedded-example.tar.zst
-mvrdata unpack embedded-example.tar.zst restored-example
+`init` creates the directory layout, `manifest.yaml`, and `checksums.sha256`.
+It does not add base objects, queries, vectors, or ground truth.
+
+```console
+$ mvrdata init raw-example --kind raw --dataset-id example/raw --top-k 10
+raw-example
+$ mvrdata init embedded-example --kind embedded --dataset-id example/embedded \
+    --dimension 128 --dtype float32 --scoring-scheme chamfer --top-k 10
+embedded-example
 ```
 
-The initializer creates an empty package. Use the Python writers to populate a
-new package safely:
+Embedded packages require a vector dimension, numeric dtype, and scoring
+scheme. Raw packages store ordered content components instead.
+
+### 2. Inspect package metadata
+
+`inspect` reads the manifest and shards without modifying them. It summarizes
+the dataset identity, kind, row and shard counts, and vector settings.
+
+```console
+$ mvrdata inspect embedded-example
+example/embedded @ 1
+  kind=embedded format=1.0.0
+  base=0, query=0, ground_truth=0
+  base_shards=0, query_shards=0, ground_truth_shards=0
+  dimension=128 dtype=float32 scoring=chamfer
+```
+
+### 3. Validate the package
+
+`validate` checks the manifest, Arrow schemas, row counts, object IDs, and
+ground-truth references and rankings. `--deep` additionally hashes every shard,
+raw payload, and package file to verify stored integrity data.
+
+```console
+$ mvrdata validate embedded-example
+valid: /path/to/embedded-example
+  base=0, query=0, ground_truth=0
+$ mvrdata validate --deep embedded-example
+valid: /path/to/embedded-example
+  base=0, query=0, ground_truth=0
+```
+
+### 4. Verify or refresh checksums
+
+`checksum` verifies `checksums.sha256`; `--write` regenerates it from the
+current package files.
+
+```console
+$ mvrdata checksum embedded-example
+checksums valid
+$ mvrdata checksum --write embedded-example
+/path/to/embedded-example/checksums.sha256
+```
+
+### 5. Create a transport archive
+
+`pack` deep-validates the package by default and creates a reproducible
+`tar.zst` archive. It refuses to overwrite an existing destination.
+
+```console
+$ mvrdata pack embedded-example embedded-example.tar.zst
+/path/to/embedded-example.tar.zst
+```
+
+### 6. Extract an archive safely
+
+`unpack` extracts regular files into a new or empty directory while rejecting
+unsafe paths, links, duplicate members, and special files.
+
+```console
+$ mvrdata unpack embedded-example.tar.zst restored-example
+/path/to/restored-example
+```
+
+A successful command returns exit code `0`. Validation or checksum failures
+return `1`; invalid arguments and operational errors return `2`.
+
+After `init`, use the Python writers to populate a new package safely:
 
 ```python
 from mvr_dataset import EmbeddedDatasetWriter
