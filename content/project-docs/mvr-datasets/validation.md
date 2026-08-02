@@ -19,7 +19,7 @@ The validator continues where safe, allowing one run to expose multiple independ
 
 ## Deep validation
 
-With `deep=True`, shard hashes are recomputed, raw asset byte sizes and digests are verified, and `checksums.sha256` is compared with every regular package file. Deep mode costs additional I/O but verifies content integrity rather than structure alone.
+With `deep=True`, shard hashes are recomputed, every raw asset is verified against the digest encoded in its `payload_uri`, and `checksums.sha256` is compared with every regular package file. Deep mode costs additional I/O but verifies content integrity rather than structure alone.
 
 ```python
 from mvr_dataset import validate_dataset

@@ -24,13 +24,11 @@ kind. All listed fields are required unless noted otherwise.
 | Field | Arrow type | Meaning |
 | --- | --- | --- |
 | `object_id` | `string` | Unique object identifier within the table. |
-| `components` | `large_list<struct>` | One or more ordered content components. |
+| `components` | `list<struct>` | One or more ordered content components of an object. |
 | `components[].component_id` | `string` | Component identifier, unique within the object. |
 | `components[].modality` | `string` | Extensible modality such as `text`, `image`, `audio`, or `video`. |
-| `components[].media_type` | `string` | MIME type of the stored payload. |
-| `components[].uri` | `string` | Package-local, content-addressed asset path. |
-| `components[].byte_size` | `uint64` | Payload size in bytes. |
-| `components[].sha256` | `fixed_size_binary[32]` | Binary SHA-256 digest of the payload. |
+| `components[].media_type` | `string` | MIME type of the stored payload, such as `text/plain` or `image/png`. |
+| `components[].payload_uri` | `string` | Package-local, content-addressed URI that encodes the payload's SHA-256 digest. |
 | `components[].metadata` | `map<string, string>` | Component-level metadata. |
 | `metadata` | `map<string, string>` | Object-level metadata. |
 
