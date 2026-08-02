@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react'
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import {
   Box,
   VStack,
@@ -36,6 +36,7 @@ import { FaChartBar, FaVideo, FaProjectDiagram, FaFileAlt, FaAtom, FaStar, FaRob
 import { IconType } from 'react-icons'
 import { highlightData } from '../utils/highlightData'
 import { publicationVenueColors, terminalPalette } from '@/config/theme'
+import TerminalPagination, { TERMINAL_PAGE_SIZE } from './TerminalPagination'
 
 /* ── Emoji → Icon mapping ─────────────────────────────────────── */
 const emojiIconMap: Record<string, IconType> = {
@@ -64,12 +65,14 @@ const PublicationsTerminal: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedYear, setSelectedYear] = useState<string>('all')
   const [selectedVenue, setSelectedVenue] = useState<string>('all')
+  const [currentPage, setCurrentPage] = useState(1)
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({})
   const [showStats, setShowStats] = useState(false)
   const [currentTime, setCurrentTime] = useState(new Date())
   const [, setCommandHistory] = useState<string[]>([])
   const [currentCommand, setCurrentCommand] = useState('')
   const [imagePreview, setImagePreview] = useState<{ src: string, alt: string } | null>(null)
+  const listTopRef = useRef<HTMLDivElement | null>(null)
   const { isOpen: isImageOpen, onOpen: openImageModal, onClose: closeImageModal } = useDisclosure()
   
   const isMobile = useBreakpointValue({ base: true, md: false })
@@ -138,6 +141,18 @@ const PublicationsTerminal: React.FC = () => {
     
     return filtered
   }, [publications, searchQuery, selectedYear, selectedVenue])
+
+  const totalPages = Math.max(1, Math.ceil(filteredPublications.length / TERMINAL_PAGE_SIZE))
+  const pagedPublications = useMemo(
+    () => filteredPublications.slice((currentPage - 1) * TERMINAL_PAGE_SIZE, currentPage * TERMINAL_PAGE_SIZE),
+    [filteredPublications, currentPage],
+  )
+  const pageStart = filteredPublications.length === 0 ? 0 : (currentPage - 1) * TERMINAL_PAGE_SIZE + 1
+  const pageEnd = Math.min(currentPage * TERMINAL_PAGE_SIZE, filteredPublications.length)
+
+  useEffect(() => {
+    if (currentPage > totalPages) setCurrentPage(totalPages)
+  }, [currentPage, totalPages])
   
   // Get unique years for filter
   const availableYears = useMemo(() => {
@@ -161,12 +176,15 @@ const PublicationsTerminal: React.FC = () => {
     switch (command) {
       case 'search':
         setSearchQuery(parts.slice(1).join(' '))
+        setCurrentPage(1)
         break
       case 'filter':
         if (parts[1] === 'year' && parts[2]) {
           setSelectedYear(parts[2])
+          setCurrentPage(1)
         } else if (parts[1] === 'venue' && parts[2]) {
           setSelectedVenue(parts[2])
+          setCurrentPage(1)
         }
         break
       case 'stats':
@@ -176,6 +194,7 @@ const PublicationsTerminal: React.FC = () => {
         setSearchQuery('')
         setSelectedYear('all')
         setSelectedVenue('all')
+        setCurrentPage(1)
         break
       case 'help':
         alert('Commands: search <query>, filter year <year>, filter venue <type>, stats, clear, help')
@@ -199,6 +218,11 @@ const PublicationsTerminal: React.FC = () => {
     setImagePreview({ src, alt: alt ?? 'publication preview' })
     openImageModal()
   }, [openImageModal])
+
+  const changePage = (page: number) => {
+    setCurrentPage(Math.min(Math.max(page, 1), totalPages))
+    window.requestAnimationFrame(() => listTopRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }))
+  }
   
   return (
     <Box w="full" minH="100vh" bg={useColorModeValue('gray.50', 'gray.900')} py={8}>
@@ -336,7 +360,7 @@ const PublicationsTerminal: React.FC = () => {
               <Input
                 placeholder="grep -i 'robotics' papers/*"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1) }}
                 size="sm"
                 flex="1"
                 minW="200px"
@@ -349,7 +373,7 @@ const PublicationsTerminal: React.FC = () => {
               
               <Select
                 value={selectedYear}
-                onChange={(e) => setSelectedYear(e.target.value)}
+                onChange={(e) => { setSelectedYear(e.target.value); setCurrentPage(1) }}
                 size="sm"
                 w="120px"
                 bg={isDark ? 'rgba(0,0,0,0.2)' : 'white'}
@@ -365,7 +389,7 @@ const PublicationsTerminal: React.FC = () => {
               
               <Select
                 value={selectedVenue}
-                onChange={(e) => setSelectedVenue(e.target.value)}
+                onChange={(e) => { setSelectedVenue(e.target.value); setCurrentPage(1) }}
                 size="sm"
                 w="140px"
                 bg={isDark ? 'rgba(0,0,0,0.2)' : 'white'}
@@ -393,20 +417,10 @@ const PublicationsTerminal: React.FC = () => {
           
           {/* Publication List */}
           <Box
+            ref={listTopRef}
             bg={termBg}
             color={termText}
-            maxH="70vh"
-            overflowY="auto"
-            sx={{
-              '&::-webkit-scrollbar': {
-                width: '8px',
-                background: 'transparent',
-              },
-              '&::-webkit-scrollbar-thumb': {
-                background: tc.border,
-                borderRadius: '4px',
-              },
-            }}
+            scrollMarginTop="80px"
           >
             {/* List Header */}
             <Flex
@@ -417,14 +431,14 @@ const PublicationsTerminal: React.FC = () => {
               fontWeight="bold"
               color={termInfo}
             >
-              {!isMobile && <Text w="320px" mr={6}>PREVIEW</Text>}
+              {!isMobile && <Text w="180px" mr={4}>PREVIEW</Text>}
               <Text flex="1">PUBLICATION</Text>
               {!isMobile && <Text w="150px">RESOURCES</Text>}
               <Text w="50px" textAlign="center">MORE</Text>
             </Flex>
             
             {/* Publications */}
-            {filteredPublications.map((pub) => (
+            {pagedPublications.map((pub) => (
               <Box
                 key={pub.id}
                 borderBottom={`1px dotted ${termBorder}`}
@@ -435,20 +449,20 @@ const PublicationsTerminal: React.FC = () => {
                 {/* Main Row */}
                 <Flex
                   px={4}
-                  py={6}
+                  py={4}
                   align="center"
                   cursor="pointer"
                   onClick={() => toggleExpanded(pub.id)}
                   fontSize="sm"
                   position="relative"
-                  minH="200px"
+                  minH="132px"
                 >
                   {/* Featured Image Thumbnail */}
                   {pub.featuredImage && !isMobile && (
                     <Box 
-                      w="320px" 
-                      h="180px"
-                      mr={6}
+                      w="180px"
+                      h="108px"
+                      mr={4}
                       flexShrink={0}
                       display="flex"
                       alignItems="center"
@@ -749,6 +763,13 @@ const PublicationsTerminal: React.FC = () => {
               </Box>
             )}
           </Box>
+
+          <TerminalPagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={changePage}
+            ariaLabel="Publications pages"
+          />
           
           {/* Command Line Footer */}
           <Flex
@@ -823,7 +844,7 @@ const PublicationsTerminal: React.FC = () => {
           gap={2}
         >
           <Text color={termInfo}>
-            Showing <Text as="span" color={termHighlight} fontWeight="bold">{filteredPublications.length}</Text> of {publications.length} papers
+            Showing <Text as="span" color={termHighlight} fontWeight="bold">{pageStart}-{pageEnd}</Text> of {filteredPublications.length} matching papers ({publications.length} total)
           </Text>
           <HStack spacing={4}>
             <Text color={termSuccess}>

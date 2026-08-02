@@ -5,7 +5,7 @@ import { withBase } from '@/utils/asset'
 
 const BioSection: React.FC = () => {
   const { t } = useTranslation()
-  const { about, research, experience, institutionLogos } = useLocalizedData()
+  const { research, experience, institutionLogos } = useLocalizedData()
   const textColor = useColorModeValue('gray.600', 'gray.400')
   const headingColor = useColorModeValue('gray.800', 'gray.100')
   const lineColor = useColorModeValue('gray.200', 'gray.700')
@@ -14,44 +14,10 @@ const BioSection: React.FC = () => {
   const hoverBg = useColorModeValue('gray.50', 'whiteAlpha.50')
   const fallbackBg = useColorModeValue('blue.50', 'blue.900')
 
-  if (!about.journey) return null
-
-  const renderLinkedText = (text: string) => {
-    const links = about.links ?? []
-    if (links.length === 0) return text
-
-    const escapedLabels = links
-      .map(({ label }) => label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
-      .join('|')
-    const parts = text.split(new RegExp(`(${escapedLabels})`, 'g'))
-
-    return parts.map((part, index) => {
-      const link = links.find(({ label }) => label === part)
-      return link ? (
-        <Link key={`${part}-${index}`} href={link.url} isExternal color="cyan.400" fontWeight="medium">
-          {part}
-        </Link>
-      ) : part
-    })
-  }
-
   return (
     <Box w="full">
       <Container maxW={["full", "full", "7xl"]} px={[2, 4, 8]}>
-        <Flex align="center" gap={3} mb={4}>
-          <Box h="2px" w="20px" bg="cyan.400" borderRadius="full" flexShrink={0} />
-          <Heading size="md" fontWeight="semibold">{t('about.bio', 'About')}</Heading>
-          <Box flex="1" h="1px" bg={lineColor} />
-        </Flex>
-        <VStack align="stretch" spacing={3}>
-          {about.journey.split(/\n+/).filter(Boolean).map((paragraph, index) => (
-            <Text key={index} fontSize="sm" lineHeight="tall" color={textColor}>
-              {renderLinkedText(paragraph)}
-            </Text>
-          ))}
-        </VStack>
-
-        <SimpleGrid columns={[1, 1, 2]} spacing={[5, 6, 8]} mt={[6, 7]} pt={[5, 6]} borderTop="1px dashed" borderColor={lineColor}>
+        <SimpleGrid columns={[1, 1, 2]} spacing={[5, 6, 8]} pt={[4, 5]} borderTop="1px dashed" borderColor={lineColor}>
           <VStack align="stretch" spacing={3}>
             <Heading size="xs" color={textColor} textTransform="uppercase" letterSpacing="wider" fontSize="2xs">
               {t('about.experience')}

@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Box, Collapse, Flex, HStack, Icon, Input, Link, Text, VStack,
   Image, useColorMode, useColorModeValue,
@@ -18,6 +18,7 @@ import { withBase } from '@/utils/asset'
 import { highlightData } from '@/utils/highlightData'
 import { useLocalizedData } from '@/hooks/useLocalizedData'
 import { buildCategoryThemes, terminalPalette, type CatTheme } from '@/config/theme'
+import TerminalPagination, { TERMINAL_PAGE_SIZE } from './TerminalPagination'
 
 /* ── Keyframes ─────────────────────────────────────────────────── */
 const blink = keyframes`0%,100%{opacity:1}50%{opacity:0}`
@@ -90,7 +91,7 @@ const FlowNode: React.FC<{
   const hasExpandable = (item.highlights && item.highlights.length > 0) || item.story
 
   return (
-    <Flex gap={[3, 3, 4]} align="start" py={3} position="relative">
+    <Flex gap={[3, 3, 4]} align="start" py={2.5} position="relative">
       {/* Dot — hollow ring, filled for featured/last */}
       <Box flexShrink={0} mt="6px">
         <Box
@@ -156,8 +157,8 @@ const FlowNode: React.FC<{
           gap={[3, 3, 4]} align="stretch">
           {hasImg && (
             <Box
-              flexShrink={0} w={['full', 'full', '260px']}
-              minH={['180px', '200px', 'auto']}
+              flexShrink={0} w={['full', 'full', '168px']}
+              h={['120px', '120px', '96px']}
               cursor="zoom-in" overflow="hidden" borderRadius="sm"
               onClick={() => {
                 const img = item.featuredImage
@@ -267,7 +268,9 @@ const Projects: React.FC = () => {
 
   const [activeTab, setActiveTab] = useState<TabKey>('all')
   const [searchQuery, setSearchQuery] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
   const [imgPreview, setImgPreview] = useState<{ src: string; alt: string } | null>(null)
+  const listTopRef = useRef<HTMLDivElement | null>(null)
   const { isOpen: isImgOpen, onOpen: openImg, onClose: closeImg } = useDisclosure()
 
   /* Terminal palette (centralized) */
@@ -326,24 +329,41 @@ const Projects: React.FC = () => {
       })
   }, [projects, searchQuery, activeTab])
 
+  const totalPages = Math.max(1, Math.ceil(filtered.length / TERMINAL_PAGE_SIZE))
+  const pagedProjects = useMemo(
+    () => filtered.slice((currentPage - 1) * TERMINAL_PAGE_SIZE, currentPage * TERMINAL_PAGE_SIZE),
+    [filtered, currentPage],
+  )
+
+  useEffect(() => {
+    if (currentPage > totalPages) setCurrentPage(totalPages)
+  }, [currentPage, totalPages])
+
   /* ── Year groups ── */
   const yearGroups = useMemo(() => {
     const g: Record<string, TP[]> = {}
-    filtered.forEach(p => { const y = getYear(p.date); (g[y] ??= []).push(p) })
+    pagedProjects.forEach(p => { const y = getYear(p.date); (g[y] ??= []).push(p) })
     return Object.entries(g)
       .sort(([a], [b]) => a === 'Unknown' ? 1 : b === 'Unknown' ? -1 : Number(b) - Number(a))
       .map(([year, items]) => ({ year, items }))
-  }, [filtered])
+  }, [pagedProjects])
 
   /* ── Stats ── */
   const totalIndep = useMemo(() => projects.filter(p => !p.role || p.role === 'independent').length, [projects])
-  const filteredIndep = useMemo(() => filtered.filter(p => !p.role || p.role === 'independent').length, [filtered])
+  const pageIndep = useMemo(() => pagedProjects.filter(p => !p.role || p.role === 'independent').length, [pagedProjects])
+  const pageStart = filtered.length === 0 ? 0 : (currentPage - 1) * TERMINAL_PAGE_SIZE + 1
+  const pageEnd = Math.min(currentPage * TERMINAL_PAGE_SIZE, filtered.length)
 
   const onImgClick = useCallback((src: string, alt: string) => {
     setImgPreview({ src, alt }); openImg()
   }, [openImg])
 
   const promptPath = activeTab === 'all' ? '~' : `~/${activeTab}`
+
+  const changePage = (page: number) => {
+    setCurrentPage(Math.min(Math.max(page, 1), totalPages))
+    window.requestAnimationFrame(() => listTopRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }))
+  }
 
   return (
     <Box w="full" minH="100vh" bg={useColorModeValue('gray.50', 'gray.900')} py={8}>
@@ -431,7 +451,7 @@ const Projects: React.FC = () => {
                     color: tab.color,
                     bg: active ? termBg : (isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)'),
                   }}
-                  onClick={() => setActiveTab(tab.key)}
+                  onClick={() => { setActiveTab(tab.key); setCurrentPage(1) }}
                   flexShrink={0} whiteSpace="nowrap"
                 >
                   <Box sx={active && tab.key !== 'all'
@@ -454,7 +474,7 @@ const Projects: React.FC = () => {
             <Text color={termPrompt} flexShrink={0}>{siteOwner.terminalUsername}@projects:{promptPath}$</Text>
             <Input
               placeholder="grep -i '...'"
-              value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
+              value={searchQuery} onChange={e => { setSearchQuery(e.target.value); setCurrentPage(1) }}
               size="xs" variant="unstyled" color={termText} fontFamily="mono"
               flex="1" minW="120px" _placeholder={{ color: termSecondary }}
             />
@@ -462,13 +482,10 @@ const Projects: React.FC = () => {
 
           {/* ═══ CONTENT — Timeline Flow ═══ */}
           <Box
+            ref={listTopRef}
             key={activeTab}
             bg={termBg} color={termText}
-            maxH="75vh" overflowY="auto"
-            sx={{
-              '&::-webkit-scrollbar': { width: '6px', background: 'transparent' },
-              '&::-webkit-scrollbar-thumb': { background: tc.border, borderRadius: '3px' },
-            }}
+            scrollMarginTop="80px"
           >
             <Box px={[3, 4, 5]} py={4}>
               {yearGroups.map((group, gi) => (
@@ -515,6 +532,13 @@ const Projects: React.FC = () => {
             )}
           </Box>
 
+          <TerminalPagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={changePage}
+            ariaLabel="Projects pages"
+          />
+
           {/* ═══ STATUS BAR ═══ */}
           <Flex
             px={4} py={1.5} bg={termHeader} borderTop={`1px solid ${termBorder}`}
@@ -522,10 +546,10 @@ const Projects: React.FC = () => {
             flexWrap="wrap" gap={2}
           >
             <HStack spacing={3}>
-              <Text>{filtered.length}/{projects.length} {t('projects.shown')}</Text>
+              <Text>{pageStart}-{pageEnd}/{filtered.length} {t('projects.shown')}</Text>
               <HStack spacing={1} color={termHighlight}>
                 <Icon as={FaUser} boxSize="9px" />
-                <Text fontWeight="bold">{filteredIndep} {t('projects.independent')}</Text>
+                <Text fontWeight="bold">{pageIndep} {t('projects.independent')}</Text>
               </HStack>
             </HStack>
             <HStack spacing={1}>

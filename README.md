@@ -47,7 +47,7 @@ Codex 和其他代码 Agent 在修改仓库前必须阅读根目录的英文规�
 编辑 `content/site.json`：
 
 - `name`：姓名及论文作者名变体。
-- `title`、`tagline`：主页标题和一句话简介。
+- `title`：网站标题。
 - `terminal`：终端用户名、轮换短语、技能和时区。
 - `contact`：邮箱和所在地。
 - `social`：GitHub、Google Scholar、LinkedIn 等链接。
