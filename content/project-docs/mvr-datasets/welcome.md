@@ -14,6 +14,33 @@ Both kinds contain an object-level, ranked ground-truth table. Tables are
 sharded Arrow IPC files; packages can optionally be transported as reproducible
 `tar.zst` archives.
 
+## Dataset schemas
+
+The `base` and `query` tables use the same object schema within each package
+kind. All listed fields are required unless noted otherwise.
+
+### Raw dataset
+
+| Field | Arrow type | Meaning |
+| --- | --- | --- |
+| `object_id` | `string` | Unique object identifier within the table. |
+| `components` | `large_list<struct>` | One or more ordered content components. |
+| `components[].component_id` | `string` | Component identifier, unique within the object. |
+| `components[].modality` | `string` | Extensible modality such as `text`, `image`, `audio`, or `video`. |
+| `components[].media_type` | `string` | MIME type of the stored payload. |
+| `components[].uri` | `string` | Package-local, content-addressed asset path. |
+| `components[].byte_size` | `uint64` | Payload size in bytes. |
+| `components[].sha256` | `fixed_size_binary[32]` | Binary SHA-256 digest of the payload. |
+| `components[].metadata` | `map<string, string>` | Component-level metadata. |
+| `metadata` | `map<string, string>` | Object-level metadata. |
+
+### Embedded dataset
+
+| Field | Arrow type | Meaning |
+| --- | --- | --- |
+| `object_id` | `string` | Unique object identifier within the table. |
+| `vectors` | `large_list<fixed_size_list<T, dimension>>` | One or more ordered vectors; their numeric dtype `T` and dimension are fixed package-wide by the manifest. |
+
 ## Install
 
 ```bash
