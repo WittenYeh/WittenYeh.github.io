@@ -8,7 +8,7 @@ Closing flushes every table, writes the manifest, and generates whole-package ch
 
 ## RawDatasetWriter
 
-`RawDatasetWriter` accepts `RawComponent` values. It validates component IDs, modality tokens, MIME types, metadata, and source files. Each source file is hashed and copied to:
+`RawDatasetWriter` accepts `RawComponent` values. It validates component IDs, modality tokens, MIME types, and source files. Each source file is hashed and copied to:
 
 ```text
 assets/sha256/<first-two-digest-characters>/<full-digest>

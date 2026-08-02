@@ -29,8 +29,6 @@ kind. All listed fields are required unless noted otherwise.
 | `components[].modality` | `string` | Extensible modality such as `text`, `image`, `audio`, or `video`. |
 | `components[].media_type` | `string` | MIME type of the stored payload, such as `text/plain` or `image/png`. |
 | `components[].payload_uri` | `string` | Package-local, content-addressed URI that encodes the payload's SHA-256 digest. |
-| `components[].metadata` | `map<string, string>` | Component-level metadata. |
-| `metadata` | `map<string, string>` | Object-level metadata. |
 
 ### Embedded dataset
 
