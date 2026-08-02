@@ -44,6 +44,7 @@
     "news": "News",
     "selectedPublications": "Selected Publications",
     "viewAllPublications": "View all publications",
+    "experience": "Experience",
     "myJourney": "Experience",
     "viewAllExperience": "View all experience",
     "equalContribution": "* equal contribution",
@@ -58,13 +59,29 @@
     "awardsSpanning": "awards spanning",
     "categories": "categories"
   },
+  "githubContributions": {
+    "title": "GitHub Contributions",
+    "autoSync": "AUTO-SYNC",
+    "syncing": "SYNCING",
+    "cached": "CACHED",
+    "offline": "OFFLINE",
+    "fetching": "fetching contribution graph...",
+    "inLastYear": "contributions in the last year",
+    "lastChecked": "last checked:",
+    "cacheFallback": "live source unavailable · cached at:",
+    "less": "Less",
+    "more": "More",
+    "unavailable": "contribution graph is temporarily unavailable",
+    "retry": "The graph will retry automatically while this page is open.",
+    "hourlySync": "synced automatically from the public GitHub contribution graph every hour"
+  },
   "hero": {
     "greeting": "Hi there, I'm",
     "sometimesI": "I",
     "defaultName": "Academic Homepage"
   },
   "footer": {
-    "poweredBy": "Powered by"
+    "adaptedFrom": "Adapted from"
   },
   "experience": {
     "education": "EDUCATION",

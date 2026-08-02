@@ -11,6 +11,7 @@
 import { readFileSync, existsSync, readdirSync } from 'fs'
 import { resolve, dirname } from 'path'
 import { fileURLToPath } from 'url'
+import matter from 'gray-matter'
 import { loadProjectDocs } from './project-docs.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -99,6 +100,30 @@ if (site) {
 }
 
 // ---------------------------------------------------------------------------
+// 3a. Runtime GitHub contribution graph configuration
+// ---------------------------------------------------------------------------
+
+if (site?.sections?.includes('githubContributions')) {
+  const config = site.githubContributions
+  if (!config || typeof config !== 'object') {
+    fail('githubContributions is enabled in sections but has no configuration')
+  } else {
+    if (typeof config.username !== 'string' || !/^[A-Za-z0-9-]+$/.test(config.username)) {
+      fail('githubContributions.username must be a valid GitHub username')
+    }
+    if (typeof config.apiBaseUrl !== 'string' || !config.apiBaseUrl.startsWith('https://')) {
+      fail('githubContributions.apiBaseUrl must be an HTTPS URL')
+    }
+    if (config.year !== 'last') {
+      fail('githubContributions.year must currently be "last"')
+    }
+    if (!Number.isFinite(config.refreshMinutes) || config.refreshMinutes < 5) {
+      fail('githubContributions.refreshMinutes must be a number of at least 5')
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
 // 4. All content JSON files are valid
 // ---------------------------------------------------------------------------
 
@@ -163,7 +188,35 @@ if (logos) {
 }
 
 // ---------------------------------------------------------------------------
-// 6. Selected publication IDs check
+// 6. Project preview image files check
+// ---------------------------------------------------------------------------
+
+const projectDir = resolve(ROOT, 'content', 'projects')
+if (existsSync(projectDir)) {
+  const projectFiles = readdirSync(projectDir).filter((file) => file.endsWith('.md'))
+  const previewImages = []
+  const invalidPreviews = []
+
+  for (const file of projectFiles) {
+    const { data } = matter(readFileSync(resolve(projectDir, file), 'utf-8'))
+    if (!data.featuredImage) continue
+
+    previewImages.push(data.featuredImage)
+    if (typeof data.featuredImage !== 'string' || !data.featuredImage.startsWith('/images/')) {
+      invalidPreviews.push(`${file}: featuredImage must start with /images/`)
+      continue
+    }
+
+    const previewPath = resolve(ROOT, 'content', data.featuredImage.replace(/^\//, ''))
+    if (!existsSync(previewPath)) invalidPreviews.push(`${file}: missing ${data.featuredImage}`)
+  }
+
+  if (invalidPreviews.length === 0) pass(`All ${previewImages.length} project preview image(s) valid`)
+  else invalidPreviews.forEach(fail)
+}
+
+// ---------------------------------------------------------------------------
+// 7. Selected publication IDs check
 // ---------------------------------------------------------------------------
 
 if (site?.selectedPublicationIds?.length > 0) {
@@ -195,7 +248,7 @@ if (site?.selectedPublicationIds?.length > 0) {
 }
 
 // ---------------------------------------------------------------------------
-// 7. Downloadable CV and benchmark targets
+// 8. Downloadable CV and benchmark targets
 // ---------------------------------------------------------------------------
 
 const cv = readJson('content/cv.json')
@@ -219,7 +272,7 @@ if (benchmarks?.items && Array.isArray(benchmarks.items)) {
 }
 
 // ---------------------------------------------------------------------------
-// 8. Project documentation structure
+// 9. Project documentation structure
 // ---------------------------------------------------------------------------
 
 try {

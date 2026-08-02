@@ -22,6 +22,7 @@ import SelectedPublicationsSection from '../../components/sections/SelectedPubli
 import TalksSection from '../../components/sections/TalksSection'
 import TeachingSection from '../../components/sections/TeachingSection'
 import ContactSection from '../../components/sections/ContactSection'
+import GithubContributionsSection from '../../components/sections/GithubContributionsSection'
 
 const Publications = lazy(() => import('../../components/Publications'))
 const Research = lazy(() => import('../../components/Research'))
@@ -69,6 +70,7 @@ const terminalTemplate: TemplateConfig = {
     talks: TalksSection,
     teaching: TeachingSection,
     contact: ContactSection,
+    githubContributions: GithubContributionsSection,
   },
 }
 

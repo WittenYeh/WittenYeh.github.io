@@ -6,6 +6,7 @@ tags: [Multi-Vector Retrieval, Apache Arrow, Benchmark, Python]
 role: maintainer
 badge: Format & Tooling
 featured: true
+featuredImage: /images/projects/mvr-datasets-preview.svg
 summary: A versioned, Arrow-based interchange format and Python toolkit for raw and embedded multi-vector retrieval benchmarks.
 highlights:
   - Supports raw multimodal objects and variable-length sets of embedded vectors.

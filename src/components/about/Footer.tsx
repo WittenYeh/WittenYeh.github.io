@@ -43,7 +43,7 @@ const Footer: React.FC = () => {
             color={textColor}
             fontSize={["xs", "sm"]}
           >
-            <Text>{t('footer.poweredBy')}</Text>
+            <Text>{t('footer.adaptedFrom')}</Text>
             <Link
               href="https://github.com/H-Freax/TermHub"
               isExternal

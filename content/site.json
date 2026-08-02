@@ -2,7 +2,7 @@
   "_comment": "Edit this file to add your English profile details. See README.md for a complete map.",
   "template": "terminal",
   "components": {},
-  "sections": ["hero", "bio", "newsDisplay", "journey", "selectedPublications", "footer"],
+  "sections": ["hero", "bio", "githubContributions", "newsDisplay", "selectedPublications", "footer"],
   "name": {
     "full": "Weitang Ye",
     "first": "Weitang",
@@ -37,6 +37,12 @@
     "zhihu": "https://www.zhihu.com/people/chi-xin-5-10",
     "csdn": "",
     "blog": ""
+  },
+  "githubContributions": {
+    "username": "WittenYeh",
+    "apiBaseUrl": "https://github-contributions-api.jogruber.de/v4",
+    "year": "last",
+    "refreshMinutes": 60
   },
   "pets": [],
   "features": {

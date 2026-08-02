@@ -6,6 +6,7 @@ tags: [Approximate Nearest Neighbor, Graph Index, Vector Search, C++23]
 role: lead
 badge: VLDB 2027 · Revision
 featured: true
+featuredImage: /images/logos/artea.webp
 summary: A theory-guided hierarchical proximity-graph index for high-performance approximate nearest neighbor search.
 highlights:
   - Combines a deterministic bottom-up r-net hierarchy with Aspect-Ratio-Constrained Pruning.

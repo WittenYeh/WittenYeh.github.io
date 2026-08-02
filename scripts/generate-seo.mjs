@@ -64,7 +64,7 @@ const formatExperienceDate = (value = 'Present') => {
   const month = monthNames[Number(match[2]) - 1]
   return month ? `${month} ${match[1]}` : value
 }
-const educationHtml = experience.timeline.map((item) => `
+const experienceHtml = experience.timeline.map((item) => `
   <article class="seo-card">
     <h3>${escapeHtml(item.title)}</h3>
     <p>${item.companyUrl ? `<a href="${escapeHtml(item.companyUrl)}">${escapeHtml(item.company)}</a>` : escapeHtml(item.company)}</p>
@@ -103,7 +103,7 @@ const homeStaticContent = `${staticStyle}
     </header>
     <section aria-labelledby="seo-about"><h2 id="seo-about">About</h2>${aboutHtml}</section>
     <div class="seo-grid">
-      <section aria-labelledby="seo-education"><h2 id="seo-education">Education</h2>${educationHtml}</section>
+      <section aria-labelledby="seo-experience"><h2 id="seo-experience">Experience</h2>${experienceHtml}</section>
       <section aria-labelledby="seo-research"><h2 id="seo-research">${escapeHtml(research.sectionTitle)}</h2>${researchHtml}</section>
     </div>
     <section aria-labelledby="seo-news"><h2 id="seo-news">Recent Updates</h2>${newsHtml}</section>

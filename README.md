@@ -51,7 +51,25 @@ Codex 和其他代码 Agent 在修改仓库前必须阅读根目录的英文规�
 - `terminal`：终端用户名、轮换短语、技能和时区。
 - `contact`：邮箱和所在地。
 - `social`：GitHub、Google Scholar、LinkedIn 等链接。
+- `githubContributions`：首页 GitHub contribution wall 的用户名、公开 API 和自动刷新间隔。
 - `features`：控制页面是否显示在导航栏。
+
+### GitHub contribution wall
+
+首页的 `githubContributions` section 会在浏览器中读取公开 GitHub contribution 数据，因此新增 contribution 不需要修改、提交或重新部署本站仓库。默认每小时重新检查一次，并把最近一次成功结果缓存在浏览器中；数据源暂时不可用时会显示缓存结果。
+
+配置位于 `content/site.json`：
+
+```json
+"githubContributions": {
+  "username": "WittenYeh",
+  "apiBaseUrl": "https://github-contributions-api.jogruber.de/v4",
+  "year": "last",
+  "refreshMinutes": 60
+}
+```
+
+在 `sections` 中加入、移除或移动 `githubContributions` 即可显示、隐藏或调整位置。该组件只读取公开数据；不要把 GitHub Personal Access Token 写入 `content/site.json` 或任何前端环境变量。
 
 ### 头像
 
@@ -78,9 +96,9 @@ version:
 Write your English biography here.
 ```
 
-### Education 与 Experience
+### Experience
 
-两处展示共用 `content/experience.json` 中的 `timeline`，每条经历只需维护一次：
+首页 Experience 列表使用 `content/experience.json` 中的 `timeline`，每条经历只需维护一次：
 
 - `title`：职位或学位名称。
 - `company`：学校、学院或机构。
@@ -88,7 +106,7 @@ Write your English biography here.
 - `start`、`end`：使用 `YYYY-MM`；当前经历的 `end` 填写 `Present`。
 - `summary`：首页 Experience 时间线中的说明。
 
-首页 Education、Experience 时间线和构建生成的 SEO 内容都会自动从这份数据同步。
+首页 Experience 列表和构建生成的 SEO 内容都会自动从这份数据同步。
 
 ### 论文
 
@@ -125,6 +143,7 @@ date: 2026-01-01
 tags: [Graph, Database, Benchmark]
 link: "https://..."
 isOpenSource: true
+featuredImage: /images/projects/project-name-preview.webp
 ---
 
 项目简介。
@@ -132,6 +151,8 @@ isOpenSource: true
 - 项目亮点一
 - 项目亮点二
 ```
+
+`featuredImage` 是 Projects 列表中的预览缩略图，也支持点击放大。图片应保存在 `content/images/projects/`（可复用 `content/images/logos/` 中已有的优化 Logo），并使用 `/images/...` 路径引用；`npm run validate` 会检查文件是否存在。
 
 ### 为项目添加 README 或多页文档
 

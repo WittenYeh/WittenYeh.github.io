@@ -42,6 +42,7 @@ export interface SelectedPublicationsSlotProps {}
 export interface TalksSlotProps {}
 export interface TeachingSlotProps {}
 export interface ContactSlotProps {}
+export interface GithubContributionsSlotProps {}
 
 /* ── Slot map type ─────────────────────────────────────────── */
 
@@ -59,6 +60,7 @@ export interface ComponentSlots {
   talks: React.ComponentType<TalksSlotProps>
   teaching: React.ComponentType<TeachingSlotProps>
   contact: React.ComponentType<ContactSlotProps>
+  githubContributions: React.ComponentType<GithubContributionsSlotProps>
 }
 
 export type SlotName = keyof ComponentSlots
@@ -70,6 +72,7 @@ export type SlotName = keyof ComponentSlots
 export const DEFAULT_SECTIONS: SlotName[] = [
   'hero',
   'bio',
+  'githubContributions',
   'newsDisplay',
   'selectedPublications',
   'journey',
@@ -86,5 +89,5 @@ export const DEFAULT_SECTIONS: SlotName[] = [
 export const SECTION_SLOTS: SlotName[] = [
   'hero', 'bio', 'skills', 'newsDisplay', 'selectedPublications',
   'journey', 'mentorship', 'talks', 'teaching', 'accomplishments',
-  'contact', 'footer',
+  'contact', 'githubContributions', 'footer',
 ]
