@@ -260,6 +260,43 @@ const ProjectDocs: React.FC = () => {
                   lineHeight: 1.7,
                 },
                 '& pre code': { color: tc.text, bg: 'transparent', border: 0, p: 0 },
+                '& pre:has(> code.language-command)': {
+                  bg: isDark ? '#202b27' : '#edf8f1',
+                  borderColor: tc.success,
+                  borderLeftWidth: '3px',
+                },
+                '& pre:has(> code.language-output)': {
+                  bg: isDark ? '#222a36' : '#eef4fb',
+                  borderColor: tc.info,
+                  borderLeftWidth: '3px',
+                },
+                '& pre code.language-command, & pre code.language-output': {
+                  display: 'block',
+                },
+                '& pre code.language-command': { color: tc.success },
+                '& pre code.language-output': { color: tc.info },
+                '& pre code.language-command::before, & pre code.language-output::before': {
+                  display: 'block',
+                  mx: -4,
+                  mt: -4,
+                  mb: 3,
+                  px: 4,
+                  py: 1.5,
+                  bg: tc.header,
+                  borderBottom: `1px solid ${tc.border}`,
+                  fontSize: '10px',
+                  fontWeight: 700,
+                  letterSpacing: '0.14em',
+                  lineHeight: 1.5,
+                },
+                '& pre code.language-command::before': {
+                  content: '"COMMAND"',
+                  color: tc.success,
+                },
+                '& pre code.language-output::before': {
+                  content: '"OUTPUT"',
+                  color: tc.info,
+                },
                 '& img': { maxWidth: '100%', height: 'auto' },
                 '& blockquote': {
                   borderLeft: `3px solid ${tc.command}`,

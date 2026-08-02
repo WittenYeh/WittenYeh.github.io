@@ -61,11 +61,20 @@ may be absolute on your machine.
 `init` creates the directory layout, `manifest.yaml`, and `checksums.sha256`.
 It does not add base objects, queries, vectors, or ground truth.
 
-```console
+```command
 $ mvrdata init raw-example --kind raw --data-id example/raw --top-k 10
+```
+
+```output
 raw-example
+```
+
+```command
 $ mvrdata init embedded-example --kind embedded --data-id example/embedded \
     --dimension 128 --dtype float32 --scoring-scheme chamfer --top-k 10
+```
+
+```output
 embedded-example
 ```
 
@@ -77,8 +86,11 @@ scheme. Raw packages store ordered content components instead.
 `inspect` reads the manifest and shards without modifying them. It summarizes
 the data identity, kind, row and shard counts, and vector settings.
 
-```console
+```command
 $ mvrdata inspect embedded-example
+```
+
+```output
 example/embedded @ 1
   kind=embedded format=1.0.0
   base=0, query=0, ground_truth=0
@@ -92,11 +104,20 @@ example/embedded @ 1
 ground-truth references and rankings. `--deep` additionally hashes every shard,
 raw payload, and package file to verify stored integrity data.
 
-```console
+```command
 $ mvrdata validate embedded-example
+```
+
+```output
 valid: /path/to/embedded-example
   base=0, query=0, ground_truth=0
+```
+
+```command
 $ mvrdata validate --deep embedded-example
+```
+
+```output
 valid: /path/to/embedded-example
   base=0, query=0, ground_truth=0
 ```
@@ -106,10 +127,19 @@ valid: /path/to/embedded-example
 `checksum` verifies `checksums.sha256`; `--write` regenerates it from the
 current package files.
 
-```console
+```command
 $ mvrdata checksum embedded-example
+```
+
+```output
 checksums valid
+```
+
+```command
 $ mvrdata checksum --write embedded-example
+```
+
+```output
 /path/to/embedded-example/checksums.sha256
 ```
 
@@ -118,8 +148,11 @@ $ mvrdata checksum --write embedded-example
 `pack` deep-validates the package by default and creates a reproducible
 `tar.zst` archive. It refuses to overwrite an existing destination.
 
-```console
+```command
 $ mvrdata pack embedded-example embedded-example.tar.zst
+```
+
+```output
 /path/to/embedded-example.tar.zst
 ```
 
@@ -128,8 +161,11 @@ $ mvrdata pack embedded-example embedded-example.tar.zst
 `unpack` extracts regular files into a new or empty directory while rejecting
 unsafe paths, links, duplicate members, and special files.
 
-```console
+```command
 $ mvrdata unpack embedded-example.tar.zst restored-example
+```
+
+```output
 /path/to/restored-example
 ```
 
