@@ -7,7 +7,7 @@ role: maintainer
 badge: Format & Tooling
 featured: true
 featuredImage: /images/projects/mvr-data-preview.svg
-summary: A versioned, Arrow-based interchange format and Python toolkit for raw and embedded multi-vector retrieval benchmarks.
+summary: An Arrow-based runtime organization, interchange format, and Python toolkit for multi-vector retrieval data.
 highlights:
   - Supports raw multimodal objects and variable-length sets of embedded vectors.
   - Includes streaming readers and writers, validation, checksums, and reproducible archives.
@@ -18,4 +18,4 @@ extraLinks:
     url: https://github.com/WittenYeh/MVR-Data
 ---
 
-A compact interchange format for building, validating, reading, and distributing multi-vector retrieval datasets.
+A compact interchange format for building, validating, reading, and distributing multi-vector retrieval data.

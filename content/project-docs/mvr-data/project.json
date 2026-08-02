@@ -2,7 +2,7 @@
   "slug": "mvr-data",
   "legacySlugs": ["mvr-datasets"],
   "title": "MVR-Data",
-  "description": "A versioned, Arrow-based interchange format and Python toolkit for raw and embedded multi-vector retrieval benchmarks.",
+  "description": "An Arrow-based runtime organization, interchange format, and Python toolkit for multi-vector retrieval data.",
   "repository": "https://github.com/WittenYeh/MVR-Data",
   "repositoryLabel": "View MVR-Data on GitHub",
   "updated": "2026-08-02",
@@ -29,7 +29,7 @@
       "title": "Welcome Page & How to Use MVR-Data",
       "shortTitle": "Welcome & Usage",
       "file": "welcome.md",
-      "description": "Install the toolkit, create raw or embedded datasets, read them, validate them, and prepare archives for distribution.",
+      "description": "Install the toolkit, create raw or embedded data packages, read and validate them, and prepare archives for distribution.",
       "hideTitle": true
     },
     {

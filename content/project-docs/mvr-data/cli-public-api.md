@@ -1,6 +1,6 @@
 ## Command-line interface
 
-`src/mvr_dataset/cli.py` defines the `mvrdata` command with `argparse`. `build_parser()` registers six subcommands:
+`src/mvr_data/cli.py` defines the `mvrdata` command with `argparse`. `build_parser()` registers six subcommands:
 
 | Command | Implementation behavior |
 | --- | --- |
@@ -15,11 +15,11 @@
 
 ## Stable Python API
 
-`src/mvr_dataset/__init__.py` re-exports the supported public surface:
+`src/mvr_data/__init__.py` re-exports the supported public surface:
 
-- `open_dataset` and `DatasetReader`;
-- `RawDatasetWriter`, `RawComponent`, and `EmbeddedDatasetWriter`;
-- validation report types and `validate_dataset`;
+- `open_data` and `DataReader`;
+- `RawDataWriter`, `RawComponent`, and `EmbeddedDataWriter`;
+- validation report types and `validate_data`;
 - checksum, pack, and unpack functions.
 
 It also declares `__version__ = "0.1.0"`. Keeping imports here separates supported entry points from internal helpers that may change.
@@ -30,7 +30,7 @@ It also declares `__version__ = "0.1.0"`. Keeping imports here separates support
 
 ```toml
 [project.scripts]
-mvrdata = "mvr_dataset.cli:main"
+mvrdata = "mvr_data.cli:main"
 ```
 
-The adjacent `src/mvr_dataset_format.egg-info/` directory is generated packaging metadata. It records dependencies, distribution inputs, the console entry point, and the top-level import name; it does not implement dataset behavior.
+The adjacent `src/mvr_data.egg-info/` directory is generated packaging metadata. It records dependencies, distribution inputs, the console entry point, and the top-level import name; it does not implement data behavior.

@@ -1,12 +1,12 @@
 ## Report model
 
-`src/mvr_dataset/validation.py` returns structured results instead of stopping at the first error. `ValidationIssue` records severity, code, message, and optional path. `ValidationReport` stores issues and discovered row counts; its `valid` property is false whenever an error is present.
+`src/mvr_data/validation.py` returns structured results instead of stopping at the first error. `ValidationIssue` records severity, code, message, and optional path. `ValidationReport` stores issues and discovered row counts; its `valid` property is false whenever an error is present.
 
 This model supports both human CLI output and JSON automation.
 
 ## Validation pipeline
 
-`validate_dataset(path, deep=False)` performs validation in stages:
+`validate_data(path, deep=False)` performs validation in stages:
 
 1. Confirm the package is a directory and load its manifest.
 2. Resolve every declared shard safely.
@@ -22,9 +22,9 @@ The validator continues where safe, allowing one run to expose multiple independ
 With `deep=True`, shard hashes are recomputed, every raw asset is verified against the digest encoded in its `payload_uri`, and `checksums.sha256` is compared with every regular package file. Deep mode costs additional I/O but verifies content integrity rather than structure alone.
 
 ```python
-from mvr_dataset import validate_dataset
+from mvr_data import validate_data
 
-report = validate_dataset("tiny-mvr", deep=True)
+report = validate_data("tiny-mvr", deep=True)
 if not report.valid:
     print(report.as_dict())
 ```

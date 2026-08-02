@@ -1,6 +1,6 @@
 ## Module responsibility
 
-`src/mvr_dataset/reader.py` provides a small streaming interface over a package. `open_dataset(path)` returns a `DatasetReader`, which resolves the package root, loads the manifest, and records whether the dataset is raw or embedded.
+`src/mvr_data/reader.py` provides a small streaming interface over a package. `open_data(path)` returns a `DataReader`, which resolves the package root, loads the manifest, and records whether the data is raw or embedded.
 
 ## Safe shard resolution
 
@@ -18,8 +18,12 @@ reader.iter_queries()
 reader.iter_ground_truth()
 ```
 
-This design keeps memory proportional to a record batch rather than the dataset size.
+This design keeps memory proportional to a record batch rather than the full
+collection size.
 
 ## Materialized reads
 
-`read_table(table)` collects all streamed batches into one `pyarrow.Table`. It is convenient for small datasets and analysis code, but callers working with benchmark-scale data should retain the iterator API to avoid unnecessary memory use.
+`read_table(table)` collects all streamed batches into one `pyarrow.Table`. It
+is convenient for small packages and analysis code, but callers working with
+benchmark-scale data should retain the iterator API to avoid unnecessary
+memory use.

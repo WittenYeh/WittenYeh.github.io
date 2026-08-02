@@ -1,6 +1,6 @@
 ## Module responsibility
 
-`src/mvr_dataset/manifest.py` owns `manifest.yaml`. It combines JSON Schema validation with format-version checks and Arrow dtype normalization.
+`src/mvr_data/manifest.py` owns `manifest.yaml`. It combines JSON Schema validation with format-version checks and Arrow dtype normalization.
 
 ## Loading and validation
 

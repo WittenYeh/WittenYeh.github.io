@@ -1,6 +1,6 @@
 ## Module responsibility
 
-`src/mvr_dataset/checksums.py` implements whole-package SHA-256 integrity records in `checksums.sha256`.
+`src/mvr_data/checksums.py` implements whole-package SHA-256 integrity records in `checksums.sha256`.
 
 ## Hashing and file discovery
 

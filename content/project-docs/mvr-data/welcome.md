@@ -1,25 +1,33 @@
-MVR-Data is a versioned, Arrow-based interchange format for
-multi-vector retrieval benchmarks. This repository contains the specification,
-Python reference implementation, command-line tools, and synthetic tests. It
-does **not** contain any published dataset.
+MVR-Data defines how multi-vector retrieval data is organized at runtime and
+packaged for interchange using Apache Arrow. This repository contains the
+specification, Python reference implementation, command-line tools, and
+synthetic tests. It does **not** contain any published data.
 
-Two self-contained package kinds are defined:
+MVR-Data supports two self-contained package types:
 
-- **Raw datasets** contain base/query objects whose ordered text, image, audio,
-  video, or other components are stored as local, content-addressed assets.
-- **Embedded datasets** contain only object identifiers and a variable number
-  of fixed-dimensional vectors per object.
+- **Raw data:** A Raw package stores the original content of base and query
+  objects. Each object can contain one or more ordered text, image, audio,
+  video, or other components, and their files are kept inside the package.
+- **Embedded data:** An Embedded package stores vector representations of base
+  and query objects. Each object keeps its ID and has one or more embedding
+  vectors; every vector in the package has the same dimension.
+
+**Object ID rule:** If Raw and Embedded packages describe the same collection,
+the same base or query object **must use the same `object_id` in both packages**.
+For example, a Raw base object named `doc-42` must also be `doc-42` in the
+Embedded base table. Row positions do not need to match; `object_id` is the
+link between original content and its vectors.
 
 Both kinds contain an object-level, ranked ground-truth table. Tables are
 sharded Arrow IPC files; packages can optionally be transported as reproducible
 `tar.zst` archives.
 
-## Dataset schemas
+## Data schemas
 
 The `base` and `query` tables use the same object schema within each package
 kind. All listed fields are required unless noted otherwise.
 
-### Raw dataset
+### Raw data
 
 | Field | Arrow type | Meaning |
 | --- | --- | --- |
@@ -30,7 +38,7 @@ kind. All listed fields are required unless noted otherwise.
 | `components[].media_type` | `string` | MIME type of the stored payload, such as `text/plain` or `image/png`. |
 | `components[].payload_uri` | `string` | Package-local, content-addressed URI that encodes the payload's SHA-256 digest. |
 
-### Embedded dataset
+### Embedded data
 
 | Field | Arrow type | Meaning |
 | --- | --- | --- |
@@ -54,9 +62,9 @@ may be absolute on your machine.
 It does not add base objects, queries, vectors, or ground truth.
 
 ```console
-$ mvrdata init raw-example --kind raw --dataset-id example/raw --top-k 10
+$ mvrdata init raw-example --kind raw --data-id example/raw --top-k 10
 raw-example
-$ mvrdata init embedded-example --kind embedded --dataset-id example/embedded \
+$ mvrdata init embedded-example --kind embedded --data-id example/embedded \
     --dimension 128 --dtype float32 --scoring-scheme chamfer --top-k 10
 embedded-example
 ```
@@ -67,7 +75,7 @@ scheme. Raw packages store ordered content components instead.
 ### 2. Inspect package metadata
 
 `inspect` reads the manifest and shards without modifying them. It summarizes
-the dataset identity, kind, row and shard counts, and vector settings.
+the data identity, kind, row and shard counts, and vector settings.
 
 ```console
 $ mvrdata inspect embedded-example
@@ -131,11 +139,11 @@ return `1`; invalid arguments and operational errors return `2`.
 After `init`, use the Python writers to populate a new package safely:
 
 ```python
-from mvr_dataset import EmbeddedDatasetWriter
+from mvr_data import EmbeddedDataWriter
 
-with EmbeddedDatasetWriter(
+with EmbeddedDataWriter(
     "tiny-mvr",
-    dataset_id="example/tiny",
+    data_id="example/tiny",
     dimension=2,
     dtype="float32",
     scoring={"scheme": "chamfer"},
@@ -147,18 +155,18 @@ with EmbeddedDatasetWriter(
 ```
 
 See [the v1 format specification](https://github.com/WittenYeh/MVR-Data/blob/main/docs/format-v1.md), the
-[Raw format](https://github.com/WittenYeh/MVR-Data/blob/main/docs/raw-dataset.md), and the
-[Embedded format](https://github.com/WittenYeh/MVR-Data/blob/main/docs/embedded-dataset.md) for normative details.
+[Raw format](https://github.com/WittenYeh/MVR-Data/blob/main/docs/raw-data.md), and the
+[Embedded format](https://github.com/WittenYeh/MVR-Data/blob/main/docs/embedded-data.md) for normative details.
 
 ## Python API
 
 The stable public entry points are:
 
-- `open_dataset(path)` and the reader's `iter_base()`, `iter_queries()`, and
+- `open_data(path)` and the reader's `iter_base()`, `iter_queries()`, and
   `iter_ground_truth()` methods;
-- `RawDatasetWriter` and `EmbeddedDatasetWriter`;
-- `validate_dataset(path, deep=False)`, which returns a structured report;
-- `pack_dataset`, `unpack_dataset`, `write_checksums`, and `verify_checksums`.
+- `RawDataWriter` and `EmbeddedDataWriter`;
+- `validate_data(path, deep=False)`, which returns a structured report;
+- `pack_data`, `unpack_data`, `write_checksums`, and `verify_checksums`.
 
 ## Development
 
@@ -167,4 +175,4 @@ pytest
 ```
 
 The committed examples are manifests only. Tests generate disposable, tiny
-packages at runtime so this repository remains dataset-free.
+packages at runtime so this repository remains data-free.

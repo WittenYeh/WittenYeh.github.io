@@ -1,10 +1,10 @@
 ## Module responsibility
 
-`src/mvr_dataset/packaging.py` transports a directory package as a reproducible `.tar.zst` archive while treating extraction as a security boundary.
+`src/mvr_data/packaging.py` transports a directory package as a reproducible `.tar.zst` archive while treating extraction as a security boundary.
 
 ## Reproducible packing
 
-`pack_dataset()` performs deep dataset validation by default and refuses to overwrite an existing destination. Archive entries are sorted, and symlinks or special files are rejected.
+`pack_data()` performs deep data validation by default and refuses to overwrite an existing destination. Archive entries are sorted, and symlinks or special files are rejected.
 
 For reproducibility, every tar entry receives normalized metadata:
 
@@ -18,6 +18,6 @@ The tar stream is compressed with Zstandard and written to a temporary file befo
 
 ## Safe extraction
 
-`unpack_dataset()` requires an empty destination. `_safe_member_path()` rejects absolute paths, parent traversal, NUL bytes, and resolved paths outside the destination. Duplicate archive entries, links, devices, and other special members are forbidden.
+`unpack_data()` requires an empty destination. `_safe_member_path()` rejects absolute paths, parent traversal, NUL bytes, and resolved paths outside the destination. Duplicate archive entries, links, devices, and other special members are forbidden.
 
 Regular files are created with exclusive mode so existing files cannot be silently replaced. If extraction fails, the newly created destination is removed, preventing callers from mistaking a partial package for a complete one.
