@@ -1,0 +1,22 @@
+{
+  "slug": "artea",
+  "title": "ARTEA",
+  "description": "Theory-Guided Hierarchical Graph Index for High-Performance ANN Search.",
+  "repository": "https://github.com/NTU-Siqiang-Group/Artea",
+  "repositoryLabel": "View ARTEA on GitHub",
+  "updated": "2026-08-02",
+  "badges": [
+    { "label": "C++23", "colorScheme": "blue" },
+    { "label": "Intel oneAPI", "colorScheme": "cyan" },
+    { "label": "Apache 2.0", "colorScheme": "green" }
+  ],
+  "chapters": [
+    {
+      "slug": "readme",
+      "title": "ARTEA README",
+      "shortTitle": "README",
+      "file": "readme.md",
+      "description": "Build ARTEA, run a minimal indexing and search pipeline, review its performance, and cite the project."
+    }
+  ]
+}

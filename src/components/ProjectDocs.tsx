@@ -254,6 +254,15 @@ const ProjectDocs: React.FC = () => {
                   lineHeight: 1.7,
                 },
                 '& pre code': { color: tc.text, bg: 'transparent', border: 0, p: 0 },
+                '& img': { maxWidth: '100%', height: 'auto' },
+                '& blockquote': {
+                  borderLeft: `3px solid ${tc.command}`,
+                  color: tc.secondary,
+                  my: 5,
+                  pl: 4,
+                },
+                '& blockquote p:last-of-type': { mb: 0 },
+                '& hr': { border: 0, borderTop: `1px solid ${tc.border}`, my: 8 },
                 '& table': {
                   display: 'block',
                   width: '100%',

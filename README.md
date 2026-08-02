@@ -134,9 +134,19 @@ isOpenSource: true
 - 项目亮点二
 ```
 
-### 为项目添加多页文档
+### 为项目添加 README 或多页文档
 
 项目文档使用统一的内容驱动结构。不要为单个项目创建专用 React 组件；所有项目共用 `src/components/ProjectDocs.tsx`，路由、侧边栏、上一章/下一章、SEO 页面和 sitemap 均根据内容配置自动生成。
+
+若项目暂时只需要展示 GitHub README，仍然使用同一套结构，但只登记一个章节：
+
+```text
+content/project-docs/<project-slug>/
+├── project.json
+└── readme.md
+```
+
+在 `project.json` 的 `chapters` 中仅添加 `readme.md`，并把 `shortTitle` 设置为 `README`。项目会发布在 `/projects/<project-slug>/`，侧边栏只有一个 README 入口；以后需要正式文档时，只需继续添加章节文件和配置，无需新增组件或路由。GitHub README 中的仓库相对链接必须改为完整 URL，图片应保存到 `content/images/projects/<project-slug>/` 并使用 `/images/projects/<project-slug>/...` 引用，以保证构建和部署不依赖外部仓库。
 
 每个带文档的项目使用以下目录：
 
