@@ -4,7 +4,7 @@
 
 ## Reproducible packing
 
-`pack_data()` performs deep data validation by default and refuses to overwrite an existing destination. Archive entries are sorted, and symlinks or special files are rejected.
+`pack_data()` performs detailed data validation by default and refuses to overwrite an existing destination. Archive entries are sorted, and symlinks or special files are rejected.
 
 For reproducibility, every tar entry receives normalized metadata:
 

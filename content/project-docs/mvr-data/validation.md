@@ -6,7 +6,7 @@ This model supports both human CLI output and JSON automation.
 
 ## Validation pipeline
 
-`validate_data(path, deep=False)` performs validation in stages:
+`validate_data(path, detail=False)` performs validation in stages:
 
 1. Confirm the package is a directory and load its manifest.
 2. Resolve every declared shard safely.
@@ -27,12 +27,12 @@ asset against the digest encoded in its `payload_uri`, and compares
 `checksums.sha256` with every regular package file. Detailed validation costs
 additional I/O but verifies content integrity rather than structure alone.
 
-The equivalent Python API continues to use the `deep=True` keyword:
+The equivalent Python API uses the matching `detail=True` keyword:
 
 ```python
 from mvr_data import validate_data
 
-report = validate_data("tiny-mvr", deep=True)
+report = validate_data("tiny-mvr", detail=True)
 if not report.valid:
     print(report.as_dict())
 ```

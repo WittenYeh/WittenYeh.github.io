@@ -60,7 +60,7 @@
       "slug": "validation",
       "title": "Validation Implementation",
       "file": "validation.md",
-      "description": "How validation.py reports structural, semantic, referential, judgment, and optional deep-integrity errors."
+      "description": "How validation.py reports structural, semantic, referential, judgment, and optional detailed-integrity errors."
     },
     {
       "slug": "checksums",
