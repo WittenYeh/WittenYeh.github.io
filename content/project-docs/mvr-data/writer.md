@@ -16,12 +16,12 @@ quantization metadata.
 
 ## Implementation
 
-The private `_DataWriter` owns the shared lifecycle. It refuses to overwrite a
-non-empty directory, buffers rows by table, and flushes at `shard_rows`. Each
-flush uses the canonical Arrow schema, writes a Zstandard-compressed IPC shard
-through a temporary file, records its row count and SHA-256 in the manifest,
-and atomically publishes it. Closing flushes all tables, writes the manifest,
-and refreshes package checksums.
+The shared writer lifecycle refuses to overwrite a non-empty directory,
+buffers rows by table, and flushes at `shard_rows`. Each flush uses the
+canonical Arrow schema, writes a Zstandard-compressed IPC shard through a
+temporary file, records its row count and SHA-256 in the manifest, and
+atomically publishes it. Closing flushes all tables, writes the manifest, and
+refreshes package checksums.
 
 `RawDataWriter` validates component IDs, modalities, MIME types, and source
 files. Payloads are deduplicated by SHA-256 under:

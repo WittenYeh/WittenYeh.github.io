@@ -7,9 +7,6 @@ The package root exports two checksum functions:
 | `write_checksums(root)` | Regenerates `checksums.sha256` and returns its path. |
 | `verify_checksums(root)` | Returns all integrity errors; an empty list means success. |
 
-`sha256_file()`, `package_files()`, and `read_checksums()` support the
-implementation but are not part of the stable package-level API.
-
 ## Implementation
 
 File discovery recursively selects regular package files, excludes symlinks

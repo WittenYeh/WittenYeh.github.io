@@ -27,8 +27,7 @@ means invalid input or an operational error.
 | Integrity | `write_checksums`, `verify_checksums` |
 | Transport | `pack_data`, `unpack_data` |
 
-Module-level helpers not re-exported here are internal and may change. The
-package currently provides no native C++ API; the format itself remains
+The package currently provides no native C++ API; the format itself remains
 language-independent and can be consumed through Apache Arrow implementations.
 
 ## Implementation
@@ -40,9 +39,9 @@ language-independent and can be consumed through Apache Arrow implementations.
 mvrdata = "mvr_data.cli:main"
 ```
 
-`build_parser()` defines command arguments and `main()` dispatches to the same
-reader, writer, validation, checksum, and packaging functions exposed to
-Python. Expected `OSError` and `ValueError` failures are converted to concise
-stderr messages. `__init__.py` centralizes supported imports and declares the
-package version, while generated `egg-info` metadata does not implement runtime
+The CLI parser defines command arguments and dispatches to the same reader,
+writer, validation, checksum, and packaging functions exposed to Python.
+Expected `OSError` and `ValueError` failures are converted to concise stderr
+messages. `__init__.py` centralizes supported imports and declares the package
+version, while generated `egg-info` metadata does not implement runtime
 behavior.

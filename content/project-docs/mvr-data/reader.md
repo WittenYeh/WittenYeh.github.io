@@ -17,7 +17,7 @@ convenience for smaller packages and analysis workflows.
 ## Implementation
 
 `DataReader` resolves the package root, loads the validated manifest, and
-records the Raw or Embedded kind. Before opening a shard, `_resolve_shard()`
+records the Raw or Embedded kind. Before opening a shard, path validation
 rejects empty or remote paths, NUL bytes, backslashes, absolute paths, parent
 traversal, paths outside the package, and paths outside the requested table.
 

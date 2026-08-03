@@ -41,20 +41,20 @@
       "slug": "schema",
       "title": "Schema",
       "file": "schema.md",
-      "description": "The schema module's callable surface and how it defines canonical Arrow representations for objects, vectors, components, and relevance judgments.",
+      "description": "How the schema module defines canonical Arrow representations for objects, vectors, components, and relevance judgments.",
       "overview": [
-        "The schema module's internal callable surface.",
-        "How it defines canonical Arrow schemas and dispatches vector dtypes and table layouts."
+        "How canonical Arrow schemas represent Raw, Embedded, and ground-truth data.",
+        "How vector dtypes and table layouts are normalized and dispatched."
       ]
     },
     {
       "slug": "manifest",
       "title": "Manifest",
       "file": "manifest.md",
-      "description": "Public Manifest loading and validation APIs, plus the internal helpers that create and atomically write package metadata.",
+      "description": "Public Manifest loading and validation APIs, plus how package metadata is created and atomically persisted.",
       "overview": [
         "The public Manifest loading and in-memory validation APIs.",
-        "How internal helpers create and atomically write package metadata."
+        "How package metadata is created, validated, loaded, and atomically persisted."
       ]
     },
     {
