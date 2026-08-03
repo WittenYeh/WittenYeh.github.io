@@ -41,6 +41,15 @@ const HeroSection = ({ title, avatar }: HeroSectionProps) => {
   const bg = useColorModeValue('gray.50', 'gray.900')
   const dividerColor = useColorModeValue('gray.200', 'gray.700')
   const socialIconColor = useColorModeValue('gray.400', 'gray.500')
+  const magnetRim = useColorModeValue(
+    'linear-gradient(145deg, #ffffff 0%, #f7fafc 48%, #dfe6ee 100%)',
+    'linear-gradient(145deg, #f7fafc 0%, #e2e8f0 52%, #a0aec0 100%)',
+  )
+  const magnetEdge = useColorModeValue('#aeb8c4', '#687386')
+  const magnetShadow = useColorModeValue(
+    '0 24px 30px -17px rgba(45, 55, 72, 0.58), 0 10px 16px -12px rgba(45, 55, 72, 0.42)',
+    '0 26px 34px -16px rgba(0, 0, 0, 0.88), 0 12px 18px -12px rgba(0, 0, 0, 0.72)',
+  )
   const subtitleCount = siteOwner.rotatingSubtitles.length
   const [subtitleIndex, setSubtitleIndex] = useState(0)
 
@@ -265,13 +274,77 @@ const HeroSection = ({ title, avatar }: HeroSectionProps) => {
             flexShrink={0}
           >
             <VStack spacing={[2, 3]}>
-              <Image
-                src={withBase(`images/${avatar}`)}
-                alt={title}
-                borderRadius="xl"
+              <Box
                 boxSize={["150px", "180px", "220px"]}
-                objectFit="cover"
-              />
+                position="relative"
+                transform="perspective(800px) rotateZ(-2deg) rotateY(-4deg)"
+                transformOrigin="center bottom"
+                transition="transform 240ms ease, filter 240ms ease"
+                filter="drop-shadow(0 2px 1px rgba(255, 255, 255, 0.35))"
+                _before={{
+                  content: '""',
+                  position: 'absolute',
+                  inset: 0,
+                  zIndex: 0,
+                  borderRadius: ['18px', '21px', '25px'],
+                  bg: magnetEdge,
+                  transform: 'translate3d(8px, 10px, -1px)',
+                  boxShadow: magnetShadow,
+                }}
+                _hover={{
+                  transform: 'perspective(800px) translateY(-5px) rotateZ(-0.35deg) rotateY(0deg)',
+                  filter: 'drop-shadow(0 4px 2px rgba(255, 255, 255, 0.32))',
+                  '& img': {
+                    transform: 'scale(1.025)',
+                  },
+                  '& .magnet-gloss': {
+                    opacity: 0.78,
+                  },
+                }}
+                sx={{
+                  transformStyle: 'preserve-3d',
+                  '@media (prefers-reduced-motion: reduce)': {
+                    transition: 'none',
+                    '& img, & .magnet-gloss': {
+                      transition: 'none',
+                    },
+                  },
+                }}
+              >
+                <Box
+                  position="relative"
+                  zIndex={1}
+                  w="full"
+                  h="full"
+                  p={["5px", "6px", "7px"]}
+                  borderRadius={['18px', '21px', '25px']}
+                  background={magnetRim}
+                  boxShadow="inset 1px 1px 1px rgba(255, 255, 255, 0.95), inset -2px -2px 4px rgba(71, 85, 105, 0.26)"
+                  overflow="hidden"
+                >
+                  <Image
+                    src={withBase(`images/${avatar}`)}
+                    alt={title}
+                    w="full"
+                    h="full"
+                    borderRadius={['14px', '16px', '19px']}
+                    objectFit="cover"
+                    transition="transform 240ms ease"
+                  />
+                  <Box
+                    className="magnet-gloss"
+                    aria-hidden="true"
+                    pointerEvents="none"
+                    position="absolute"
+                    inset={["5px", "6px", "7px"]}
+                    borderRadius={['14px', '16px', '19px']}
+                    background="linear-gradient(135deg, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0.16) 24%, transparent 45%, rgba(255, 255, 255, 0.08) 100%)"
+                    boxShadow="inset 0 0 0 1px rgba(255, 255, 255, 0.36)"
+                    opacity={0.58}
+                    transition="opacity 240ms ease"
+                  />
+                </Box>
+              </Box>
               {((siteConfig.pets ?? []) as { name: string; emoji: string; image: string }[]).length > 0 && (
                 <HStack spacing={[4, 5]} justify="center">
                   {((siteConfig.pets ?? []) as { name: string; emoji: string; image: string }[]).map((pet) => (
