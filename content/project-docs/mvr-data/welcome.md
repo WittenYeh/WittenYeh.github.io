@@ -70,24 +70,72 @@ Every package includes a `manifest.yaml`. Arrow files store object and
 ground-truth rows, while the manifest stores package-wide settings and indexes
 the Arrow shards.
 
-| Field | Meaning |
-| --- | --- |
-| `format`, `format_version` | Identify the MVR-Data format and version. |
-| `kind` | Selects a `raw` or `embedded` package. |
-| `data_name`, `data_version` | Identify the logical collection and its version. |
-| `tables.<name>` | Records each table's total rows and shard paths, row counts, and SHA-256 digests. |
-| `vector` | Required only for Embedded data; stores `dimension`, `dtype`, and `scoring`. |
+| Field | Manifest type | Meaning |
+| --- | --- | --- |
+| `format`, `format_version` | String | Identify the MVR-Data format and version. |
+| `kind` | String | Selects a `raw` or `embedded` package. |
+| `data_name`, `data_version` | String | Identify the logical collection and its version. |
+| `tables` | Mapping (object) | Contains exactly the `base`, `query`, and `ground_truth` table entries. |
+| `tables.<name>` | Mapping (object) | Records the table's total row count and, for each shard, its path, row count, and SHA-256 digest. |
+| `vector` | Mapping (object) | Required only for Embedded data; stores `dimension`, `dtype`, and `scoring`, plus optional `quantization`. |
 
-For example, the writer arguments `dimension=2`, `dtype="float32"`, and
-`scoring={"scheme": "chamfer"}` produce:
+Here, `<name>` means one of the three fixed keys: `base`, `query`, or
+`ground_truth`. Both `tables.<name>` and `vector` are YAML mappings validated as
+JSON objects, not Arrow `struct` fields. Their keys are constrained by the
+Manifest JSON Schema; designated extension mappings such as
+`scoring.parameters`, `quantization`, and top-level `extensions` hold more
+flexible key-value data.
+
+A small Embedded manifest might look like this. The `base` table has three rows
+in total: two in its first shard and one in its second shard.
 
 ```yaml
+format: mvr-data
+format_version: 1.0.0
+kind: embedded
+data_name: example/tiny
+data_version: "1"
+description: A small multi-vector retrieval example.
+license: Apache-2.0
+source: https://example.org/tiny-mvr
+
+tables:
+  base:
+    rows: 3
+    shards:
+      - path: base/part-00000.arrow
+        rows: 2
+        sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      - path: base/part-00001.arrow
+        rows: 1
+        sha256: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+  query:
+    rows: 1
+    shards:
+      - path: query/part-00000.arrow
+        rows: 1
+        sha256: cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+  ground_truth:
+    rows: 2
+    shards:
+      - path: ground_truth/part-00000.arrow
+        rows: 2
+        sha256: dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
+
 vector:
   dimension: 2
   dtype: float32
   scoring:
     scheme: chamfer
+    parameters:
+      pairwise_similarity: dot_product
+      query_aggregation: sum
+    reference: ColBERT-style late interaction
+    description: Sum of each query vector's maximum similarity to any base vector.
 ```
+
+The repeated-character SHA-256 values above are illustrative placeholders; a
+writer records the actual digest of each generated Arrow shard.
 
 The dimension and dtype are also reflected in each Embedded Arrow shard's
 physical vector schema; scoring remains package-level metadata in the manifest.
