@@ -7,7 +7,7 @@
 | `init` | Validates raw/embedded arguments and creates an empty package skeleton. |
 | `inspect` | Summarizes manifest metadata, counts, vector settings, or discovered raw modalities. |
 | `validate` | Prints a validation report as text or JSON. |
-| `checksum` | Verifies checksums or rewrites them with `--write`. |
+| `checksum` | Verifies checksums or refreshes them with `-r` / `--refresh`. |
 | `pack` | Creates a reproducible archive, with validation enabled by default. |
 | `unpack` | Safely extracts a transport archive. |
 

@@ -148,8 +148,8 @@ valid: /path/to/embedded-example
 
 ### 4. Verify or refresh checksums
 
-`checksum` verifies `checksums.sha256`; `--write` regenerates it from the
-current package files.
+`checksum` verifies `checksums.sha256`; `-r` (or `--refresh`) regenerates it
+from the current package files.
 
 ```command
 $ mvrdata checksum embedded-example
@@ -160,7 +160,7 @@ checksums valid
 ```
 
 ```command
-$ mvrdata checksum --write embedded-example
+$ mvrdata checksum -r embedded-example
 ```
 
 ```output
