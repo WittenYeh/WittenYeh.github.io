@@ -19,9 +19,15 @@ This model supports both human CLI output and JSON automation.
 
 The validator continues where safe, allowing one run to expose multiple independent problems.
 
-## Deep validation
+## Detailed validation
 
-With `deep=True`, shard hashes are recomputed, every raw asset is verified against the digest encoded in its `payload_uri`, and `checksums.sha256` is compared with every regular package file. Deep mode costs additional I/O but verifies content integrity rather than structure alone.
+From the CLI, `mvrdata validate -d <path>` (or the longer
+`mvrdata validate --detail <path>`) recomputes shard hashes, verifies every raw
+asset against the digest encoded in its `payload_uri`, and compares
+`checksums.sha256` with every regular package file. Detailed validation costs
+additional I/O but verifies content integrity rather than structure alone.
+
+The equivalent Python API continues to use the `deep=True` keyword:
 
 ```python
 from mvr_data import validate_data

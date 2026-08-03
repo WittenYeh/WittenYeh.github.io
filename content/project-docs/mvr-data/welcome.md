@@ -124,8 +124,9 @@ example/embedded @ 1
 ### 3. Validate the package
 
 `validate` checks the manifest, Arrow schemas, row counts, object IDs, and
-ground-truth judgments and references. `--deep` additionally hashes every
-shard, raw payload, and package file to verify stored integrity data.
+ground-truth judgments and references. `-d` (or `--detail`) additionally
+hashes every shard, raw payload, and package file to verify stored integrity
+data.
 
 ```command
 $ mvrdata validate embedded-example
@@ -137,7 +138,7 @@ valid: /path/to/embedded-example
 ```
 
 ```command
-$ mvrdata validate --deep embedded-example
+$ mvrdata validate -d embedded-example
 ```
 
 ```output
@@ -168,7 +169,7 @@ $ mvrdata checksum --write embedded-example
 
 ### 5. Create a transport archive
 
-`pack` deep-validates the package by default and creates a reproducible
+`pack` performs detailed validation by default and creates a reproducible
 `tar.zst` archive. It refuses to overwrite an existing destination.
 
 ```command
