@@ -27,57 +27,57 @@
     {
       "slug": "welcome",
       "title": "Welcome Page & How to Use MVR-Data",
-      "shortTitle": "Welcome & Usage",
+      "shortTitle": "Quick Start",
       "file": "welcome.md",
       "description": "Install the toolkit, create raw or embedded data packages, read and validate them, and prepare archives for distribution.",
       "hideTitle": true
     },
     {
       "slug": "schema",
-      "title": "Schema APIs & Impl",
+      "title": "Schema",
       "file": "schema.md",
       "description": "The schema module's callable surface and how it defines canonical Arrow representations for objects, vectors, components, and relevance judgments."
     },
     {
       "slug": "manifest",
-      "title": "Manifest APIs & Impl",
+      "title": "Manifest",
       "file": "manifest.md",
       "description": "The manifest module's internal callable surface and how it creates, validates, loads, and atomically writes package metadata."
     },
     {
       "slug": "writer",
-      "title": "Writer APIs & Impl",
+      "title": "Writer",
       "file": "writer.md",
       "description": "Public writer APIs and how they construct Raw and Embedded packages while enforcing IDs, vector shapes, sharding, and ground-truth invariants."
     },
     {
       "slug": "reader",
-      "title": "Reader APIs & Impl",
+      "title": "Reader",
       "file": "reader.md",
       "description": "Public reader APIs and how they resolve trusted shard paths and stream schema-checked Arrow record batches."
     },
     {
       "slug": "validation",
-      "title": "Validation APIs & Impl",
+      "title": "Validation",
       "file": "validation.md",
       "description": "Public validation APIs and how they report structural, semantic, referential, judgment, and optional detailed-integrity errors."
     },
     {
       "slug": "checksums",
-      "title": "Checksum APIs & Impl",
+      "title": "Checksum",
       "file": "checksums.md",
       "description": "Public checksum APIs and how they create and verify deterministic whole-package SHA-256 integrity records."
     },
     {
       "slug": "packaging",
-      "title": "Packaging APIs & Impl",
+      "title": "Packaging",
       "file": "packaging.md",
       "description": "Public packaging APIs and how they create reproducible tar.zst archives and reject unsafe content during extraction."
     },
     {
       "slug": "cli-public-api",
-      "title": "CLI & Package APIs & Impl",
-      "shortTitle": "CLI & Package APIs",
+      "title": "CLI & Package",
+      "shortTitle": "CLI & Package",
       "file": "cli-public-api.md",
       "description": "The CLI and stable package APIs, plus how cli.py, __init__.py, and pyproject.toml expose them to users."
     }
