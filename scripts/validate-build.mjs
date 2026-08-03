@@ -63,7 +63,13 @@ const lazyJavascript = javascriptFiles
   .filter((file) => file !== mainBundleName)
   .map((file) => readFileSync(resolve(assetsDir, file), 'utf8'))
   .join('\n')
-for (const signal of ['hljs language-python', 'hljs language-yaml', 'hljs-keyword']) {
+for (const signal of [
+  'data-language="python"',
+  'data-language="yaml"',
+  'hljs language-python',
+  'hljs language-yaml',
+  'hljs-keyword',
+]) {
   if (!lazyJavascript.includes(signal)) {
     throw new Error(`Build validation failed: Markdown syntax highlighting is missing ${signal}`)
   }

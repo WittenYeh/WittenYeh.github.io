@@ -33,6 +33,14 @@ const markdown = new Marked(
   }),
 )
 
+const addCodeLanguageLabels = (html: string): string =>
+  html.replace(
+    /<pre><code class="hljs language-([^"]+)">/g,
+    (openingTag, language: string) => terminalBlockLanguages.has(language)
+      ? openingTag
+      : `<pre data-language="${language}"><code class="hljs language-${language}">`,
+  )
+
 const flattenText = (value: unknown): string => {
   if (Array.isArray(value)) return value.map(flattenText).join(' ')
   if (value && typeof value === 'object') return Object.values(value).map(flattenText).join(' ')
@@ -106,7 +114,7 @@ export default function markdownPlugin(): Plugin {
         }
       }
 
-      const body = markdown.parse(content.trim()) as string
+      const body = addCodeLanguageLabels(markdown.parse(content.trim()) as string)
 
       const result = { ...data, body }
       return {
