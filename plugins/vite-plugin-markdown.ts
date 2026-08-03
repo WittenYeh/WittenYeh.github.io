@@ -41,11 +41,26 @@ const addCodeLanguageLabels = (html: string): string =>
       : `<pre data-language="${language}"><code class="hljs language-${language}">`,
   )
 
-const addCodeCopyButtons = (html: string): string =>
-  html.replace(
-    /<pre([^>]*)><code/g,
-    '<pre$1><button type="button" class="code-copy-button" aria-label="Copy code to clipboard">Copy</button><code',
-  )
+const copyIcon = [
+  '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">',
+  '<rect x="9" y="9" width="11" height="11" rx="2"></rect>',
+  '<path d="M15 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h3"></path>',
+  '</svg>',
+].join('')
+
+const addCodeBlockTools = (html: string): string =>
+  html.replace(/<pre([^>]*)><code/g, (_openingTag, attributes: string) => {
+    const language = attributes.match(/\sdata-language="([^"]+)"/)?.[1]
+    const languageLabel = language
+      ? `<span class="code-language-label">${language}</span>`
+      : ''
+    return [
+      `<pre${attributes}><span class="code-block-tools">`,
+      `<button type="button" class="code-copy-button" aria-label="Copy code to clipboard" title="Copy code">${copyIcon}</button>`,
+      languageLabel,
+      '</span><code',
+    ].join('')
+  })
 
 const flattenText = (value: unknown): string => {
   if (Array.isArray(value)) return value.map(flattenText).join(' ')
@@ -122,7 +137,7 @@ export default function markdownPlugin(): Plugin {
 
       const renderedBody = addCodeLanguageLabels(markdown.parse(content.trim()) as string)
       const body = fileId.includes('/content/project-docs/')
-        ? addCodeCopyButtons(renderedBody)
+        ? addCodeBlockTools(renderedBody)
         : renderedBody
 
       const result = { ...data, body }

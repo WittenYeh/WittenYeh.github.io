@@ -72,23 +72,20 @@ const ProjectDocs: React.FC = () => {
     const button = event.target.closest<HTMLButtonElement>('.code-copy-button')
     if (!button || !event.currentTarget.contains(button)) return
 
-    const code = button.parentElement?.querySelector('code')
+    const code = button.closest('pre')?.querySelector('code')
     if (!code) return
 
     try {
       await copyText(code.textContent ?? '')
-      button.textContent = 'Copied'
       button.setAttribute('aria-label', 'Code copied')
       button.dataset.copyState = 'success'
     } catch {
-      button.textContent = 'Failed'
       button.setAttribute('aria-label', 'Unable to copy code')
       button.dataset.copyState = 'error'
     }
 
     window.setTimeout(() => {
       if (!button.isConnected) return
-      button.textContent = 'Copy'
       button.setAttribute('aria-label', 'Copy code to clipboard')
       delete button.dataset.copyState
     }, 1600)
@@ -328,7 +325,7 @@ const ProjectDocs: React.FC = () => {
                   border: `1px solid ${tc.border}`,
                   borderRadius: 'md',
                   p: 4,
-                  pr: '76px',
+                  pr: '44px',
                   mb: 5,
                   overflowX: 'auto',
                   lineHeight: 1.7,
@@ -339,11 +336,16 @@ const ProjectDocs: React.FC = () => {
                   pt: 4,
                   pr: '160px',
                 },
-                '& pre[data-language]::before': {
-                  content: 'attr(data-language)',
+                '& .code-block-tools': {
                   position: 'absolute',
                   top: 2,
-                  right: '76px',
+                  right: 3,
+                  zIndex: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                },
+                '& .code-language-label': {
                   px: 1.5,
                   py: 0.5,
                   color: tc.command,
@@ -357,36 +359,40 @@ const ProjectDocs: React.FC = () => {
                   textTransform: 'uppercase',
                 },
                 '& .code-copy-button': {
-                  position: 'absolute',
-                  top: 2,
-                  right: 3,
-                  zIndex: 1,
-                  px: 1.5,
-                  py: 0.5,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  w: '16px',
+                  h: '16px',
+                  p: 0,
                   color: tc.secondary,
-                  bg: isDark ? 'rgba(46, 52, 64, 0.82)' : 'rgba(255, 255, 255, 0.78)',
-                  border: `1px solid ${tc.border}`,
-                  borderRadius: 'sm',
-                  fontFamily: 'inherit',
-                  fontSize: '9px',
-                  fontWeight: 700,
-                  letterSpacing: '0.08em',
-                  lineHeight: 1.2,
+                  bg: 'transparent',
+                  border: 0,
                   cursor: 'pointer',
-                  transition: 'color 0.15s ease, border-color 0.15s ease',
+                  transition: 'color 0.15s ease',
                 },
-                '& .code-copy-button:hover, & .code-copy-button:focus-visible': {
+                '& .code-copy-button svg': {
+                  w: '14px',
+                  h: '14px',
+                  fill: 'none',
+                  stroke: 'currentColor',
+                  strokeWidth: 2,
+                  strokeLinecap: 'round',
+                  strokeLinejoin: 'round',
+                },
+                '& .code-copy-button:hover': {
                   color: tc.command,
-                  borderColor: tc.command,
-                  outline: 'none',
+                },
+                '& .code-copy-button:focus-visible': {
+                  color: tc.command,
+                  outline: '1px solid currentColor',
+                  outlineOffset: '2px',
                 },
                 '& .code-copy-button[data-copy-state="success"]': {
                   color: tc.success,
-                  borderColor: tc.success,
                 },
                 '& .code-copy-button[data-copy-state="error"]': {
                   color: tc.error,
-                  borderColor: tc.error,
                 },
                 '& .hljs-comment, & .hljs-quote': {
                   color: tc.secondary,
