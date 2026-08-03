@@ -1,8 +1,6 @@
-## APIs
-
 The package root exports two transport functions:
 
-### `pack_data` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/packaging.py "View source on GitHub")
+## `pack_data` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/packaging.py "View source on GitHub")
 
 ```python
 pack_data(
@@ -30,7 +28,14 @@ if detailed package validation fails.
 
 The path to the created archive.
 
-### `unpack_data` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/packaging.py "View source on GitHub")
+### Implementation
+
+Packing performs detailed validation by default, sorts entries, and rejects
+symlinks and special files. It normalizes user/group IDs and names, timestamps,
+modes, and PAX headers, then streams the tar archive through Zstandard. A
+temporary file plus `os.replace()` provides atomic publication.
+
+## `unpack_data` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/packaging.py "View source on GitHub")
 
 ```python
 unpack_data(
@@ -52,17 +57,12 @@ Safely extracts an MVR-Data `.tar.zst` archive into a new or empty directory.
 
 The resolved destination directory.
 
-Both functions refuse to overwrite existing non-empty targets.
-
-## Implementation
-
-Packing performs detailed validation by default, sorts entries, and rejects
-symlinks and special files. It normalizes user/group IDs and names, timestamps,
-modes, and PAX headers, then streams the tar archive through Zstandard. A
-temporary file plus `os.replace()` provides atomic publication.
+### Implementation
 
 Extraction treats the archive as untrusted input. It rejects absolute paths,
 parent traversal, NUL bytes, duplicate members, links, devices, special files,
 and paths escaping the destination. Files are created exclusively. On failure,
 the newly created destination is removed so callers cannot mistake a partial
 extraction for a complete package.
+
+Both functions refuse to overwrite existing non-empty targets.

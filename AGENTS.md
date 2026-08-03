@@ -55,20 +55,21 @@ Use a PyTorch/Sphinx-style reference layout for every project's public APIs:
 1. Document only the stable package exports and their public constructors,
    properties, functions, CLI commands, and instance methods. Never present a
    private helper as an API.
-2. Give every API its own level-three heading, including inherited methods that
+2. Give every API its own level-two heading, including inherited methods that
    are public on more than one class. Do not combine two API names in one
    heading and do not compress APIs into one-row entries in a role table.
 3. Put a GitHub source link immediately after the API name with this exact
    reusable Markdown convention:
 
    ```markdown
-   ### `load_manifest` [source](https://github.com/OWNER/REPOSITORY/blob/main/PATH "View source on GitHub")
+   ## `load_manifest` [source](https://github.com/OWNER/REPOSITORY/blob/main/PATH "View source on GitHub")
    ```
 
    Link to the corresponding implementation file. The shared
    `ProjectDocs.tsx` renderer recognizes the exact `View source on GitHub`
-   title, styles the heading as an API separator, and displays the link as a
-   GitHub logo. Do not embed an icon, raw HTML, or project-specific React code.
+   title, styles the level-two heading as a reusable API divider, and displays
+   the link as a GitHub logo. Do not embed an icon, raw HTML, or
+   project-specific React code.
 4. Follow the heading with a fenced prototype. Use `python` for Python APIs,
    `bash` for CLI commands, and the appropriate standard language for other
    interfaces. Keep parameter types, keyword-only markers, defaults, and return
@@ -85,7 +86,11 @@ Use a PyTorch/Sphinx-style reference layout for every project's public APIs:
 8. Keep usage examples outside individual API entries under an `Example` or
    `Examples` section. Use a short linked index when readers need an overview;
    do not duplicate full prototypes in multiple chapters.
-9. Before publishing, compare every documented prototype with the current
+9. Do not add a standalone `Implementation` section to a chapter. Only when an
+   API has non-obvious mechanics that materially help users understand its
+   behavior, add a concise level-three `Implementation` subsection immediately
+   inside that API entry. Omit routine internals and private-helper details.
+10. Before publishing, compare every documented prototype with the current
    source and confirm that the static SEO HTML contains the headings,
    prototypes, parameters, and source links.
 

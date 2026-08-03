@@ -1,8 +1,6 @@
-## CLI APIs
-
 The installed `mvrdata` entry point provides six commands:
 
-### `mvrdata init` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/cli.py "View source on GitHub")
+## `mvrdata init` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/cli.py "View source on GitHub")
 
 ```bash
 mvrdata init PATH --kind {raw,embedded} --data-name NAME \
@@ -25,7 +23,7 @@ and checksum file.
 | `--dtype` | Vector dtype; required only for Embedded data. |
 | `--scoring-scheme` | Scoring-scheme identifier; required only for Embedded data. |
 
-### `mvrdata inspect` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/cli.py "View source on GitHub")
+## `mvrdata inspect` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/cli.py "View source on GitHub")
 
 ```bash
 mvrdata inspect PATH [--json]
@@ -41,7 +39,7 @@ modality information.
 | `PATH` | Root directory of the data package. |
 | `--json` | Emit machine-readable JSON instead of terminal text. |
 
-### `mvrdata validate` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/cli.py "View source on GitHub")
+## `mvrdata validate` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/cli.py "View source on GitHub")
 
 ```bash
 mvrdata validate PATH [-d | --detail] [--json]
@@ -57,7 +55,7 @@ Validates a data package and reports every recoverable issue.
 | `-d`, `--detail` | Also recompute shard, payload, and package checksums. |
 | `--json` | Emit the complete validation report as JSON. |
 
-### `mvrdata checksum` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/cli.py "View source on GitHub")
+## `mvrdata checksum` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/cli.py "View source on GitHub")
 
 ```bash
 mvrdata checksum PATH [-r | --refresh]
@@ -72,7 +70,7 @@ Verifies `checksums.sha256`, or regenerates it from the current package files.
 | `PATH` | Root directory of the data package. |
 | `-r`, `--refresh` | Regenerate `checksums.sha256` instead of verifying it. |
 
-### `mvrdata pack` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/cli.py "View source on GitHub")
+## `mvrdata pack` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/cli.py "View source on GitHub")
 
 ```bash
 mvrdata pack SOURCE DESTINATION \
@@ -90,7 +88,7 @@ Creates a reproducible `.tar.zst` transport archive.
 | `--compression-level` | Zstandard compression level. Defaults to `10`. |
 | `--no-validate` | Skip the default detailed package validation. |
 
-### `mvrdata unpack` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/cli.py "View source on GitHub")
+## `mvrdata unpack` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/cli.py "View source on GitHub")
 
 ```bash
 mvrdata unpack SOURCE DESTINATION
@@ -128,19 +126,3 @@ and return values without repeating those signatures here.
 
 The package currently provides no native C++ API; the format itself remains
 language-independent and can be consumed through Apache Arrow implementations.
-
-## Implementation
-
-`pyproject.toml` connects the terminal command to the Python dispatcher:
-
-```toml
-[project.scripts]
-mvrdata = "mvr_data.cli:main"
-```
-
-The CLI parser defines command arguments and dispatches to the same reader,
-writer, validation, checksum, and packaging functions exposed to Python.
-Expected `OSError` and `ValueError` failures are converted to concise stderr
-messages. `__init__.py` centralizes supported imports and declares the package
-version, while generated `egg-info` metadata does not implement runtime
-behavior.

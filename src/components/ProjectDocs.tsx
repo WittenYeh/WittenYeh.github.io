@@ -309,29 +309,35 @@ const ProjectDocs: React.FC = () => {
                 },
                 '& h2:first-of-type': { mt: 0 },
                 '& h3': { color: tc.text, fontSize: 'md', fontWeight: 700, mt: 7, mb: 3 },
-                '& h3:has(> a[title="View source on GitHub"])': {
+                '& h2:has(> a[title="View source on GitHub"])': {
                   display: 'flex',
                   alignItems: 'center',
                   flexWrap: 'wrap',
                   gap: 2,
-                  mt: 9,
+                  mt: 12,
                   mb: 4,
                   px: 3,
                   py: 2.5,
                   bg: tc.header,
-                  borderLeft: '3px solid',
+                  border: '1px solid',
+                  borderLeftWidth: '3px',
+                  borderColor: tc.border,
                   borderLeftColor: tc.command,
                   borderRadius: 'sm',
+                  fontSize: ['md', 'lg'],
                   scrollMarginTop: '96px',
                 },
-                '& h3:has(> a[title="View source on GitHub"]) > code': {
+                '& h2:first-of-type:has(> a[title="View source on GitHub"])': {
+                  mt: 0,
+                },
+                '& h2:has(> a[title="View source on GitHub"]) > code': {
                   p: 0,
                   color: tc.text,
                   bg: 'transparent',
                   border: 0,
                   fontSize: 'inherit',
                 },
-                '& h3 > a[title="View source on GitHub"]': {
+                '& h2 > a[title="View source on GitHub"]': {
                   display: 'inline-block',
                   flexShrink: 0,
                   w: '15px',
@@ -344,11 +350,11 @@ const ProjectDocs: React.FC = () => {
                   mask: `${githubLogoMask} center / contain no-repeat`,
                   transition: 'color 0.15s ease',
                 },
-                '& h3 > a[title="View source on GitHub"]:hover': {
+                '& h2 > a[title="View source on GitHub"]:hover': {
                   color: tc.command,
                   textDecoration: 'none',
                 },
-                '& h3 > a[title="View source on GitHub"]:focus-visible': {
+                '& h2 > a[title="View source on GitHub"]:focus-visible': {
                   color: tc.command,
                   outline: '1px solid currentColor',
                   outlineOffset: '3px',

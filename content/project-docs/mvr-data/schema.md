@@ -1,4 +1,4 @@
-## Implementation
+## Canonical Arrow schemas
 
 `schema.py` is the single source of truth for physical Arrow layouts. Schema
 construction makes every format field non-nullable.

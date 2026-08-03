@@ -1,8 +1,6 @@
-## APIs
-
 The package root exports the validation function and report types:
 
-### `validate_data` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/validation.py "View source on GitHub")
+## `validate_data` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/validation.py "View source on GitHub")
 
 ```python
 validate_data(
@@ -26,7 +24,16 @@ references without stopping after the first recoverable error.
 
 A complete `ValidationReport`.
 
-### `ValidationIssue` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/validation.py "View source on GitHub")
+### Implementation
+
+Validation loads the Manifest, resolves every shard safely, checks exact Arrow
+schemas and row counts, then validates object IDs, vectors or components, Raw
+asset references, and ground-truth references and judgments. It continues where
+safe so one run can report multiple independent problems. With `detail=True`,
+it also recomputes shard hashes, verifies Raw payloads against `payload_uri`, and
+compares `checksums.sha256` with every regular package file.
+
+## `ValidationIssue` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/validation.py "View source on GitHub")
 
 ```python
 ValidationIssue(
@@ -48,7 +55,7 @@ Represents one validation error or warning.
 | `message` | `str` | Human-readable explanation. |
 | `path` | `str \| None` | Optional package-relative location. |
 
-### `ValidationIssue.as_dict` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/validation.py "View source on GitHub")
+## `ValidationIssue.as_dict` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/validation.py "View source on GitHub")
 
 ```python
 ValidationIssue.as_dict() -> dict[str, Any]
@@ -64,7 +71,7 @@ None.
 
 A mapping containing `severity`, `code`, `message`, and `path` when present.
 
-### `ValidationReport` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/validation.py "View source on GitHub")
+## `ValidationReport` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/validation.py "View source on GitHub")
 
 ```python
 ValidationReport(
@@ -86,7 +93,7 @@ Collects the package kind, observed table row counts, and all validation issues.
 | `issues` | `list[ValidationIssue]` | Initial issues; defaults to a fresh empty list. |
 | `counts` | `dict[str, int]` | Initial table counts; defaults to a fresh empty mapping. |
 
-### `ValidationReport.valid` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/validation.py "View source on GitHub")
+## `ValidationReport.valid` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/validation.py "View source on GitHub")
 
 ```python
 ValidationReport.valid -> bool
@@ -98,7 +105,7 @@ Derived property that is `True` when the report contains no error-level issue.
 
 None.
 
-### `ValidationReport.error` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/validation.py "View source on GitHub")
+## `ValidationReport.error` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/validation.py "View source on GitHub")
 
 ```python
 ValidationReport.error(
@@ -118,7 +125,7 @@ Appends an error-level `ValidationIssue` to the report.
 | `message` | `str` | Human-readable explanation. |
 | `path` | `str \| None` | Optional package-relative location. |
 
-### `ValidationReport.warning` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/validation.py "View source on GitHub")
+## `ValidationReport.warning` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/validation.py "View source on GitHub")
 
 ```python
 ValidationReport.warning(
@@ -138,7 +145,7 @@ Appends a warning-level `ValidationIssue` to the report.
 | `message` | `str` | Human-readable explanation. |
 | `path` | `str \| None` | Optional package-relative location. |
 
-### `ValidationReport.as_dict` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/validation.py "View source on GitHub")
+## `ValidationReport.as_dict` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/validation.py "View source on GitHub")
 
 ```python
 ValidationReport.as_dict() -> dict[str, Any]
@@ -166,15 +173,3 @@ if not report.valid:
 
 `as_dict()` makes reports suitable for JSON automation as well as human CLI
 output.
-
-## Implementation
-
-Validation loads the manifest, resolves every shard safely, checks exact Arrow
-schemas and row counts, then validates object IDs, vectors or components, Raw
-asset references, and ground-truth references and judgments. It continues
-where safe so one run can report multiple independent problems.
-
-With `detail=True`, it additionally recomputes manifest shard hashes, verifies
-Raw payloads against the digest encoded in `payload_uri`, and compares
-`checksums.sha256` with every regular package file. The equivalent CLI forms
-are `mvrdata validate -d <path>` and `mvrdata validate --detail <path>`.

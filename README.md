@@ -213,10 +213,10 @@ content/project-docs/<project-slug>/
       "hideTitle": true
     },
     {
-      "slug": "implementation",
-      "title": "Implementation",
-      "file": "implementation.md",
-      "description": "How the main module works."
+      "slug": "api-reference",
+      "title": "API Reference",
+      "file": "api-reference.md",
+      "description": "Public interfaces for the main module."
     }
   ]
 }
@@ -240,7 +240,7 @@ extraLinks:
 
 8. 终端示例应把用户输入写在 <code>```command</code> fenced block 中，把程序输出写在紧随其后的 <code>```output</code> fenced block 中。共享文档组件会把两者拼成一组，以分隔线区分，并在右下角显示不同颜色的 `COMMAND` / `OUTPUT` 标识；不要再把命令与输出混写在同一个 `console` block 中。
 9. 普通代码块应在 fenced block 中指定标准语言，例如 `python`、`yaml`、`toml`、`bash` 或 `typescript`；Markdown 渲染器会自动应用语法高亮、语言标签和一键复制图标。
-10. 公开 API 参考应采用类似 PyTorch/Sphinx 的结构，不要把每个 API 压缩为汇总表格中的一行。每个公开构造方法、函数、CLI 命令或实例方法分别使用三级标题，并依次提供 fenced prototype、简短说明和 `Parameters` 表格或无序列表；需要明确返回约定时再添加 `Returns`。标题末尾按照 `AGENTS.md` 规定的 Markdown 语法添加 GitHub source link，共享渲染器会自动显示 GitHub logo 和 API 分隔样式。不要介绍非公开 helper，也不要在多个章节重复维护完整签名。
+10. 公开 API 参考应采用类似 PyTorch/Sphinx 的结构，不要把每个 API 压缩为汇总表格中的一行。每个公开构造方法、函数、CLI 命令或实例方法分别使用二级标题，并依次提供 fenced prototype、简短说明和 `Parameters` 表格或无序列表；需要明确返回约定时再添加 `Returns`。标题末尾按照 `AGENTS.md` 规定的 Markdown 语法添加 GitHub source link，共享渲染器会自动显示 GitHub logo 和 API 分隔栏。不要为章节单独添加 `Implementation` 部分；只有复杂 API 的内部机制确实有助于理解其行为时，才紧接该 API 添加简短的三级 `Implementation` 小节。不要介绍非公开 helper，也不要在多个章节重复维护完整签名。
 
 若项目改名并更换 slug，应移动项目卡片、文档目录和预览图片，并把旧 slug 加入 `project.json` 的 `legacySlugs`。构建会为旧章节路径生成 `noindex` 页面和新地址的 canonical URL，浏览器访问旧路径时也会自动跳转；sitemap 只保留新路径。
 

@@ -1,8 +1,6 @@
-## APIs
-
 The package root exports two stable Manifest APIs:
 
-### `load_manifest` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/manifest.py "View source on GitHub")
+## `load_manifest` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/manifest.py "View source on GitHub")
 
 ```python
 load_manifest(root: str | os.PathLike[str]) -> dict[str, Any]
@@ -22,7 +20,7 @@ Loads `manifest.yaml`, validates it, and returns the parsed Manifest mapping.
 
 The validated Manifest as a `dict[str, Any]`.
 
-### `validate_manifest_data` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/manifest.py "View source on GitHub")
+## `validate_manifest_data` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/manifest.py "View source on GitHub")
 
 ```python
 validate_manifest_data(data: Any) -> dict[str, Any]
@@ -41,6 +39,12 @@ format rules. The value must be a mapping.
 
 The same validated Manifest mapping.
 
+### Implementation
+
+Validation applies the Draft 2020-12 JSON Schema, checks the MVR-Data format
+name and supported major version, and verifies the Embedded vector dtype.
+Errors retain the failing Manifest path so callers can locate invalid values.
+
 ## Example
 
 ```python
@@ -49,18 +53,3 @@ from mvr_data import load_manifest, validate_manifest_data
 manifest = load_manifest("tiny-mvr")
 validate_manifest_data(manifest)
 ```
-
-## Implementation
-
-Loading first parses YAML, then applies the Draft 2020-12 JSON Schema, checks
-the format name and supported major version, and verifies the Embedded vector
-dtype. Errors preserve the failing manifest path for actionable reports.
-
-Package construction initializes `base`, `query`, and `ground_truth` with zero
-rows and no shards. Embedded manifests require `dimension`, `dtype`, and
-`scoring`; dtype aliases are normalized to stable names such as `float32`.
-
-Manifest persistence validates before serialization, writes to a temporary
-file, and publishes with `os.replace()`. Callers therefore never observe a
-partially rewritten `manifest.yaml`; package writers also keep shard metadata
-and checksums synchronized.

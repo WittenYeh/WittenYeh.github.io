@@ -112,11 +112,10 @@
       "title": "CLI & Package",
       "shortTitle": "CLI & Package",
       "file": "cli-public-api.md",
-      "description": "The CLI and stable package APIs, plus how cli.py, __init__.py, and pyproject.toml expose them to users.",
+      "description": "The CLI commands, options, exit codes, and stable Python package exports.",
       "overview": [
         "The mvrdata commands, options, and exit-code conventions.",
-        "The stable Python package APIs exported from mvr_data.",
-        "How the command entry point and package exports are implemented."
+        "The stable Python package APIs exported from mvr_data."
       ]
     }
   ]

@@ -1,9 +1,7 @@
-## APIs
-
 The package root exports `RawComponent`, `RawDataWriter`, and
 `EmbeddedDataWriter`. Both writers are intended to be used as context managers.
 
-### `RawComponent` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/writer.py "View source on GitHub")
+## `RawComponent` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/writer.py "View source on GitHub")
 
 ```python
 RawComponent(
@@ -25,7 +23,7 @@ Describes one local payload that a `RawDataWriter` will copy into the package.
 | `modality` | `str` | Extensible modality token, such as `text`, `image`, `audio`, or `video`. |
 | `media_type` | `str` | MIME type of the payload, such as `text/plain` or `image/png`. |
 
-### `RawDataWriter` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/writer.py "View source on GitHub")
+## `RawDataWriter` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/writer.py "View source on GitHub")
 
 ```python
 RawDataWriter(
@@ -57,7 +55,14 @@ The target directory must be new or empty.
 | `source` | `str \| None` | Optional source or provenance string. |
 | `extensions` | `Mapping[str, Any] \| None` | Optional namespaced Manifest extensions. |
 
-### `RawDataWriter.add_base` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/writer.py "View source on GitHub")
+### Implementation
+
+The shared writer lifecycle refuses to overwrite a non-empty directory and
+buffers rows by table until `shard_rows` is reached. A flush writes a
+Zstandard-compressed Arrow IPC shard through a temporary file, atomically
+publishes it, and records its row count and SHA-256 digest in the Manifest.
+
+## `RawDataWriter.add_base` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/writer.py "View source on GitHub")
 
 ```python
 RawDataWriter.add_base(
@@ -75,7 +80,13 @@ Adds one Raw object to the base table while preserving component order.
 | `object_id` | `str` | Non-empty ID, unique within the base table. |
 | `components` | `Iterable[RawComponent]` | One or more ordered local payload components. |
 
-### `RawDataWriter.add_query` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/writer.py "View source on GitHub")
+### Implementation
+
+The writer validates component IDs, modalities, MIME types, and source files.
+It hashes each payload once and deduplicates identical content under
+`assets/sha256/<digest-prefix>/<digest>`.
+
+## `RawDataWriter.add_query` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/writer.py "View source on GitHub")
 
 ```python
 RawDataWriter.add_query(
@@ -93,7 +104,7 @@ Adds one Raw object to the query table while preserving component order.
 | `object_id` | `str` | Non-empty ID, unique within the query table. |
 | `components` | `Iterable[RawComponent]` | One or more ordered local payload components. |
 
-### `EmbeddedDataWriter` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/writer.py "View source on GitHub")
+## `EmbeddedDataWriter` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/writer.py "View source on GitHub")
 
 ```python
 EmbeddedDataWriter(
@@ -133,7 +144,13 @@ settings. The target directory must be new or empty.
 | `source` | `str \| None` | Optional source or provenance string. |
 | `extensions` | `Mapping[str, Any] \| None` | Optional namespaced Manifest extensions. |
 
-### `EmbeddedDataWriter.add_base` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/writer.py "View source on GitHub")
+### Implementation
+
+The writer canonicalizes the vector dtype and stores the dimension, dtype,
+scoring configuration, and optional quantization metadata in the Manifest. It
+uses the same buffered, atomic shard-writing lifecycle as `RawDataWriter`.
+
+## `EmbeddedDataWriter.add_base` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/writer.py "View source on GitHub")
 
 ```python
 EmbeddedDataWriter.add_base(
@@ -151,7 +168,13 @@ Adds one Embedded object and its ordered vectors to the base table.
 | `object_id` | `str` | Non-empty ID, unique within the base table. |
 | `vectors` | `Iterable[Iterable[Any]]` | One or more vectors matching the package dimension and dtype. |
 
-### `EmbeddedDataWriter.add_query` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/writer.py "View source on GitHub")
+### Implementation
+
+The iterable is materialized once, must contain at least one vector, and is
+converted to the configured Arrow scalar type. Every vector is checked against
+the package-wide dimension before its row is buffered.
+
+## `EmbeddedDataWriter.add_query` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/writer.py "View source on GitHub")
 
 ```python
 EmbeddedDataWriter.add_query(
@@ -169,7 +192,7 @@ Adds one Embedded object and its ordered vectors to the query table.
 | `object_id` | `str` | Non-empty ID, unique within the query table. |
 | `vectors` | `Iterable[Iterable[Any]]` | One or more vectors matching the package dimension and dtype. |
 
-### `RawDataWriter.add_ground_truth` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/writer.py "View source on GitHub")
+## `RawDataWriter.add_ground_truth` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/writer.py "View source on GitHub")
 
 ```python
 RawDataWriter.add_ground_truth(
@@ -183,7 +206,10 @@ RawDataWriter.add_ground_truth(
 ) -> None
 ```
 
-Adds one judged query-object pair to a Raw package's ground-truth table.
+Adds one judged query-object pair to a Raw package's ground-truth table. Both
+IDs must already exist, and `(query_id, object_id, split_type, pool_id)` must be
+unique. After the first judgment is added, no more base or query objects may be
+added.
 
 **Parameters**
 
@@ -196,7 +222,7 @@ Adds one judged query-object pair to a Raw package's ground-truth table.
 | `judgment_source` | `str` | Non-empty label source, such as `human`. |
 | `pool_id` | `str` | Non-empty candidate-pool identifier. |
 
-### `EmbeddedDataWriter.add_ground_truth` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/writer.py "View source on GitHub")
+## `EmbeddedDataWriter.add_ground_truth` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/writer.py "View source on GitHub")
 
 ```python
 EmbeddedDataWriter.add_ground_truth(
@@ -211,6 +237,9 @@ EmbeddedDataWriter.add_ground_truth(
 ```
 
 Adds one judged query-object pair to an Embedded package's ground-truth table.
+Both IDs must already exist, and `(query_id, object_id, split_type, pool_id)`
+must be unique. After the first judgment is added, no more base or query
+objects may be added.
 
 **Parameters**
 
@@ -223,7 +252,7 @@ Adds one judged query-object pair to an Embedded package's ground-truth table.
 | `judgment_source` | `str` | Non-empty label source, such as `human`. |
 | `pool_id` | `str` | Non-empty candidate-pool identifier. |
 
-### `RawDataWriter.close` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/writer.py "View source on GitHub")
+## `RawDataWriter.close` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/writer.py "View source on GitHub")
 
 ```python
 RawDataWriter.close() -> None
@@ -237,7 +266,7 @@ calls this method automatically.
 
 None.
 
-### `EmbeddedDataWriter.close` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/writer.py "View source on GitHub")
+## `EmbeddedDataWriter.close` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/writer.py "View source on GitHub")
 
 ```python
 EmbeddedDataWriter.close() -> None
@@ -250,25 +279,3 @@ calls this method automatically.
 **Parameters**
 
 None.
-
-## Implementation
-
-The shared writer lifecycle refuses to overwrite a non-empty directory,
-buffers rows by table, and flushes at `shard_rows`. Each flush uses the
-canonical Arrow schema, writes a Zstandard-compressed IPC shard through a
-temporary file, records its row count and SHA-256 in the manifest, and
-atomically publishes it. Closing flushes all tables, writes the manifest, and
-refreshes package checksums.
-
-`RawDataWriter` validates component IDs, modalities, MIME types, and source
-files. Payloads are deduplicated by SHA-256 under:
-
-```text
-assets/sha256/<first-two-digest-characters>/<full-digest>
-```
-
-`EmbeddedDataWriter` canonicalizes the numeric dtype, requires at least one
-vector per object, and enforces the manifest dimension. Ground-truth insertion
-requires existing query/base IDs, relevance from 0 through 32767, non-empty
-annotations, and a unique `(query_id, object_id, split_type, pool_id)` tuple.
-Once judgments begin, base and query objects can no longer be added.
