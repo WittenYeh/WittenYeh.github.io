@@ -3,7 +3,7 @@
 The package root exports `RawComponent`, `RawDataWriter`, and
 `EmbeddedDataWriter`. Both writers are intended to be used as context managers.
 
-### `RawComponent`
+### `RawComponent` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/writer.py "View source on GitHub")
 
 ```python
 RawComponent(
@@ -25,7 +25,7 @@ Describes one local payload that a `RawDataWriter` will copy into the package.
 | `modality` | `str` | Extensible modality token, such as `text`, `image`, `audio`, or `video`. |
 | `media_type` | `str` | MIME type of the payload, such as `text/plain` or `image/png`. |
 
-### `RawDataWriter`
+### `RawDataWriter` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/writer.py "View source on GitHub")
 
 ```python
 RawDataWriter(
@@ -57,7 +57,7 @@ The target directory must be new or empty.
 | `source` | `str \| None` | Optional source or provenance string. |
 | `extensions` | `Mapping[str, Any] \| None` | Optional namespaced Manifest extensions. |
 
-### `RawDataWriter.add_base`
+### `RawDataWriter.add_base` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/writer.py "View source on GitHub")
 
 ```python
 RawDataWriter.add_base(
@@ -75,7 +75,7 @@ Adds one Raw object to the base table while preserving component order.
 | `object_id` | `str` | Non-empty ID, unique within the base table. |
 | `components` | `Iterable[RawComponent]` | One or more ordered local payload components. |
 
-### `RawDataWriter.add_query`
+### `RawDataWriter.add_query` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/writer.py "View source on GitHub")
 
 ```python
 RawDataWriter.add_query(
@@ -93,7 +93,7 @@ Adds one Raw object to the query table while preserving component order.
 | `object_id` | `str` | Non-empty ID, unique within the query table. |
 | `components` | `Iterable[RawComponent]` | One or more ordered local payload components. |
 
-### `EmbeddedDataWriter`
+### `EmbeddedDataWriter` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/writer.py "View source on GitHub")
 
 ```python
 EmbeddedDataWriter(
@@ -133,7 +133,7 @@ settings. The target directory must be new or empty.
 | `source` | `str \| None` | Optional source or provenance string. |
 | `extensions` | `Mapping[str, Any] \| None` | Optional namespaced Manifest extensions. |
 
-### `EmbeddedDataWriter.add_base`
+### `EmbeddedDataWriter.add_base` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/writer.py "View source on GitHub")
 
 ```python
 EmbeddedDataWriter.add_base(
@@ -151,7 +151,7 @@ Adds one Embedded object and its ordered vectors to the base table.
 | `object_id` | `str` | Non-empty ID, unique within the base table. |
 | `vectors` | `Iterable[Iterable[Any]]` | One or more vectors matching the package dimension and dtype. |
 
-### `EmbeddedDataWriter.add_query`
+### `EmbeddedDataWriter.add_query` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/writer.py "View source on GitHub")
 
 ```python
 EmbeddedDataWriter.add_query(
@@ -169,10 +169,10 @@ Adds one Embedded object and its ordered vectors to the query table.
 | `object_id` | `str` | Non-empty ID, unique within the query table. |
 | `vectors` | `Iterable[Iterable[Any]]` | One or more vectors matching the package dimension and dtype. |
 
-### `RawDataWriter.add_ground_truth` and `EmbeddedDataWriter.add_ground_truth`
+### `RawDataWriter.add_ground_truth` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/writer.py "View source on GitHub")
 
 ```python
-writer.add_ground_truth(
+RawDataWriter.add_ground_truth(
     query_id: str,
     object_id: str,
     relevance: int,
@@ -183,8 +183,7 @@ writer.add_ground_truth(
 ) -> None
 ```
 
-Adds one judged query-object pair to the ground-truth table. Both writer classes
-expose the same method prototype.
+Adds one judged query-object pair to a Raw package's ground-truth table.
 
 **Parameters**
 
@@ -197,10 +196,51 @@ expose the same method prototype.
 | `judgment_source` | `str` | Non-empty label source, such as `human`. |
 | `pool_id` | `str` | Non-empty candidate-pool identifier. |
 
-### `RawDataWriter.close` and `EmbeddedDataWriter.close`
+### `EmbeddedDataWriter.add_ground_truth` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/writer.py "View source on GitHub")
 
 ```python
-writer.close() -> None
+EmbeddedDataWriter.add_ground_truth(
+    query_id: str,
+    object_id: str,
+    relevance: int,
+    *,
+    split_type: str,
+    judgment_source: str,
+    pool_id: str,
+) -> None
+```
+
+Adds one judged query-object pair to an Embedded package's ground-truth table.
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `query_id` | `str` | ID of an existing object in the query table. |
+| `object_id` | `str` | ID of an existing object in the base table. |
+| `relevance` | `int` | Relevance level from `0` through `32767`. |
+| `split_type` | `str` | Non-empty data split label, such as `test`. |
+| `judgment_source` | `str` | Non-empty label source, such as `human`. |
+| `pool_id` | `str` | Non-empty candidate-pool identifier. |
+
+### `RawDataWriter.close` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/writer.py "View source on GitHub")
+
+```python
+RawDataWriter.close() -> None
+```
+
+Flushes all buffered rows, writes the final Manifest, and refreshes package
+checksums. Calling `close()` again has no effect. A successful `with` block
+calls this method automatically.
+
+**Parameters**
+
+None.
+
+### `EmbeddedDataWriter.close` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/writer.py "View source on GitHub")
+
+```python
+EmbeddedDataWriter.close() -> None
 ```
 
 Flushes all buffered rows, writes the final Manifest, and refreshes package

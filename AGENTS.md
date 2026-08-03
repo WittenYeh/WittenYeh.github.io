@@ -48,13 +48,46 @@ For ordinary code, use a standard fenced language such as `python`, `yaml`,
 `toml`, `bash`, or `typescript`; the shared Markdown pipeline applies syntax
 highlighting automatically.
 
-Write public API references in the PyTorch/Sphinx style instead of compressing
-one API into each row of a summary table. Give every public constructor,
-function, CLI command, or instance method its own level-three heading, followed
-by a fenced prototype, a short description, and a `Parameters` table or
-unordered list. Add `Returns` when it clarifies the contract. Do not document
-private helpers as APIs, and use a short linked index instead of duplicating
-full signatures across chapters.
+### Public API documentation
+
+Use a PyTorch/Sphinx-style reference layout for every project's public APIs:
+
+1. Document only the stable package exports and their public constructors,
+   properties, functions, CLI commands, and instance methods. Never present a
+   private helper as an API.
+2. Give every API its own level-three heading, including inherited methods that
+   are public on more than one class. Do not combine two API names in one
+   heading and do not compress APIs into one-row entries in a role table.
+3. Put a GitHub source link immediately after the API name with this exact
+   reusable Markdown convention:
+
+   ```markdown
+   ### `load_manifest` [source](https://github.com/OWNER/REPOSITORY/blob/main/PATH "View source on GitHub")
+   ```
+
+   Link to the corresponding implementation file. The shared
+   `ProjectDocs.tsx` renderer recognizes the exact `View source on GitHub`
+   title, styles the heading as an API separator, and displays the link as a
+   GitHub logo. Do not embed an icon, raw HTML, or project-specific React code.
+4. Follow the heading with a fenced prototype. Use `python` for Python APIs,
+   `bash` for CLI commands, and the appropriate standard language for other
+   interfaces. Keep parameter types, keyword-only markers, defaults, and return
+   types synchronized with the source.
+5. Add a concise one- or two-paragraph description immediately after the
+   prototype. Explain the contract and important behavior rather than restating
+   the API name.
+6. Add a bold `Parameters` label followed by either a table or an unordered
+   list. Describe every parameter, including its type, default when applicable,
+   allowed values, and semantic role. Write `None.` for APIs with no parameters.
+7. Add a bold `Returns` label when the return value is part of the useful
+   contract. State both its type and meaning; omit it for constructors and
+   mutating methods that only return `None` when that omission is clearer.
+8. Keep usage examples outside individual API entries under an `Example` or
+   `Examples` section. Use a short linked index when readers need an overview;
+   do not duplicate full prototypes in multiple chapters.
+9. Before publishing, compare every documented prototype with the current
+   source and confirm that the static SEO HTML contains the headings,
+   prototypes, parameters, and source links.
 
 When renaming a project-doc slug, move its content directory and project card, update its preview asset and repository links, and list prior slugs in `project.json` under `legacySlugs`. The shared routing and SEO pipeline preserves old chapter URLs as `noindex` compatibility pages that canonicalize and redirect to the current slug.
 

@@ -2,7 +2,7 @@
 
 The package root exports the validation function and report types:
 
-### `validate_data`
+### `validate_data` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/validation.py "View source on GitHub")
 
 ```python
 validate_data(
@@ -26,7 +26,7 @@ references without stopping after the first recoverable error.
 
 A complete `ValidationReport`.
 
-### `ValidationIssue`
+### `ValidationIssue` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/validation.py "View source on GitHub")
 
 ```python
 ValidationIssue(
@@ -48,7 +48,7 @@ Represents one validation error or warning.
 | `message` | `str` | Human-readable explanation. |
 | `path` | `str \| None` | Optional package-relative location. |
 
-### `ValidationIssue.as_dict`
+### `ValidationIssue.as_dict` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/validation.py "View source on GitHub")
 
 ```python
 ValidationIssue.as_dict() -> dict[str, Any]
@@ -64,7 +64,7 @@ None.
 
 A mapping containing `severity`, `code`, `message`, and `path` when present.
 
-### `ValidationReport`
+### `ValidationReport` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/validation.py "View source on GitHub")
 
 ```python
 ValidationReport(
@@ -86,7 +86,7 @@ Collects the package kind, observed table row counts, and all validation issues.
 | `issues` | `list[ValidationIssue]` | Initial issues; defaults to a fresh empty list. |
 | `counts` | `dict[str, int]` | Initial table counts; defaults to a fresh empty mapping. |
 
-### `ValidationReport.valid`
+### `ValidationReport.valid` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/validation.py "View source on GitHub")
 
 ```python
 ValidationReport.valid -> bool
@@ -98,7 +98,7 @@ Derived property that is `True` when the report contains no error-level issue.
 
 None.
 
-### `ValidationReport.error`
+### `ValidationReport.error` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/validation.py "View source on GitHub")
 
 ```python
 ValidationReport.error(
@@ -118,7 +118,7 @@ Appends an error-level `ValidationIssue` to the report.
 | `message` | `str` | Human-readable explanation. |
 | `path` | `str \| None` | Optional package-relative location. |
 
-### `ValidationReport.warning`
+### `ValidationReport.warning` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/validation.py "View source on GitHub")
 
 ```python
 ValidationReport.warning(
@@ -138,7 +138,7 @@ Appends a warning-level `ValidationIssue` to the report.
 | `message` | `str` | Human-readable explanation. |
 | `path` | `str \| None` | Optional package-relative location. |
 
-### `ValidationReport.as_dict`
+### `ValidationReport.as_dict` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/validation.py "View source on GitHub")
 
 ```python
 ValidationReport.as_dict() -> dict[str, Any]

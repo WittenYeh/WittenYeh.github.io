@@ -2,7 +2,7 @@
 
 The package root exports two checksum functions:
 
-### `write_checksums`
+### `write_checksums` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/checksums.py "View source on GitHub")
 
 ```python
 write_checksums(root: str | os.PathLike[str]) -> Path
@@ -21,7 +21,7 @@ Recomputes every package-file digest and atomically replaces
 
 The path to the regenerated `checksums.sha256` file.
 
-### `verify_checksums`
+### `verify_checksums` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/checksums.py "View source on GitHub")
 
 ```python
 verify_checksums(root: str | os.PathLike[str]) -> list[str]

@@ -2,7 +2,7 @@
 
 The package root exports two stable Manifest APIs:
 
-### `load_manifest`
+### `load_manifest` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/manifest.py "View source on GitHub")
 
 ```python
 load_manifest(root: str | os.PathLike[str]) -> dict[str, Any]
@@ -22,7 +22,7 @@ Loads `manifest.yaml`, validates it, and returns the parsed Manifest mapping.
 
 The validated Manifest as a `dict[str, Any]`.
 
-### `validate_manifest_data`
+### `validate_manifest_data` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/manifest.py "View source on GitHub")
 
 ```python
 validate_manifest_data(data: Any) -> dict[str, Any]

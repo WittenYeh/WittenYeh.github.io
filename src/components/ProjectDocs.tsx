@@ -18,6 +18,10 @@ import { getProjectDocs } from '@/data/projectDocs'
 import { terminalPalette } from '@/config/theme'
 import { siteOwner } from '@/site.config'
 
+const githubLogoMask = `url("data:image/svg+xml,${encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.835 2.809 1.305 3.495.998.108-.776.418-1.305.762-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23a11.5 11.5 0 0 1 3-.405c1.02.005 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57A12.02 12.02 0 0 0 24 12.297c0-6.627-5.373-12-12-12"/></svg>',
+)}")`
+
 const copyText = async (text: string) => {
   if (navigator.clipboard?.writeText) {
     try {
@@ -305,6 +309,50 @@ const ProjectDocs: React.FC = () => {
                 },
                 '& h2:first-of-type': { mt: 0 },
                 '& h3': { color: tc.text, fontSize: 'md', fontWeight: 700, mt: 7, mb: 3 },
+                '& h3:has(> a[title="View source on GitHub"])': {
+                  display: 'flex',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                  gap: 2,
+                  mt: 9,
+                  mb: 4,
+                  px: 3,
+                  py: 2.5,
+                  bg: tc.header,
+                  borderLeft: '3px solid',
+                  borderLeftColor: tc.command,
+                  borderRadius: 'sm',
+                  scrollMarginTop: '96px',
+                },
+                '& h3:has(> a[title="View source on GitHub"]) > code': {
+                  p: 0,
+                  color: tc.text,
+                  bg: 'transparent',
+                  border: 0,
+                  fontSize: 'inherit',
+                },
+                '& h3 > a[title="View source on GitHub"]': {
+                  display: 'inline-block',
+                  flexShrink: 0,
+                  w: '15px',
+                  h: '15px',
+                  color: tc.secondary,
+                  bg: 'currentColor',
+                  fontSize: 0,
+                  textDecoration: 'none',
+                  WebkitMask: `${githubLogoMask} center / contain no-repeat`,
+                  mask: `${githubLogoMask} center / contain no-repeat`,
+                  transition: 'color 0.15s ease',
+                },
+                '& h3 > a[title="View source on GitHub"]:hover': {
+                  color: tc.command,
+                  textDecoration: 'none',
+                },
+                '& h3 > a[title="View source on GitHub"]:focus-visible': {
+                  color: tc.command,
+                  outline: '1px solid currentColor',
+                  outlineOffset: '3px',
+                },
                 '& p': { mb: 4, lineHeight: 1.85 },
                 '& ul, & ol': { mb: 5, pl: 6 },
                 '& li': { mb: 2, lineHeight: 1.75 },

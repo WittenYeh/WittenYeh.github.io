@@ -2,7 +2,7 @@
 
 The package root exports two transport functions:
 
-### `pack_data`
+### `pack_data` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/packaging.py "View source on GitHub")
 
 ```python
 pack_data(
@@ -30,7 +30,7 @@ if detailed package validation fails.
 
 The path to the created archive.
 
-### `unpack_data`
+### `unpack_data` [source](https://github.com/WittenYeh/MVR-Data/blob/main/src/mvr_data/packaging.py "View source on GitHub")
 
 ```python
 unpack_data(
