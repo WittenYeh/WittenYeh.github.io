@@ -146,7 +146,10 @@ const projectDocRouteConfigs = Object.fromEntries(projectDocs.flatMap((project) 
     const showAsciiHero = chapter.hideTitle && project.hero?.type === 'ascii'
     const heading = showAsciiHero
       ? `<h1 class="seo-visually-hidden">${escapeHtml(project.hero.ariaLabel ?? project.title)}</h1><pre class="seo-ascii" role="img" aria-label="${escapeHtml(project.hero.ariaLabel ?? project.title)}">${escapeHtml(project.hero.lines.join('\n'))}</pre>`
-      : `<h1>${escapeHtml(chapter.title)}</h1><p>${escapeHtml(chapter.description)}</p>`
+      : `<h1>${escapeHtml(chapter.title)}</h1>`
+    const overview = chapter.overview?.length
+      ? `<p>The <strong>${escapeHtml(chapter.shortTitle ?? chapter.title)}</strong> chapter includes:</p><ul>${chapter.overview.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`
+      : `<p>${escapeHtml(chapter.description)}</p>`
     return [
       chapter.route,
       {
@@ -155,7 +158,7 @@ const projectDocRouteConfigs = Object.fromEntries(projectDocs.flatMap((project) 
           : `${chapter.title} | ${project.title} | Weitang Ye`,
         description: chapter.description,
         index: true,
-        content: `<main id="seo-static-content"><p><a href="/projects/">Projects</a> / ${escapeHtml(project.title)}</p>${heading}<article>${marked.parse(chapter.markdown)}</article></main>`,
+        content: `<main id="seo-static-content"><p><a href="/projects/">Projects</a> / ${escapeHtml(project.title)}</p>${heading}${overview}<article>${marked.parse(chapter.markdown)}</article></main>`,
       },
     ]
   }),

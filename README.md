@@ -206,6 +206,10 @@ content/project-docs/<project-slug>/
       "shortTitle": "Welcome",
       "file": "welcome.md",
       "description": "Install and use the project.",
+      "overview": [
+        "What the project provides.",
+        "How to install and use it."
+      ],
       "hideTitle": true
     },
     {
@@ -223,7 +227,7 @@ content/project-docs/<project-slug>/
 1. `chapters` 数组顺序就是侧边栏和上一篇/下一篇的顺序。
 2. 第一章发布在 `/projects/<project-slug>/`；后续章节发布在 `/projects/<project-slug>/<chapter-slug>/`。
 3. 章节的 `slug` 和 Markdown 文件名必须使用小写 kebab-case，并且在项目内唯一。
-4. 每个 Markdown 文件只写一个小章节的正文；页面标题和说明来自 `project.json`，正文建议从 `##` 开始。
+4. 每个 Markdown 文件只写一个小章节的正文；页面标题和说明来自 `project.json`，正文建议从 `##` 开始。`description` 是用于 SEO 的简短摘要；可选的 `overview` 是非空字符串数组，会在章节标题下渲染为 “The **Chapter** chapter includes:” 和无序列表。
 5. 目录中的每个 Markdown 文件都必须在 `chapters` 中登记；缺失文件、重复 slug、未登记文件会使 `npm run validate` 或构建失败。
 6. `hero` 是可选配置。若某一章设置 `hideTitle: true`，该项目必须提供 `hero`；页面会隐藏可见的大标题并在相同位置显示 ASCII 字符画，同时保留屏幕阅读器可访问的 `h1`。
 7. 在 `content/projects/<project-slug>.md` 的 `extraLinks` 中加入文档入口：

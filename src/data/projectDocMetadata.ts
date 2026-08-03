@@ -9,6 +9,7 @@ export interface ProjectDocChapterDefinition {
   shortTitle?: string
   file: string
   description: string
+  overview?: string[]
   hideTitle?: boolean
 }
 

@@ -193,14 +193,36 @@ const ProjectDocs: React.FC = () => {
                   </Box>
                 </>
               ) : (
-                <>
-                  <Heading as="h1" fontSize={['xl', '2xl', '3xl']} lineHeight="1.3" color={tc.text} mb={4}>
-                    {chapter.title}
-                  </Heading>
-                  <Text maxW="780px" color={tc.secondary} fontSize={['sm', 'md']} lineHeight="1.8">
-                    {chapter.description}
+                <Heading as="h1" fontSize={['xl', '2xl', '3xl']} lineHeight="1.3" color={tc.text} mb={4}>
+                  {chapter.title}
+                </Heading>
+              )}
+              {chapter.overview?.length ? (
+                <Box maxW="780px" mt={showAsciiHero ? 5 : 0} color={tc.secondary} fontSize={['sm', 'md']} lineHeight="1.8">
+                  <Text mb={2}>
+                    The{' '}
+                    <Text as="span" color={tc.text} fontWeight={700}>
+                      {chapter.shortTitle ?? chapter.title}
+                    </Text>{' '}
+                    chapter includes:
                   </Text>
-                </>
+                  <Box
+                    as="ul"
+                    m={0}
+                    pl={5}
+                    sx={{ '& li::marker': { color: tc.command } }}
+                  >
+                    {chapter.overview.map((item) => (
+                      <Text as="li" key={item} mb={1}>
+                        {item}
+                      </Text>
+                    ))}
+                  </Box>
+                </Box>
+              ) : (
+                <Text maxW="780px" color={tc.secondary} fontSize={['sm', 'md']} lineHeight="1.8">
+                  {chapter.description}
+                </Text>
               )}
               {project.repository && (
                 <Link

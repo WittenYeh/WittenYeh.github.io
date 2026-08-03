@@ -30,56 +30,94 @@
       "shortTitle": "Quick Start",
       "file": "welcome.md",
       "description": "Install the toolkit, create raw or embedded data packages, read and validate them, and prepare archives for distribution.",
+      "overview": [
+        "The Raw, Embedded, and ground-truth data schemas.",
+        "How the manifest records package-wide settings and Arrow shards.",
+        "How to install and use the CLI and Python APIs."
+      ],
       "hideTitle": true
     },
     {
       "slug": "schema",
       "title": "Schema",
       "file": "schema.md",
-      "description": "The schema module's callable surface and how it defines canonical Arrow representations for objects, vectors, components, and relevance judgments."
+      "description": "The schema module's callable surface and how it defines canonical Arrow representations for objects, vectors, components, and relevance judgments.",
+      "overview": [
+        "The schema module's internal callable surface.",
+        "How it defines canonical Arrow schemas and dispatches vector dtypes and table layouts."
+      ]
     },
     {
       "slug": "manifest",
       "title": "Manifest",
       "file": "manifest.md",
-      "description": "The manifest module's internal callable surface and how it creates, validates, loads, and atomically writes package metadata."
+      "description": "The manifest module's internal callable surface and how it creates, validates, loads, and atomically writes package metadata.",
+      "overview": [
+        "The manifest module's internal callable surface.",
+        "How it creates, validates, loads, and atomically writes package metadata."
+      ]
     },
     {
       "slug": "writer",
       "title": "Writer",
       "file": "writer.md",
-      "description": "Public writer APIs and how they construct Raw and Embedded packages while enforcing IDs, vector shapes, sharding, and ground-truth invariants."
+      "description": "Public writer APIs and how they construct Raw and Embedded packages while enforcing IDs, vector shapes, sharding, and ground-truth invariants.",
+      "overview": [
+        "The public Raw and Embedded writer APIs.",
+        "How writers validate objects, create shards, deduplicate payloads, and finalize packages."
+      ]
     },
     {
       "slug": "reader",
       "title": "Reader",
       "file": "reader.md",
-      "description": "Public reader APIs and how they resolve trusted shard paths and stream schema-checked Arrow record batches."
+      "description": "Public reader APIs and how they resolve trusted shard paths and stream schema-checked Arrow record batches.",
+      "overview": [
+        "The public streaming and materialized reader APIs.",
+        "How readers resolve safe shard paths and enforce exact Arrow schemas."
+      ]
     },
     {
       "slug": "validation",
       "title": "Validation",
       "file": "validation.md",
-      "description": "Public validation APIs and how they report structural, semantic, referential, judgment, and optional detailed-integrity errors."
+      "description": "Public validation APIs and how they report structural, semantic, referential, judgment, and optional detailed-integrity errors.",
+      "overview": [
+        "The public validation function and structured report APIs.",
+        "How structural, semantic, referential, judgment, and detailed integrity checks are performed."
+      ]
     },
     {
       "slug": "checksums",
       "title": "Checksum",
       "file": "checksums.md",
-      "description": "Public checksum APIs and how they create and verify deterministic whole-package SHA-256 integrity records."
+      "description": "Public checksum APIs and how they create and verify deterministic whole-package SHA-256 integrity records.",
+      "overview": [
+        "The public checksum refresh and verification APIs.",
+        "How deterministic whole-package SHA-256 records are generated, parsed, and checked."
+      ]
     },
     {
       "slug": "packaging",
       "title": "Packaging",
       "file": "packaging.md",
-      "description": "Public packaging APIs and how they create reproducible tar.zst archives and reject unsafe content during extraction."
+      "description": "Public packaging APIs and how they create reproducible tar.zst archives and reject unsafe content during extraction.",
+      "overview": [
+        "The public archive packing and extraction APIs.",
+        "How reproducible tar.zst archives are created and unsafe extraction content is rejected."
+      ]
     },
     {
       "slug": "cli-public-api",
       "title": "CLI & Package",
       "shortTitle": "CLI & Package",
       "file": "cli-public-api.md",
-      "description": "The CLI and stable package APIs, plus how cli.py, __init__.py, and pyproject.toml expose them to users."
+      "description": "The CLI and stable package APIs, plus how cli.py, __init__.py, and pyproject.toml expose them to users.",
+      "overview": [
+        "The mvrdata commands, options, and exit-code conventions.",
+        "The stable Python package APIs exported from mvr_data.",
+        "How the command entry point and package exports are implemented."
+      ]
     }
   ]
 }

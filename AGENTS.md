@@ -35,6 +35,11 @@ worktree changes.
 
 Project pages are content-driven. Do not create a project-specific React component. Use `project.json` plus Markdown chapters under `content/project-docs/<project-slug>/`; the shared `src/components/ProjectDocs.tsx` supplies routing, sidebar navigation, previous/next navigation, theming, SEO entry points, and sitemap entries. A README-only project uses one chapter named `README` and can grow into multiple chapters later.
 
+Keep each chapter's `description` as a concise plain-text SEO summary. When a
+chapter needs a structured introduction below its title, add `overview` as a
+non-empty array of list-item strings; the shared renderer and static SEO output
+generate the lead sentence and unordered list.
+
 For terminal examples in project documentation, put user input in a
 <code>```command</code> fence and captured output in an immediately following
 <code>```output</code> fence. The shared renderer joins, labels, and colors each

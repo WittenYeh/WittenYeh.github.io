@@ -81,6 +81,13 @@ export const loadProjectDocs = (root) => {
         requireString(chapter.title, 'title', source)
         requireString(chapter.description, 'description', source)
         requireString(chapter.file, 'file', source)
+        if (chapter.overview !== undefined && (
+          !Array.isArray(chapter.overview)
+          || chapter.overview.length === 0
+          || chapter.overview.some((item) => typeof item !== 'string' || !item.trim())
+        )) {
+          throw new Error(`${source}: overview must be a non-empty string array`)
+        }
         if (chapter.hideTitle !== undefined && typeof chapter.hideTitle !== 'boolean') {
           throw new Error(`${source}: hideTitle must be a boolean`)
         }
