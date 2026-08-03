@@ -30,8 +30,13 @@ import {
   ModalCloseButton
 } from '@chakra-ui/react'
 import { keyframes } from '@emotion/react'
-import { getPublicationStats } from '../data'
 import { useLocalizedData } from '@/hooks/useLocalizedData'
+import { usePagedContent } from '@/hooks/usePagedContent'
+import {
+  getPublicationStats,
+  loadPublicationPage,
+  publicationIndex,
+} from '@/data/publicationPages'
 import { FaChartBar, FaVideo, FaProjectDiagram, FaFileAlt, FaAtom, FaStar, FaRobot, FaGlobe, FaHandRock, FaCloudSun, FaFutbol } from 'react-icons/fa'
 import { IconType } from 'react-icons'
 import { highlightData } from '../utils/highlightData'
@@ -61,7 +66,7 @@ const blink = keyframes`
 const PublicationsTerminal: React.FC = () => {
   const { colorMode } = useColorMode()
   const isDark = colorMode === 'dark'
-  const { publications, siteOwner } = useLocalizedData()
+  const { siteOwner } = useLocalizedData()
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedYear, setSelectedYear] = useState<string>('all')
   const [selectedVenue, setSelectedVenue] = useState<string>('all')
@@ -106,21 +111,16 @@ const PublicationsTerminal: React.FC = () => {
   }, [])
   
   // Get statistics
-  const stats = useMemo(() => getPublicationStats(), [publications])
+  const stats = useMemo(() => getPublicationStats(publicationIndex), [])
   
   // Filter publications
   const filteredPublications = useMemo(() => {
-    let filtered = [...publications]
+    let filtered = [...publicationIndex]
     
     // Filter by search query
     if (searchQuery) {
       const query = searchQuery.toLowerCase()
-      filtered = filtered.filter(pub => 
-        pub.title.toLowerCase().includes(query) ||
-        pub.authors.some(author => author.toLowerCase().includes(query)) ||
-        pub.venue.toLowerCase().includes(query) ||
-        pub.keywords?.some(keyword => keyword.toLowerCase().includes(query))
-      )
+      filtered = filtered.filter(pub => pub.searchText.includes(query))
     }
     
     // Filter by year
@@ -140,13 +140,18 @@ const PublicationsTerminal: React.FC = () => {
     })
     
     return filtered
-  }, [publications, searchQuery, selectedYear, selectedVenue])
+  }, [searchQuery, selectedYear, selectedVenue])
 
   const totalPages = Math.max(1, Math.ceil(filteredPublications.length / TERMINAL_PAGE_SIZE))
-  const pagedPublications = useMemo(
+  const pagedPublicationEntries = useMemo(
     () => filteredPublications.slice((currentPage - 1) * TERMINAL_PAGE_SIZE, currentPage * TERMINAL_PAGE_SIZE),
     [filteredPublications, currentPage],
   )
+  const {
+    items: pagedPublications,
+    error: pageLoadError,
+    isLoading: isPageLoading,
+  } = usePagedContent(pagedPublicationEntries, loadPublicationPage)
   const pageStart = filteredPublications.length === 0 ? 0 : (currentPage - 1) * TERMINAL_PAGE_SIZE + 1
   const pageEnd = Math.min(currentPage * TERMINAL_PAGE_SIZE, filteredPublications.length)
 
@@ -156,9 +161,9 @@ const PublicationsTerminal: React.FC = () => {
   
   // Get unique years for filter
   const availableYears = useMemo(() => {
-    const years = [...new Set(publications.map(p => p.year))].sort((a, b) => b - a)
+    const years = [...new Set(publicationIndex.map(p => p.year))].sort((a, b) => b - a)
     return years
-  }, [publications])
+  }, [])
   
   // Toggle expanded state
   const toggleExpanded = (id: string) => {
@@ -223,6 +228,14 @@ const PublicationsTerminal: React.FC = () => {
     setCurrentPage(Math.min(Math.max(page, 1), totalPages))
     window.requestAnimationFrame(() => listTopRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }))
   }
+
+  const preloadPage = (page: number) => {
+    const start = (page - 1) * TERMINAL_PAGE_SIZE
+    const entries = filteredPublications.slice(start, start + TERMINAL_PAGE_SIZE)
+    void loadPublicationPage(entries).catch(() => undefined)
+  }
+
+  if (pageLoadError) throw pageLoadError
   
   return (
     <Box w="full" minH="100vh" bg={useColorModeValue('gray.50', 'gray.900')} py={8}>
@@ -437,6 +450,14 @@ const PublicationsTerminal: React.FC = () => {
               <Text w="50px" textAlign="center">MORE</Text>
             </Flex>
             
+            {isPageLoading && (
+              <Box px={4} py={8} textAlign="center" borderBottom={`1px dotted ${termBorder}`}>
+                <Text color={termInfo} fontSize="sm" fontFamily="mono">
+                  loading publication page…
+                </Text>
+              </Box>
+            )}
+
             {/* Publications */}
             {pagedPublications.map((pub) => (
               <Box
@@ -752,7 +773,7 @@ const PublicationsTerminal: React.FC = () => {
             ))}
             
             {/* No Results */}
-            {filteredPublications.length === 0 && (
+            {!isPageLoading && filteredPublications.length === 0 && (
               <Box px={4} py={8} textAlign="center">
                 <Text color={termError} fontSize="sm">
                   No publications found matching criteria
@@ -768,6 +789,7 @@ const PublicationsTerminal: React.FC = () => {
             currentPage={currentPage}
             totalPages={totalPages}
             onPageChange={changePage}
+            onPagePreload={preloadPage}
             ariaLabel="Publications pages"
           />
           
@@ -844,7 +866,7 @@ const PublicationsTerminal: React.FC = () => {
           gap={2}
         >
           <Text color={termInfo}>
-            Showing <Text as="span" color={termHighlight} fontWeight="bold">{pageStart}-{pageEnd}</Text> of {filteredPublications.length} matching papers ({publications.length} total)
+            Showing <Text as="span" color={termHighlight} fontWeight="bold">{pageStart}-{pageEnd}</Text> of {filteredPublications.length} matching papers ({publicationIndex.length} total)
           </Text>
           <HStack spacing={4}>
             <Text color={termSuccess}>

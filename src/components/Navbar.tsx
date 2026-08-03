@@ -8,6 +8,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { navItems, siteConfig, siteOwner } from '@/site.config'
 import { withBase } from '@/utils/asset'
+import { preloadRoute } from '@/routing/pageModules'
 
 const Navbar: React.FC = () => {
   const { colorMode, toggleColorMode } = useColorMode()
@@ -78,6 +79,8 @@ const Navbar: React.FC = () => {
               <Link
                 key={item.path}
                 to={item.path}
+                onMouseEnter={() => preloadRoute(item.path)}
+                onFocus={() => preloadRoute(item.path)}
                 style={{
                   color: 'var(--text-color)',
                   textDecoration: 'none',
@@ -124,6 +127,8 @@ const Navbar: React.FC = () => {
                     as={Link}
                     to={item.path}
                     onClick={onClose}
+                    onFocus={() => preloadRoute(item.path)}
+                    onTouchStart={() => preloadRoute(item.path)}
                     color={isActive ? 'var(--accent-color)' : 'var(--text-color)'}
                     _hover={{ color: 'var(--accent-color)' }}
                     fontWeight={isActive ? 600 : 400}

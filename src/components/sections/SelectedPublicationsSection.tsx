@@ -3,8 +3,12 @@ import { Box, Container, VStack, HStack, Text, Heading, Flex, Link,
   useColorModeValue } from '@chakra-ui/react'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Link as RouterLink } from 'react-router-dom'
 import { selectedPublicationIds } from '@/site.config'
-import { useLocalizedData } from '@/hooks/useLocalizedData'
+import { loadPublicationPage, publicationIndex } from '@/data/publicationPages'
+import { usePagedContent } from '@/hooks/usePagedContent'
+import { preloadRoute } from '@/routing/pageModules'
+import type { Publication } from '@/types'
 import DynamicIcon from '../DynamicIcon'
 
 const PubLink = ({ href, icon, label }: { href: string; icon: string; label: string }) => (
@@ -22,7 +26,7 @@ const PubLink = ({ href, icon, label }: { href: string; icon: string; label: str
   </Link>
 )
 
-const PublicationCard = ({ pub }: { pub: any }) => {
+const PublicationCard = ({ pub }: { pub: Publication }) => {
   const { t } = useTranslation()
   const { isOpen: isAbstractOpen, onToggle: onToggleAbstract } = useDisclosure()
   const { isOpen: isImageOpen, onOpen: onImageOpen, onClose: onImageClose } = useDisclosure()
@@ -124,14 +128,17 @@ const PublicationCard = ({ pub }: { pub: any }) => {
 
 const SelectedPublicationsSection: React.FC = () => {
   const { t } = useTranslation()
-  const { publications } = useLocalizedData()
-
-  const selectedPubs = useMemo(
-    () => publications.filter((pub) => selectedPublicationIds.has(pub.id)),
-    [publications]
+  const selectedEntries = useMemo(
+    () => publicationIndex.filter((publication) => selectedPublicationIds.has(publication.id)),
+    [],
+  )
+  const { items: selectedPubs, error, isLoading } = usePagedContent(
+    selectedEntries,
+    loadPublicationPage,
   )
 
-  if (selectedPubs.length === 0) return null
+  if (error) throw error
+  if (isLoading || selectedPubs.length === 0) return null
 
   return (
     <Box w="full">
@@ -146,7 +153,13 @@ const SelectedPublicationsSection: React.FC = () => {
             <PublicationCard key={pub.id} pub={pub} />
           ))}
           <Box textAlign="center" pt={2}>
-            <Link href="/publications" _hover={{ textDecoration: 'none' }}>
+            <Link
+              as={RouterLink}
+              to="/publications"
+              onMouseEnter={() => preloadRoute('/publications')}
+              onFocus={() => preloadRoute('/publications')}
+              _hover={{ textDecoration: 'none' }}
+            >
               <HStack spacing={2} justify="center" color={useColorModeValue('gray.500', 'gray.400')} fontSize="sm" fontFamily="mono" transition="all 0.15s" _hover={{ color: 'cyan.400' }}>
                 <Text>{t('about.viewAllPublications')}</Text>
                 <Text>→</Text>

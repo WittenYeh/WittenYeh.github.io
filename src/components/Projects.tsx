@@ -17,6 +17,8 @@ import type { ProjectItem } from '../types'
 import { withBase } from '@/utils/asset'
 import { highlightData } from '@/utils/highlightData'
 import { useLocalizedData } from '@/hooks/useLocalizedData'
+import { usePagedContent } from '@/hooks/usePagedContent'
+import { loadProjectPage, projectIndex } from '@/data/projectPages'
 import { buildCategoryThemes, terminalPalette, type CatTheme } from '@/config/theme'
 import TerminalPagination, { TERMINAL_PAGE_SIZE } from './TerminalPagination'
 
@@ -262,7 +264,7 @@ const Projects: React.FC = () => {
   const { colorMode } = useColorMode()
   const isDark = colorMode === 'dark'
   const { t } = useTranslation()
-  const { projects: projectData, siteOwner } = useLocalizedData()
+  const { siteOwner } = useLocalizedData()
 
   const [activeTab, setActiveTab] = useState<TabKey>('all')
   const [searchQuery, setSearchQuery] = useState('')
@@ -289,9 +291,7 @@ const Projects: React.FC = () => {
 
   const themes = useMemo(() => buildThemes(isDark), [isDark])
 
-  const projects = useMemo<TP[]>(() =>
-    projectData.map((p, i) => ({ ...p, id: `p-${i}` }))
-  , [projectData])
+  const projects = projectIndex
 
   /* ── Tabs ── */
   const tabs = useMemo(() => {
@@ -314,8 +314,7 @@ const Projects: React.FC = () => {
       .filter(p => {
         if (activeTab !== 'all' && p.category !== activeTab) return false
         if (!q) return true
-        return [p.title, p.summary, p.tags?.join(' '), p.highlights?.join(' ')]
-          .filter(Boolean).some(s => (s as string).toLowerCase().includes(q))
+        return p.searchText.includes(q)
       })
       .sort((a, b) => {
         const da = a.date ? Date.parse(a.date) : 0
@@ -328,10 +327,15 @@ const Projects: React.FC = () => {
   }, [projects, searchQuery, activeTab])
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / TERMINAL_PAGE_SIZE))
-  const pagedProjects = useMemo(
+  const pagedProjectEntries = useMemo(
     () => filtered.slice((currentPage - 1) * TERMINAL_PAGE_SIZE, currentPage * TERMINAL_PAGE_SIZE),
     [filtered, currentPage],
   )
+  const {
+    items: pagedProjects,
+    error: pageLoadError,
+    isLoading: isPageLoading,
+  } = usePagedContent(pagedProjectEntries, loadProjectPage)
 
   useEffect(() => {
     if (currentPage > totalPages) setCurrentPage(totalPages)
@@ -348,7 +352,10 @@ const Projects: React.FC = () => {
 
   /* ── Stats ── */
   const totalIndep = useMemo(() => projects.filter(p => !p.role || p.role === 'independent').length, [projects])
-  const pageIndep = useMemo(() => pagedProjects.filter(p => !p.role || p.role === 'independent').length, [pagedProjects])
+  const pageIndep = useMemo(
+    () => pagedProjectEntries.filter(p => !p.role || p.role === 'independent').length,
+    [pagedProjectEntries],
+  )
   const pageStart = filtered.length === 0 ? 0 : (currentPage - 1) * TERMINAL_PAGE_SIZE + 1
   const pageEnd = Math.min(currentPage * TERMINAL_PAGE_SIZE, filtered.length)
 
@@ -362,6 +369,14 @@ const Projects: React.FC = () => {
     setCurrentPage(Math.min(Math.max(page, 1), totalPages))
     window.requestAnimationFrame(() => listTopRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }))
   }
+
+  const preloadPage = (page: number) => {
+    const start = (page - 1) * TERMINAL_PAGE_SIZE
+    const entries = filtered.slice(start, start + TERMINAL_PAGE_SIZE)
+    void loadProjectPage(entries).catch(() => undefined)
+  }
+
+  if (pageLoadError) throw pageLoadError
 
   return (
     <Box w="full" minH="100vh" bg={useColorModeValue('gray.50', 'gray.900')} py={8}>
@@ -485,6 +500,14 @@ const Projects: React.FC = () => {
             bg={termBg} color={termText}
             scrollMarginTop="80px"
           >
+            {isPageLoading && (
+              <Box px={4} py={8} textAlign="center">
+                <Text color={termInfo} fontSize="sm" fontFamily="mono">
+                  loading project page…
+                </Text>
+              </Box>
+            )}
+
             <Box px={[3, 4, 5]} py={4}>
               {yearGroups.map((group, gi) => (
                 <Box key={group.year} mb={gi < yearGroups.length - 1 ? 6 : 0}>
@@ -522,7 +545,7 @@ const Projects: React.FC = () => {
               ))}
             </Box>
 
-            {filtered.length === 0 && (
+            {!isPageLoading && filtered.length === 0 && (
               <Box px={4} py={8} textAlign="center">
                 <Text color={termHighlight} fontSize="sm">{t('projects.noMatches')}</Text>
                 <Text color={termSecondary} fontSize="xs" mt={1}>{t('projects.tryAdjustingSearch')}</Text>
@@ -534,6 +557,7 @@ const Projects: React.FC = () => {
             currentPage={currentPage}
             totalPages={totalPages}
             onPageChange={changePage}
+            onPagePreload={preloadPage}
             ariaLabel="Projects pages"
           />
 

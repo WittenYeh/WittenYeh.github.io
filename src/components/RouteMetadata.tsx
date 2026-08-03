@@ -23,7 +23,7 @@ const routeMetadata: Record<string, { title: string; description: string; index:
   '/projects': {
     title: 'Projects | Weitang Ye',
     description: 'Research and systems projects by Weitang Ye.',
-    index: false,
+    index: true,
   },
   '/cv': {
     title: 'CV | Weitang Ye',

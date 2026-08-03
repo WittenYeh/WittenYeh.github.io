@@ -1,11 +1,24 @@
 import { ChakraProvider, ColorModeScript } from '@chakra-ui/react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import { Suspense } from 'react'
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
+import { Suspense, type ReactNode } from 'react'
 import { siteConfig } from './site.config'
 import { getTemplate, getResolvedSlots, SlotProvider } from './templates'
 import RouteMetadata from './components/RouteMetadata'
+import { RouteErrorBoundary, RouteLoading } from './components/RouteFeedback'
 import './styles/globals.css'
 import './i18n'
+
+const RouteGuard: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const { pathname } = useLocation()
+
+  return (
+    <RouteErrorBoundary key={pathname}>
+      <Suspense fallback={<RouteLoading />}>
+        {children}
+      </Suspense>
+    </RouteErrorBoundary>
+  )
+}
 
 function App() {
   const features = siteConfig.features as Record<string, boolean>
@@ -23,7 +36,7 @@ function App() {
           <Router basename={import.meta.env.BASE_URL}>
             <RouteMetadata />
             <TemplateLayout>
-              <Suspense fallback={null}>
+              <RouteGuard>
                 <Routes>
                   <Route path="/" element={<pages.home />} />
                   {features.research && pages.research && (
@@ -60,7 +73,7 @@ function App() {
                     <Route path="/docs" element={<pages.guideDocs />} />
                   )}
                 </Routes>
-              </Suspense>
+              </RouteGuard>
             </TemplateLayout>
           </Router>
         </SlotProvider>

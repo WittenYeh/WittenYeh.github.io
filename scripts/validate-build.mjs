@@ -11,6 +11,12 @@ const site = JSON.parse(readFileSync(resolve(root, 'content/site.json'), 'utf8')
 const distIndexPath = resolve(root, 'dist/index.html')
 const distIndex = readFileSync(distIndexPath, 'utf8')
 const projectDocs = loadProjectDocs(root)
+const projectDir = resolve(root, 'content/projects')
+const projectTitles = readdirSync(projectDir)
+  .filter((file) => file.endsWith('.md'))
+  .map((file) => matter(readFileSync(resolve(projectDir, file), 'utf8')).data.title)
+const assetsDir = resolve(root, 'dist/assets')
+const javascriptFiles = readdirSync(assetsDir).filter((file) => file.endsWith('.js'))
 const projectDocRoutes = projectDocs.flatMap((project) => project.chapters.map((chapter) => chapter.route))
 const legacyProjectDocRoutes = projectDocs.flatMap((project) =>
   (project.legacySlugs ?? []).flatMap((legacySlug) =>
@@ -32,9 +38,7 @@ if (site.sections?.includes('bio')) {
   }
 
   const signature = biography.slice(0, 100)
-  const assetsDir = resolve(root, 'dist/assets')
-  const javascript = readdirSync(assetsDir)
-    .filter((file) => file.endsWith('.js'))
+  const javascript = javascriptFiles
     .map((file) => readFileSync(resolve(assetsDir, file), 'utf8'))
     .join('\n')
     .replace(/\s+/g, ' ')
@@ -44,6 +48,55 @@ if (site.sections?.includes('bio')) {
   }
 
   console.log('✓ Biography is present in the production bundle')
+}
+
+const mainBundleName = javascriptFiles.find((file) => /^main-[^.]+\.js$/.test(file))
+if (!mainBundleName) throw new Error('Build validation failed: main JavaScript bundle is missing')
+const mainBundle = readFileSync(resolve(assetsDir, mainBundleName), 'utf8')
+for (const signal of ['vite:preloadError', 'Reload page', 'Loading page module']) {
+  if (!mainBundle.includes(signal)) {
+    throw new Error(`Build validation failed: route recovery bundle is missing ${signal}`)
+  }
+}
+
+const publicationFiles = readdirSync(resolve(root, 'content/publications'))
+  .filter((file) => file.endsWith('.md'))
+const publicationBodySignature = publicationFiles.length === 0
+  ? ''
+  : matter(readFileSync(resolve(root, 'content/publications', publicationFiles[0]), 'utf8'))
+      .content.replace(/\s+/g, ' ').trim().slice(0, 80)
+if (publicationBodySignature) {
+  const lazyBundles = javascriptFiles
+    .filter((file) => file !== mainBundleName)
+    .map((file) => readFileSync(resolve(assetsDir, file), 'utf8'))
+    .join('\n')
+    .replace(/\s+/g, ' ')
+  if (mainBundle.replace(/\s+/g, ' ').includes(publicationBodySignature)) {
+    throw new Error('Build validation failed: full publication bodies leaked into the main bundle')
+  }
+  if (!lazyBundles.includes(publicationBodySignature)) {
+    throw new Error('Build validation failed: paged publication content chunks are missing')
+  }
+}
+
+const projectFiles = readdirSync(projectDir).filter((file) => file.endsWith('.md'))
+const projectBodySignature = projectFiles.length === 0
+  ? ''
+  : matter(readFileSync(resolve(projectDir, projectFiles[0]), 'utf8'))
+      .content.replace(/\s+/g, ' ').trim().slice(0, 80)
+if (projectBodySignature) {
+  const normalizedMainBundle = mainBundle.replace(/\s+/g, ' ')
+  const lazyBundles = javascriptFiles
+    .filter((file) => file !== mainBundleName)
+    .map((file) => readFileSync(resolve(assetsDir, file), 'utf8'))
+    .join('\n')
+    .replace(/\s+/g, ' ')
+  if (normalizedMainBundle.includes(projectBodySignature)) {
+    throw new Error('Build validation failed: full project bodies leaked into the main bundle')
+  }
+  if (!lazyBundles.includes(projectBodySignature)) {
+    throw new Error('Build validation failed: paged project content chunks are missing')
+  }
 }
 
 const requiredHomepageSignals = [
@@ -71,6 +124,16 @@ for (const route of ['publications', 'projects', 'cv', 'benchmarks', ...projectD
   }
 }
 
+const projectsHtml = readFileSync(resolve(root, 'dist/projects/index.html'), 'utf8')
+if (!projectsHtml.includes('<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />')) {
+  throw new Error('SEO validation failed: projects page must be indexable')
+}
+for (const title of projectTitles) {
+  if (!projectsHtml.includes(title)) {
+    throw new Error(`SEO validation failed: projects page is missing ${title}`)
+  }
+}
+
 for (const { route, canonicalRoute } of legacyProjectDocRoutes) {
   const routePath = resolve(root, `dist/${route}/index.html`)
   if (!existsSync(routePath)) throw new Error(`SEO validation failed: missing legacy route ${routePath}`)
@@ -88,6 +151,9 @@ const sitemapPath = resolve(root, 'dist/sitemap.xml')
 const robotsPath = resolve(root, 'dist/robots.txt')
 if (!existsSync(sitemapPath)) throw new Error('SEO validation failed: dist/sitemap.xml is missing')
 const sitemap = readFileSync(sitemapPath, 'utf8')
+if (!sitemap.includes('<loc>https://wittenyeh.github.io/projects/</loc>')) {
+  throw new Error('SEO validation failed: sitemap is missing projects')
+}
 for (const route of projectDocRoutes) {
   if (!sitemap.includes(`<loc>https://wittenyeh.github.io/${route}/</loc>`)) {
     throw new Error(`SEO validation failed: sitemap is missing ${route}`)

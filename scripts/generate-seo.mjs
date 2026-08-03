@@ -10,6 +10,7 @@ import { loadProjectDocs } from './project-docs.mjs'
 const root = resolve(import.meta.dirname, '..')
 const distDir = resolve(root, 'dist')
 const baseHtml = readFileSync(resolve(distDir, 'index.html'), 'utf8')
+const site = JSON.parse(readFileSync(resolve(root, 'content/site.json'), 'utf8'))
 const experience = JSON.parse(readFileSync(resolve(root, 'content/experience.json'), 'utf8'))
 const research = JSON.parse(readFileSync(resolve(root, 'content/research.json'), 'utf8'))
 const news = JSON.parse(readFileSync(resolve(root, 'content/news.json'), 'utf8'))
@@ -39,6 +40,15 @@ const publications = readdirSync(publicationDir)
     return { ...data, abstract: content.trim() }
   })
   .sort((a, b) => Number(b.year) - Number(a.year))
+
+const projectDir = resolve(root, 'content/projects')
+const projects = readdirSync(projectDir)
+  .filter((file) => file.endsWith('.md'))
+  .map((file) => {
+    const { data, content } = matter(readFileSync(resolve(projectDir, file), 'utf8'))
+    return { ...data, body: content.trim() }
+  })
+  .sort((a, b) => Date.parse(b.date ?? '') - Date.parse(a.date ?? ''))
 
 const staticStyle = `
   <style id="seo-static-style">
@@ -85,7 +95,7 @@ const newsHtml = news.map((item) => `
     <p>${escapeHtml(item.description)}</p>
   </article>`).join('')
 
-const publicationHtml = publications.map((publication) => `
+const renderPublicationHtml = (publication) => `
   <article class="seo-card">
     <h3>${escapeHtml(publication.title)}</h3>
     <p>${escapeHtml((publication.authors ?? []).join(', '))}</p>
@@ -93,7 +103,28 @@ const publicationHtml = publications.map((publication) => `
     ${publication.abstract ? `<p>${escapeHtml(publication.abstract)}</p>` : ''}
     ${publication.links?.paper ? `<a href="${escapeHtml(publication.links.paper)}">Paper</a>` : ''}
     ${publication.links?.code ? ` · <a href="${escapeHtml(publication.links.code)}">Code</a>` : ''}
-  </article>`).join('')
+  </article>`
+const publicationHtml = publications.map(renderPublicationHtml).join('')
+const selectedPublicationIds = new Set(site.selectedPublicationIds ?? [])
+const selectedPublicationHtml = publications
+  .filter((publication) => selectedPublicationIds.has(publication.id))
+  .map(renderPublicationHtml)
+  .join('')
+
+const projectHtml = projects.map((project) => {
+  const summary = project.summary || project.body
+  const links = [
+    ...(project.link ? [{ label: 'Project', url: project.link }] : []),
+    ...(project.extraLinks ?? []),
+  ]
+  return `
+  <article class="seo-card">
+    <h3>${escapeHtml(project.title)}</h3>
+    ${summary ? `<p>${escapeHtml(summary)}</p>` : ''}
+    ${project.tags?.length ? `<p class="seo-meta">${escapeHtml(project.tags.join(' · '))}</p>` : ''}
+    ${links.map((link) => `<a href="${escapeHtml(link.url)}">${escapeHtml(link.label)}</a>`).join(' · ')}
+  </article>`
+}).join('')
 
 const homeStaticContent = `${staticStyle}
   <main id="seo-static-content">
@@ -107,7 +138,7 @@ const homeStaticContent = `${staticStyle}
       <section aria-labelledby="seo-research"><h2 id="seo-research">${escapeHtml(research.sectionTitle)}</h2>${researchHtml}</section>
     </div>
     <section aria-labelledby="seo-news"><h2 id="seo-news">Recent Updates</h2>${newsHtml}</section>
-    <section aria-labelledby="seo-publications"><h2 id="seo-publications">Selected Publications</h2>${publicationHtml}</section>
+    <section aria-labelledby="seo-publications"><h2 id="seo-publications">Selected Publications</h2>${selectedPublicationHtml}</section>
   </main>`
 
 const projectDocRouteConfigs = Object.fromEntries(projectDocs.flatMap((project) =>
@@ -166,8 +197,8 @@ const routeConfigs = {
   projects: {
     title: 'Projects | Weitang Ye',
     description: 'Research and systems projects by Weitang Ye.',
-    index: false,
-    content: '<main id="seo-static-content"><h1>Projects by Weitang Ye</h1><p>Project information will be added here.</p></main>',
+    index: true,
+    content: `<main id="seo-static-content"><h1>Projects by Weitang Ye</h1>${projectHtml}</main>`,
   },
   cv: {
     title: 'CV | Weitang Ye',

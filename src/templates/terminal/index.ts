@@ -1,9 +1,21 @@
 // SPDX-FileCopyrightText: 2026 Yaoyao(Freax) Qian <limyoonaxi@gmail.com>
 // SPDX-License-Identifier: GPL-3.0-only
 
-import { lazy } from 'react'
 import type { TemplateConfig } from '../types'
 import theme from '../../theme'
+import {
+  ArticlesPage,
+  BenchmarksPage,
+  CvPage,
+  ExperiencePage,
+  GuideDocsPage,
+  GuideLandingPage,
+  NewsPage,
+  ProjectDocsPage,
+  ProjectsPage,
+  PublicationsPage,
+  ResearchPage,
+} from '../../routing/pageModules'
 
 import Layout from '../../components/Layout'
 import Home from '../../components/Home'
@@ -18,23 +30,11 @@ import BioSection from '../../components/sections/BioSection'
 import SkillsSection from '../../components/sections/SkillsSection'
 import JourneySection from '../../components/sections/JourneySection'
 import MentorshipSection from '../../components/sections/MentorshipSection'
-import SelectedPublicationsSection from '../../components/sections/SelectedPublicationsSection'
+import SelectedPublicationsSlot from '../../components/sections/SelectedPublicationsSlot'
 import TalksSection from '../../components/sections/TalksSection'
 import TeachingSection from '../../components/sections/TeachingSection'
 import ContactSection from '../../components/sections/ContactSection'
 import GithubContributionsSection from '../../components/sections/GithubContributionsSection'
-
-const Publications = lazy(() => import('../../components/Publications'))
-const Research = lazy(() => import('../../components/Research'))
-const Projects = lazy(() => import('../../components/Projects'))
-const Articles = lazy(() => import('../../components/Articles'))
-const Experience = lazy(() => import('../../components/Experience'))
-const News = lazy(() => import('../../components/News'))
-const Cv = lazy(() => import('../../components/Cv'))
-const Benchmarks = lazy(() => import('../../components/Benchmarks'))
-const GuideLanding = lazy(() => import('../../components/GuideLanding'))
-const GuideDocs = lazy(() => import('../../components/GuideDocs'))
-const ProjectDocs = lazy(() => import('../../components/ProjectDocs'))
 
 const terminalTemplate: TemplateConfig = {
   id: 'terminal',
@@ -44,17 +44,17 @@ const terminalTemplate: TemplateConfig = {
   layout: Layout,
   pages: {
     home: Home,
-    research: Research,
-    publications: Publications,
-    projects: Projects,
-    articles: Articles,
-    experience: Experience,
-    news: News,
-    cv: Cv,
-    benchmarks: Benchmarks,
-    guide: GuideLanding,
-    guideDocs: GuideDocs,
-    projectDocs: ProjectDocs,
+    research: ResearchPage,
+    publications: PublicationsPage,
+    projects: ProjectsPage,
+    articles: ArticlesPage,
+    experience: ExperiencePage,
+    news: NewsPage,
+    cv: CvPage,
+    benchmarks: BenchmarksPage,
+    guide: GuideLandingPage,
+    guideDocs: GuideDocsPage,
+    projectDocs: ProjectDocsPage,
   },
   slots: {
     navbar: Navbar,
@@ -66,7 +66,7 @@ const terminalTemplate: TemplateConfig = {
     skills: SkillsSection,
     journey: JourneySection,
     mentorship: MentorshipSection,
-    selectedPublications: SelectedPublicationsSection,
+    selectedPublications: SelectedPublicationsSlot,
     talks: TalksSection,
     teaching: TeachingSection,
     contact: ContactSection,

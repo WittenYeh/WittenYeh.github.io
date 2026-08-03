@@ -7,6 +7,7 @@ interface TerminalPaginationProps {
   currentPage: number
   totalPages: number
   onPageChange: (page: number) => void
+  onPagePreload?: (page: number) => void
   ariaLabel: string
 }
 
@@ -27,6 +28,7 @@ const TerminalPagination: React.FC<TerminalPaginationProps> = ({
   currentPage,
   totalPages,
   onPageChange,
+  onPagePreload,
   ariaLabel,
 }) => {
   const { colorMode } = useColorMode()
@@ -35,6 +37,9 @@ const TerminalPagination: React.FC<TerminalPaginationProps> = ({
   if (totalPages <= 1) return null
 
   const tokens = getPageTokens(currentPage, totalPages)
+  const preload = (page: number) => {
+    if (page >= 1 && page <= totalPages) onPagePreload?.(page)
+  }
   const buttonStyles = {
     h: '28px',
     minW: '28px',
@@ -72,6 +77,8 @@ const TerminalPagination: React.FC<TerminalPaginationProps> = ({
         <Button
           {...buttonStyles}
           onClick={() => onPageChange(currentPage - 1)}
+          onMouseEnter={() => preload(currentPage - 1)}
+          onFocus={() => preload(currentPage - 1)}
           isDisabled={currentPage === 1}
           aria-label="Previous page"
         >
@@ -91,6 +98,8 @@ const TerminalPagination: React.FC<TerminalPaginationProps> = ({
             borderColor={token === currentPage ? tc.prompt : tc.border}
             fontWeight={token === currentPage ? 'bold' : 'normal'}
             onClick={() => onPageChange(token)}
+            onMouseEnter={() => preload(token)}
+            onFocus={() => preload(token)}
             aria-label={`Page ${token}`}
             aria-current={token === currentPage ? 'page' : undefined}
           >
@@ -101,6 +110,8 @@ const TerminalPagination: React.FC<TerminalPaginationProps> = ({
         <Button
           {...buttonStyles}
           onClick={() => onPageChange(currentPage + 1)}
+          onMouseEnter={() => preload(currentPage + 1)}
+          onFocus={() => preload(currentPage + 1)}
           isDisabled={currentPage === totalPages}
           aria-label="Next page"
         >
