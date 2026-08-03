@@ -18,6 +18,28 @@ import { getProjectDocs } from '@/data/projectDocs'
 import { terminalPalette } from '@/config/theme'
 import { siteOwner } from '@/site.config'
 
+const copyText = async (text: string) => {
+  if (navigator.clipboard?.writeText) {
+    try {
+      await navigator.clipboard.writeText(text)
+      return
+    } catch {
+      // Fall through for browsers that expose the API but deny permission.
+    }
+  }
+
+  const textarea = document.createElement('textarea')
+  textarea.value = text
+  textarea.setAttribute('readonly', '')
+  textarea.style.position = 'fixed'
+  textarea.style.opacity = '0'
+  document.body.appendChild(textarea)
+  textarea.select()
+  const copied = document.execCommand('copy')
+  textarea.remove()
+  if (!copied) throw new Error('Clipboard copy failed')
+}
+
 const ProjectDocs: React.FC = () => {
   const { projectSlug = '', chapterSlug } = useParams()
   const isDark = useColorMode().colorMode === 'dark'
@@ -44,6 +66,33 @@ const ProjectDocs: React.FC = () => {
   const previous = project.chapters[chapterIndex - 1]
   const next = project.chapters[chapterIndex + 1]
   const showAsciiHero = chapter.hideTitle && project.hero?.type === 'ascii'
+
+  const handleCodeCopy = async (event: React.MouseEvent<HTMLElement>) => {
+    if (!(event.target instanceof Element)) return
+    const button = event.target.closest<HTMLButtonElement>('.code-copy-button')
+    if (!button || !event.currentTarget.contains(button)) return
+
+    const code = button.parentElement?.querySelector('code')
+    if (!code) return
+
+    try {
+      await copyText(code.textContent ?? '')
+      button.textContent = 'Copied'
+      button.setAttribute('aria-label', 'Code copied')
+      button.dataset.copyState = 'success'
+    } catch {
+      button.textContent = 'Failed'
+      button.setAttribute('aria-label', 'Unable to copy code')
+      button.dataset.copyState = 'error'
+    }
+
+    window.setTimeout(() => {
+      if (!button.isConnected) return
+      button.textContent = 'Copy'
+      button.setAttribute('aria-label', 'Copy code to clipboard')
+      delete button.dataset.copyState
+    }, 1600)
+  }
 
   return (
     <Box w="full" minH="100vh" bg={isDark ? 'gray.900' : 'gray.50'} py={[6, 8, 10]}>
@@ -242,6 +291,7 @@ const ProjectDocs: React.FC = () => {
 
             <Box
               as="article"
+              onClick={handleCodeCopy}
               px={[5, 8, 12]}
               py={[8, 10, 12]}
               color={tc.secondary}
@@ -273,10 +323,12 @@ const ProjectDocs: React.FC = () => {
                   py: 0.5,
                 },
                 '& pre': {
+                  position: 'relative',
                   bg: tc.touchBar,
                   border: `1px solid ${tc.border}`,
                   borderRadius: 'md',
                   p: 4,
+                  pr: '76px',
                   mb: 5,
                   overflowX: 'auto',
                   lineHeight: 1.7,
@@ -284,14 +336,14 @@ const ProjectDocs: React.FC = () => {
                 '& pre code': { color: tc.text, bg: 'transparent', border: 0, p: 0 },
                 '& pre code.hljs': { display: 'block' },
                 '& pre[data-language]': {
-                  position: 'relative',
-                  pt: 8,
+                  pt: 4,
+                  pr: '160px',
                 },
                 '& pre[data-language]::before': {
                   content: 'attr(data-language)',
                   position: 'absolute',
                   top: 2,
-                  right: 3,
+                  right: '76px',
                   px: 1.5,
                   py: 0.5,
                   color: tc.command,
@@ -303,6 +355,38 @@ const ProjectDocs: React.FC = () => {
                   letterSpacing: '0.08em',
                   lineHeight: 1.2,
                   textTransform: 'uppercase',
+                },
+                '& .code-copy-button': {
+                  position: 'absolute',
+                  top: 2,
+                  right: 3,
+                  zIndex: 1,
+                  px: 1.5,
+                  py: 0.5,
+                  color: tc.secondary,
+                  bg: isDark ? 'rgba(46, 52, 64, 0.82)' : 'rgba(255, 255, 255, 0.78)',
+                  border: `1px solid ${tc.border}`,
+                  borderRadius: 'sm',
+                  fontFamily: 'inherit',
+                  fontSize: '9px',
+                  fontWeight: 700,
+                  letterSpacing: '0.08em',
+                  lineHeight: 1.2,
+                  cursor: 'pointer',
+                  transition: 'color 0.15s ease, border-color 0.15s ease',
+                },
+                '& .code-copy-button:hover, & .code-copy-button:focus-visible': {
+                  color: tc.command,
+                  borderColor: tc.command,
+                  outline: 'none',
+                },
+                '& .code-copy-button[data-copy-state="success"]': {
+                  color: tc.success,
+                  borderColor: tc.success,
+                },
+                '& .code-copy-button[data-copy-state="error"]': {
+                  color: tc.error,
+                  borderColor: tc.error,
                 },
                 '& .hljs-comment, & .hljs-quote': {
                   color: tc.secondary,

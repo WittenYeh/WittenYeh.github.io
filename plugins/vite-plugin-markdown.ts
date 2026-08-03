@@ -41,6 +41,12 @@ const addCodeLanguageLabels = (html: string): string =>
       : `<pre data-language="${language}"><code class="hljs language-${language}">`,
   )
 
+const addCodeCopyButtons = (html: string): string =>
+  html.replace(
+    /<pre([^>]*)><code/g,
+    '<pre$1><button type="button" class="code-copy-button" aria-label="Copy code to clipboard">Copy</button><code',
+  )
+
 const flattenText = (value: unknown): string => {
   if (Array.isArray(value)) return value.map(flattenText).join(' ')
   if (value && typeof value === 'object') return Object.values(value).map(flattenText).join(' ')
@@ -114,7 +120,10 @@ export default function markdownPlugin(): Plugin {
         }
       }
 
-      const body = addCodeLanguageLabels(markdown.parse(content.trim()) as string)
+      const renderedBody = addCodeLanguageLabels(markdown.parse(content.trim()) as string)
+      const body = fileId.includes('/content/project-docs/')
+        ? addCodeCopyButtons(renderedBody)
+        : renderedBody
 
       const result = { ...data, body }
       return {
