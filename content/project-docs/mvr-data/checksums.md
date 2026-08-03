@@ -2,10 +2,43 @@
 
 The package root exports two checksum functions:
 
-| API | Role |
-| --- | --- |
-| `write_checksums(root)` | Regenerates `checksums.sha256` and returns its path. |
-| `verify_checksums(root)` | Returns all integrity errors; an empty list means success. |
+### `write_checksums`
+
+```python
+write_checksums(root: str | os.PathLike[str]) -> Path
+```
+
+Recomputes every package-file digest and atomically replaces
+`checksums.sha256`.
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `root` | `str \| os.PathLike[str]` | Root directory of the data package. |
+
+**Returns**
+
+The path to the regenerated `checksums.sha256` file.
+
+### `verify_checksums`
+
+```python
+verify_checksums(root: str | os.PathLike[str]) -> list[str]
+```
+
+Compares `checksums.sha256` with the package's current regular files and
+collects every integrity error it finds.
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `root` | `str \| os.PathLike[str]` | Root directory of the data package. |
+
+**Returns**
+
+A list of human-readable errors. An empty list means verification succeeded.
 
 ## Implementation
 

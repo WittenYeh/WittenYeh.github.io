@@ -2,14 +2,121 @@
 
 `open_data` and `DataReader` are exported from the package root:
 
-| API | Role |
-| --- | --- |
-| `open_data(path)` | Opens a package and returns a `DataReader`. |
-| `reader.iter_base()` | Streams base-table `RecordBatch` values. |
-| `reader.iter_queries()` | Streams query-table `RecordBatch` values. |
-| `reader.iter_ground_truth()` | Streams ground-truth `RecordBatch` values. |
-| `reader.iter_batches(table)` | Streams any named package table. |
-| `reader.read_table(table)` | Materializes one complete table as `pyarrow.Table`. |
+### `DataReader`
+
+```python
+DataReader(path: str | os.PathLike[str])
+```
+
+Constructs a streaming reader and loads the package's validated Manifest.
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `path` | `str \| os.PathLike[str]` | Root directory of the data package. |
+
+### `open_data`
+
+```python
+open_data(path: str | os.PathLike[str]) -> DataReader
+```
+
+Convenience function that opens a package and returns a `DataReader`.
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `path` | `str \| os.PathLike[str]` | Root directory of the data package. |
+
+**Returns**
+
+A `DataReader` for the package.
+
+### `DataReader.iter_base`
+
+```python
+DataReader.iter_base() -> Iterator[pyarrow.RecordBatch]
+```
+
+Streams base-table record batches in Manifest shard order.
+
+**Parameters**
+
+None.
+
+**Returns**
+
+An iterator of `pyarrow.RecordBatch` values.
+
+### `DataReader.iter_queries`
+
+```python
+DataReader.iter_queries() -> Iterator[pyarrow.RecordBatch]
+```
+
+Streams query-table record batches in Manifest shard order.
+
+**Parameters**
+
+None.
+
+**Returns**
+
+An iterator of `pyarrow.RecordBatch` values.
+
+### `DataReader.iter_ground_truth`
+
+```python
+DataReader.iter_ground_truth() -> Iterator[pyarrow.RecordBatch]
+```
+
+Streams ground-truth record batches in Manifest shard order.
+
+**Parameters**
+
+None.
+
+**Returns**
+
+An iterator of `pyarrow.RecordBatch` values.
+
+### `DataReader.iter_batches`
+
+```python
+DataReader.iter_batches(table: str) -> Iterator[pyarrow.RecordBatch]
+```
+
+Streams record batches from any canonical package table.
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `table` | `str` | One of `base`, `query`, or `ground_truth`. |
+
+**Returns**
+
+An iterator of schema-checked `pyarrow.RecordBatch` values.
+
+### `DataReader.read_table`
+
+```python
+DataReader.read_table(table: str) -> pyarrow.Table
+```
+
+Materializes one complete package table in memory.
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `table` | `str` | One of `base`, `query`, or `ground_truth`. |
+
+**Returns**
+
+The complete schema-checked `pyarrow.Table`.
 
 Iterator methods are preferred for benchmark-scale data; `read_table()` is a
 convenience for smaller packages and analysis workflows.

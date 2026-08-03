@@ -2,10 +2,55 @@
 
 The package root exports two transport functions:
 
-| API | Role |
-| --- | --- |
-| `pack_data(source, destination, compression_level=10, validate=True)` | Creates a reproducible `.tar.zst` archive and returns its path. |
-| `unpack_data(source, destination)` | Safely extracts an archive and returns the package directory. |
+### `pack_data`
+
+```python
+pack_data(
+    source: str | os.PathLike[str],
+    destination: str | os.PathLike[str],
+    *,
+    compression_level: int = 10,
+    validate: bool = True,
+) -> Path
+```
+
+Creates a reproducible `.tar.zst` transport archive. By default, packing stops
+if detailed package validation fails.
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `source` | `str \| os.PathLike[str]` | Root directory of the data package to archive. |
+| `destination` | `str \| os.PathLike[str]` | New archive path; an existing target is never overwritten. |
+| `compression_level` | `int` | Zstandard compression level. Defaults to `10`. |
+| `validate` | `bool` | Run detailed validation before packing. Defaults to `True`. |
+
+**Returns**
+
+The path to the created archive.
+
+### `unpack_data`
+
+```python
+unpack_data(
+    source: str | os.PathLike[str],
+    destination: str | os.PathLike[str],
+) -> Path
+```
+
+Safely extracts an MVR-Data `.tar.zst` archive into a new or empty directory.
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `source` | `str \| os.PathLike[str]` | Path to the archive to extract. |
+| `destination` | `str \| os.PathLike[str]` | New or empty extraction directory. |
+
+**Returns**
+
+The resolved destination directory.
 
 Both functions refuse to overwrite existing non-empty targets.
 

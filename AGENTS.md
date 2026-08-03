@@ -48,6 +48,14 @@ For ordinary code, use a standard fenced language such as `python`, `yaml`,
 `toml`, `bash`, or `typescript`; the shared Markdown pipeline applies syntax
 highlighting automatically.
 
+Write public API references in the PyTorch/Sphinx style instead of compressing
+one API into each row of a summary table. Give every public constructor,
+function, CLI command, or instance method its own level-three heading, followed
+by a fenced prototype, a short description, and a `Parameters` table or
+unordered list. Add `Returns` when it clarifies the contract. Do not document
+private helpers as APIs, and use a short linked index instead of duplicating
+full signatures across chapters.
+
 When renaming a project-doc slug, move its content directory and project card, update its preview asset and repository links, and list prior slugs in `project.json` under `legacySlugs`. The shared routing and SEO pipeline preserves old chapter URLs as `noindex` compatibility pages that canonicalize and redirect to the current slug.
 
 When copying a GitHub README, pin the source commit, preserve the wording, rewrite repository-relative links to stable absolute URLs, and host important raster images under `content/images/projects/<project-slug>/`. Prefer an existing optimized site asset when it is visually equivalent. Do not silently rewrite technical claims.
