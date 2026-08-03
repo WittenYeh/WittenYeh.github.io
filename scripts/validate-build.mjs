@@ -59,6 +59,16 @@ for (const signal of ['vite:preloadError', 'Reload page', 'Loading page module']
   }
 }
 
+const lazyJavascript = javascriptFiles
+  .filter((file) => file !== mainBundleName)
+  .map((file) => readFileSync(resolve(assetsDir, file), 'utf8'))
+  .join('\n')
+for (const signal of ['hljs language-python', 'hljs language-yaml', 'hljs-keyword']) {
+  if (!lazyJavascript.includes(signal)) {
+    throw new Error(`Build validation failed: Markdown syntax highlighting is missing ${signal}`)
+  }
+}
+
 const publicationFiles = readdirSync(resolve(root, 'content/publications'))
   .filter((file) => file.endsWith('.md'))
 const publicationBodySignature = publicationFiles.length === 0

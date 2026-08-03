@@ -39,6 +39,9 @@ For terminal examples in project documentation, put user input in a
 <code>```command</code> fence and captured output in an immediately following
 <code>```output</code> fence. The shared renderer joins, labels, and colors each
 pair globally; do not interleave commands and output in one `console` block.
+For ordinary code, use a standard fenced language such as `python`, `yaml`,
+`toml`, `bash`, or `typescript`; the shared Markdown pipeline applies syntax
+highlighting automatically.
 
 When renaming a project-doc slug, move its content directory and project card, update its preview asset and repository links, and list prior slugs in `project.json` under `legacySlugs`. The shared routing and SEO pipeline preserves old chapter URLs as `noindex` compatibility pages that canonicalize and redirect to the current slug.
 

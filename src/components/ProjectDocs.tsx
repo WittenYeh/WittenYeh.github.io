@@ -260,6 +260,29 @@ const ProjectDocs: React.FC = () => {
                   lineHeight: 1.7,
                 },
                 '& pre code': { color: tc.text, bg: 'transparent', border: 0, p: 0 },
+                '& pre code.hljs': { display: 'block' },
+                '& .hljs-comment, & .hljs-quote': {
+                  color: tc.secondary,
+                  fontStyle: 'italic',
+                },
+                '& .hljs-keyword, & .hljs-selector-tag, & .hljs-literal, & .hljs-section, & .hljs-link': {
+                  color: tc.param,
+                },
+                '& .hljs-string, & .hljs-title, & .hljs-name, & .hljs-type': {
+                  color: tc.success,
+                },
+                '& .hljs-number, & .hljs-symbol, & .hljs-bullet, & .hljs-variable, & .hljs-template-variable': {
+                  color: tc.highlight,
+                },
+                '& .hljs-built_in, & .hljs-builtin-name, & .hljs-attr, & .hljs-attribute, & .hljs-property': {
+                  color: tc.command,
+                },
+                '& .hljs-meta, & .hljs-selector-attr, & .hljs-selector-pseudo': {
+                  color: tc.info,
+                },
+                '& .hljs-doctag, & .hljs-regexp': { color: tc.warning },
+                '& .hljs-addition': { color: tc.success },
+                '& .hljs-deletion': { color: tc.error },
                 '& pre:has(> code.language-command)': {
                   position: 'relative',
                   bg: isDark ? '#202b27' : '#edf8f1',

@@ -10,8 +10,28 @@
  */
 
 import matter from 'gray-matter'
-import { marked } from 'marked'
+import hljs from 'highlight.js'
+import { Marked } from 'marked'
+import { markedHighlight } from 'marked-highlight'
 import type { Plugin } from 'vite'
+
+const terminalBlockLanguages = new Set(['command', 'output'])
+
+const markdown = new Marked(
+  markedHighlight({
+    emptyLangClass: 'hljs',
+    langPrefix: 'hljs language-',
+    highlight(code, language) {
+      // These pseudo-languages use ProjectDocs' paired terminal presentation.
+      if (terminalBlockLanguages.has(language)) return code
+      const resolvedLanguage = hljs.getLanguage(language) ? language : 'plaintext'
+      return hljs.highlight(code, {
+        language: resolvedLanguage,
+        ignoreIllegals: true,
+      }).value
+    },
+  }),
+)
 
 const flattenText = (value: unknown): string => {
   if (Array.isArray(value)) return value.map(flattenText).join(' ')
@@ -86,7 +106,7 @@ export default function markdownPlugin(): Plugin {
         }
       }
 
-      const body = marked.parse(content.trim()) as string
+      const body = markdown.parse(content.trim()) as string
 
       const result = { ...data, body }
       return {
