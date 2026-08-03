@@ -2,15 +2,18 @@
 
 `src/mvr_data/schema.py` is the physical-format authority. It defines the format name and version, the three table names, every canonical Arrow schema, and the supported numeric vector dtypes. Readers, writers, and validators all call this module so that schema rules have one source of truth.
 
+Here, an object is one retrievable content item (for example, an illustrated
+article, a video clip, an audio recording, or another multimodal form).
+
 ## Canonical definitions
 
 `RAW_OBJECT_SCHEMA` defines raw base and query objects. `embedded_object_schema(dimension, dtype)` constructs the vector-only equivalent from manifest settings, allowing a variable vector count while fixing every vector's width and numeric type.
 
 `GROUND_TRUTH_SCHEMA` is shared by both package kinds. Its non-null fields are
-`query_id`, `document_id`, `relevance`, `split_type`, `judgment_source`, and
-`pool_id`. Each row is one completed relevance judgment for a query-document
-pair; it is not a ranked retrieval result. `document_id` references the
-`object_id` of a document in the `base` table.
+`query_id`, `object_id`, `relevance`, `split_type`, `judgment_source`, and
+`pool_id`. Each row is one completed relevance judgment for a query-object
+pair; it is not a ranked retrieval result. `object_id` references the
+identically named field in the `base` table.
 
 `object_id` is the logical link between the two representations. When a Raw
 and an Embedded package describe the same collection, the same object must keep

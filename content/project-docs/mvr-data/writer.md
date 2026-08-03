@@ -22,12 +22,12 @@ Existing assets with the same digest are reused, providing package-local dedupli
 
 ## Ground-truth invariants
 
-Each `add_ground_truth()` call writes one judged query-document pair. It checks
-that `query_id` exists in the query table, `document_id` exists in the base
+Each `add_ground_truth()` call writes one judged query-object pair. It checks
+that `query_id` exists in the query table, `object_id` exists in the base
 table, `relevance` is an integer from 0 through 32767, and `split_type`,
 `judgment_source`, and `pool_id` are non-empty strings.
 
-The tuple `(query_id, document_id, split_type, pool_id)` must be unique, while
+The tuple `(query_id, object_id, split_type, pool_id)` must be unique, while
 multiple documents can be judged for the same query. Every query must have at
 least one judgment when the package contains base objects. Row order is not a
 ranking and has no semantic meaning. Once ground-truth writing starts, no more

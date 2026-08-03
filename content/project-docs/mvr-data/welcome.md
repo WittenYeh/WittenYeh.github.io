@@ -5,6 +5,10 @@ synthetic tests. It does **not** contain any published data.
 
 MVR-Data supports two self-contained package types:
 
+Here, an **object** means one retrievable content item (for example, an
+illustrated article, a video clip, an audio recording, or another multimodal
+form).
+
 - **Raw data:** A Raw package stores the original content of base and query
   objects. Each object can contain one or more ordered text, image, audio,
   video, or other components, and their files are kept inside the package.
@@ -14,12 +18,12 @@ MVR-Data supports two self-contained package types:
 
 **Object ID rule:** If Raw and Embedded packages describe the same collection,
 the same base or query object **must use the same `object_id` in both packages**.
-For example, a Raw base object named `doc-42` must also be `doc-42` in the
+For example, a Raw base object named `obj-42` must also be `obj-42` in the
 Embedded base table. Row positions do not need to match; `object_id` is the
 link between original content and its vectors.
 
 Both kinds use the same long-form ground-truth table. Each row is one judged
-query-document pair and records its relevance level, data split, judgment
+query-object pair and records its relevance level, data split, judgment
 source, and annotation pool. Tables are sharded Arrow IPC files; packages can
 optionally be transported as reproducible `tar.zst` archives.
 
@@ -48,20 +52,20 @@ kind. All listed fields are required.
 
 ### Ground-truth data
 
-Each row represents one query-document pair for which a relevance judgment has
+Each row represents one query-object pair for which a relevance judgment has
 been completed:
 
-| `query_id` | `document_id` | `relevance` | `split_type` | `judgment_source` | `pool_id` |
+| `query_id` | `object_id` | `relevance` | `split_type` | `judgment_source` | `pool_id` |
 | --- | --- | ---: | --- | --- | --- |
-| `q001` | `doc_17` | 2 | `test` | `human` | `pool_v1` |
-| `q001` | `doc_23` | 1 | `test` | `human` | `pool_v1` |
-| `q001` | `doc_41` | 0 | `test` | `human` | `pool_v1` |
-| `q002` | `doc_93` | 2 | `test` | `adjudicated` | `pool_v1` |
+| `q001` | `obj_17` | 2 | `test` | `human` | `pool_v1` |
+| `q001` | `obj_23` | 1 | `test` | `human` | `pool_v1` |
+| `q001` | `obj_41` | 0 | `test` | `human` | `pool_v1` |
+| `q002` | `obj_93` | 2 | `test` | `adjudicated` | `pool_v1` |
 
 | Field | Arrow type | Meaning |
 | --- | --- | --- |
 | `query_id` | `string` | Unique ID of the query object, such as `q001`. |
-| `document_id` | `string` | Unique ID of a corpus document in the `base` table, such as `doc_17`. |
+| `object_id` | `string` | Unique ID of an object in the `base` table, such as `obj_17`. |
 | `relevance` | `int16` | Non-negative relevance level; for example, `2` means highly relevant. |
 | `split_type` | `string` | Data split containing the judgment, such as `test`. |
 | `judgment_source` | `string` | How the label was produced, such as `human` or `adjudicated`. |
@@ -210,11 +214,11 @@ with EmbeddedDataWriter(
     dtype="float32",
     scoring={"scheme": "chamfer"},
 ) as writer:
-    writer.add_base("doc-1", [[1.0, 0.0], [0.5, 0.5]])
+    writer.add_base("obj-1", [[1.0, 0.0], [0.5, 0.5]])
     writer.add_query("query-1", [[1.0, 0.0]])
     writer.add_ground_truth(
         "query-1",
-        "doc-1",
+        "obj-1",
         2,
         split_type="test",
         judgment_source="human",
