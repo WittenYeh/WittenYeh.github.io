@@ -51,10 +51,10 @@
       "slug": "manifest",
       "title": "Manifest",
       "file": "manifest.md",
-      "description": "The manifest module's internal callable surface and how it creates, validates, loads, and atomically writes package metadata.",
+      "description": "Public Manifest loading and validation APIs, plus the internal helpers that create and atomically write package metadata.",
       "overview": [
-        "The manifest module's internal callable surface.",
-        "How it creates, validates, loads, and atomically writes package metadata."
+        "The public Manifest loading and in-memory validation APIs.",
+        "How internal helpers create and atomically write package metadata."
       ]
     },
     {

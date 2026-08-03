@@ -1,19 +1,30 @@
 ## APIs
 
-`manifest.py` currently exposes no stable package-level API: its functions are
-not re-exported from `mvr_data.__init__`. Writers, readers, and validators use
-the following internal interfaces:
+The package root exports two stable Manifest APIs:
 
 | Name | Role |
 | --- | --- |
 | `load_manifest(root)` | Loads `manifest.yaml` and returns validated data. |
 | `validate_manifest_data(data)` | Validates an in-memory manifest mapping. |
+
+```python
+from mvr_data import load_manifest, validate_manifest_data
+
+manifest = load_manifest("tiny-mvr")
+validate_manifest_data(manifest)
+```
+
+Creation and persistence remain lower-level internal interfaces:
+
+| Internal name | Role |
+| --- | --- |
 | `empty_manifest(...)` | Creates an empty Raw or Embedded manifest. |
 | `write_manifest(root, data)` | Validates and atomically writes the manifest. |
 | `manifest_json_schema()` | Locates and caches the v1 JSON Schema. |
 
-These names are importable from `mvr_data.manifest`, but should be treated as
-internal until promoted to the documented package API.
+Keeping creation and writing internal prevents callers from updating
+`manifest.yaml` without also synchronizing shard metadata and package
+checksums.
 
 ## Implementation
 

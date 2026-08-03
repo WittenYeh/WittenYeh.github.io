@@ -20,6 +20,7 @@ means invalid input or an operational error.
 
 | Area | Exported APIs |
 | --- | --- |
+| Manifest | `load_manifest`, `validate_manifest_data` |
 | Reading | `open_data`, `DataReader` |
 | Writing | `RawComponent`, `RawDataWriter`, `EmbeddedDataWriter` |
 | Validation | `validate_data`, `ValidationIssue`, `ValidationReport` |

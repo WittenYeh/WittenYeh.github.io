@@ -258,6 +258,7 @@ The stable public entry points are:
 
 - `open_data(path)` and the reader's `iter_base()`, `iter_queries()`, and
   `iter_ground_truth()` methods;
+- `load_manifest(path)` and `validate_manifest_data(data)`;
 - `RawDataWriter` and `EmbeddedDataWriter`;
 - `validate_data(path, detail=False)`, which returns a structured report;
 - `pack_data`, `unpack_data`, `write_checksums`, and `verify_checksums`.
