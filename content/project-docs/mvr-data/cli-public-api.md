@@ -1,30 +1,36 @@
-## Command-line interface
+## CLI APIs
 
-`src/mvr_data/cli.py` defines the `mvrdata` command with `argparse`. `build_parser()` registers six subcommands:
+The installed `mvrdata` entry point provides six commands:
 
-| Command | Implementation behavior |
+| Command | Role |
 | --- | --- |
-| `init` | Validates raw/embedded arguments and creates an empty package skeleton. |
-| `inspect` | Summarizes manifest metadata, counts, vector settings, or discovered raw modalities. |
-| `validate` | Prints a validation report as text or JSON. |
-| `checksum` | Verifies checksums or refreshes them with `-r` / `--refresh`. |
-| `pack` | Creates a reproducible archive, with validation enabled by default. |
+| `init` | Creates an empty Raw or Embedded package. |
+| `inspect` | Summarizes manifest, table, shard, and vector information. |
+| `validate` | Reports structural validation, with `-d` / `--detail` for integrity checks. |
+| `checksum` | Verifies checksums, or refreshes them with `-r` / `--refresh`. |
+| `pack` | Creates a reproducible `.tar.zst` archive. |
 | `unpack` | Safely extracts a transport archive. |
 
-`main()` dispatches commands and converts expected `OSError` and `ValueError` failures into concise stderr messages. Exit code `0` means success, `1` means validation or checksum failure, and `2` means invalid input or an operational error.
+Exit code `0` means success, `1` means validation or checksum failure, and `2`
+means invalid input or an operational error.
 
-## Stable Python API
+## Package APIs
 
-`src/mvr_data/__init__.py` re-exports the supported public surface:
+`mvr_data.__init__` defines the stable Python surface:
 
-- `open_data` and `DataReader`;
-- `RawDataWriter`, `RawComponent`, and `EmbeddedDataWriter`;
-- validation report types and `validate_data`;
-- checksum, pack, and unpack functions.
+| Area | Exported APIs |
+| --- | --- |
+| Reading | `open_data`, `DataReader` |
+| Writing | `RawComponent`, `RawDataWriter`, `EmbeddedDataWriter` |
+| Validation | `validate_data`, `ValidationIssue`, `ValidationReport` |
+| Integrity | `write_checksums`, `verify_checksums` |
+| Transport | `pack_data`, `unpack_data` |
 
-It also declares `__version__ = "0.1.0"`. Keeping imports here separates supported entry points from internal helpers that may change.
+Module-level helpers not re-exported here are internal and may change. The
+package currently provides no native C++ API; the format itself remains
+language-independent and can be consumed through Apache Arrow implementations.
 
-## Package entry point
+## Implementation
 
 `pyproject.toml` connects the terminal command to the Python dispatcher:
 
@@ -33,4 +39,9 @@ It also declares `__version__ = "0.1.0"`. Keeping imports here separates support
 mvrdata = "mvr_data.cli:main"
 ```
 
-The adjacent `src/mvr_data.egg-info/` directory is generated packaging metadata. It records dependencies, distribution inputs, the console entry point, and the top-level import name; it does not implement data behavior.
+`build_parser()` defines command arguments and `main()` dispatches to the same
+reader, writer, validation, checksum, and packaging functions exposed to
+Python. Expected `OSError` and `ValueError` failures are converted to concise
+stderr messages. `__init__.py` centralizes supported imports and declares the
+package version, while generated `egg-info` metadata does not implement runtime
+behavior.

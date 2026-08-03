@@ -34,52 +34,52 @@
     },
     {
       "slug": "schema",
-      "title": "Schema API & Impl",
+      "title": "Schema APIs & Impl",
       "file": "schema.md",
       "description": "The schema module's callable surface and how it defines canonical Arrow representations for objects, vectors, components, and relevance judgments."
     },
     {
       "slug": "manifest",
-      "title": "Manifest Implementation",
+      "title": "Manifest APIs & Impl",
       "file": "manifest.md",
-      "description": "How manifest.py creates, normalizes, validates, loads, and atomically writes package metadata."
+      "description": "The manifest module's internal callable surface and how it creates, validates, loads, and atomically writes package metadata."
     },
     {
       "slug": "writer",
-      "title": "Writer Implementation",
+      "title": "Writer APIs & Impl",
       "file": "writer.md",
-      "description": "How writer.py constructs safe raw and embedded packages while enforcing IDs, vector shapes, sharding, and ground-truth invariants."
+      "description": "Public writer APIs and how they construct Raw and Embedded packages while enforcing IDs, vector shapes, sharding, and ground-truth invariants."
     },
     {
       "slug": "reader",
-      "title": "Reader Implementation",
+      "title": "Reader APIs & Impl",
       "file": "reader.md",
-      "description": "How reader.py resolves trusted shard paths and streams schema-checked Arrow record batches."
+      "description": "Public reader APIs and how they resolve trusted shard paths and stream schema-checked Arrow record batches."
     },
     {
       "slug": "validation",
-      "title": "Validation Implementation",
+      "title": "Validation APIs & Impl",
       "file": "validation.md",
-      "description": "How validation.py reports structural, semantic, referential, judgment, and optional detailed-integrity errors."
+      "description": "Public validation APIs and how they report structural, semantic, referential, judgment, and optional detailed-integrity errors."
     },
     {
       "slug": "checksums",
-      "title": "Checksum Implementation",
+      "title": "Checksum APIs & Impl",
       "file": "checksums.md",
-      "description": "How checksums.py creates and verifies deterministic whole-package SHA-256 integrity records."
+      "description": "Public checksum APIs and how they create and verify deterministic whole-package SHA-256 integrity records."
     },
     {
       "slug": "packaging",
-      "title": "Packaging Implementation",
+      "title": "Packaging APIs & Impl",
       "file": "packaging.md",
-      "description": "How packaging.py creates reproducible tar.zst archives and rejects unsafe content during extraction."
+      "description": "Public packaging APIs and how they create reproducible tar.zst archives and reject unsafe content during extraction."
     },
     {
       "slug": "cli-public-api",
-      "title": "CLI & Public API Implementation",
-      "shortTitle": "CLI & Public API",
+      "title": "CLI & Package APIs & Impl",
+      "shortTitle": "CLI & Package APIs",
       "file": "cli-public-api.md",
-      "description": "How cli.py, __init__.py, and pyproject.toml expose the reference implementation to scripts and terminal workflows."
+      "description": "The CLI and stable package APIs, plus how cli.py, __init__.py, and pyproject.toml expose them to users."
     }
   ]
 }

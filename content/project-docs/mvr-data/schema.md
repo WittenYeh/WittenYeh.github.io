@@ -1,6 +1,6 @@
-## Public API
+## APIs
 
-`schema.py` currently exposes no stable package-level API: none of its symbols
+`schema.py` currently exposes no stable package-level APIs: none of its symbols
 are re-exported from `mvr_data.__init__`. Most users should construct, read, or
 validate data through `RawDataWriter`, `EmbeddedDataWriter`, `open_data()`, and
 `validate_data()` instead of depending on PyArrow schema details.

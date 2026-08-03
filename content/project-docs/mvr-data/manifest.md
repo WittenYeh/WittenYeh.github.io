@@ -1,28 +1,30 @@
-## Module responsibility
+## APIs
 
-`src/mvr_data/manifest.py` owns `manifest.yaml`. It combines JSON Schema validation with format-version checks and Arrow dtype normalization.
+`manifest.py` currently exposes no stable package-level API: its functions are
+not re-exported from `mvr_data.__init__`. Writers, readers, and validators use
+the following internal interfaces:
 
-## Loading and validation
+| Name | Role |
+| --- | --- |
+| `load_manifest(root)` | Loads `manifest.yaml` and returns validated data. |
+| `validate_manifest_data(data)` | Validates an in-memory manifest mapping. |
+| `empty_manifest(...)` | Creates an empty Raw or Embedded manifest. |
+| `write_manifest(root, data)` | Validates and atomically writes the manifest. |
+| `manifest_json_schema()` | Locates and caches the v1 JSON Schema. |
 
-`manifest_json_schema()` locates `manifest-v1.schema.json` in the source tree or installed package data and caches it. `validate_manifest_data()` then:
+These names are importable from `mvr_data.manifest`, but should be treated as
+internal until promoted to the documented package API.
 
-1. Requires a mapping at the document root.
-2. Applies the Draft 2020-12 JSON Schema.
-3. Checks the format name and supported major version.
-4. Parses the embedded vector dtype to reject unsupported physical types.
+## Implementation
 
-Validation errors include the failing manifest path, making CLI reports actionable. `load_manifest()` also converts missing files and invalid YAML into consistent `ValueError` messages.
+Loading first parses YAML, then applies the Draft 2020-12 JSON Schema, checks
+the format name and supported major version, and verifies the Embedded vector
+dtype. Errors preserve the failing manifest path for actionable reports.
 
-## Creating manifests
+`empty_manifest()` initializes `base`, `query`, and `ground_truth` with zero
+rows and no shards. Embedded manifests require `dimension`, `dtype`, and
+`scoring`; dtype aliases are normalized to stable names such as `float32`.
 
-`empty_manifest()` records the required `data_name` and `data_version`, then
-initializes the three table declarations with zero rows and no shards. Embedded
-packages must provide `dimension`, `dtype`, and `scoring`; raw packages reject
-embedded-only scoring settings. Ground-truth judgments are self-describing
-rows, so the manifest no longer needs Top-K, score-name, or score-order fields.
-
-`canonical_manifest_dtype()` ensures aliases such as `float` are recorded with a stable spelling such as `float32`.
-
-## Atomic writes
-
-`write_manifest()` validates before writing. It serializes YAML to a temporary file in the package directory, then uses `os.replace()` to publish it atomically. A failed write therefore does not leave a partially rewritten manifest at the final path.
+`write_manifest()` validates before serialization, writes to a temporary file,
+and publishes with `os.replace()`. Callers therefore never observe a partially
+rewritten `manifest.yaml`.

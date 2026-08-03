@@ -1,29 +1,28 @@
-## Module responsibility
+## APIs
 
-`src/mvr_data/reader.py` provides a small streaming interface over a package. `open_data(path)` returns a `DataReader`, which resolves the package root, loads the manifest, and records whether the data is raw or embedded.
+`open_data` and `DataReader` are exported from the package root:
 
-## Safe shard resolution
+| API | Role |
+| --- | --- |
+| `open_data(path)` | Opens a package and returns a `DataReader`. |
+| `reader.iter_base()` | Streams base-table `RecordBatch` values. |
+| `reader.iter_queries()` | Streams query-table `RecordBatch` values. |
+| `reader.iter_ground_truth()` | Streams ground-truth `RecordBatch` values. |
+| `reader.iter_batches(table)` | Streams any named package table. |
+| `reader.read_table(table)` | Materializes one complete table as `pyarrow.Table`. |
 
-Before opening a shard, `_resolve_shard()` rejects empty paths, NUL bytes, backslashes, URI schemes, absolute paths, parent traversal, and paths outside the expected table directory. It also resolves the candidate against the package root to prevent escaping through path normalization.
+Iterator methods are preferred for benchmark-scale data; `read_table()` is a
+convenience for smaller packages and analysis workflows.
 
-## Streaming Arrow batches
+## Implementation
 
-`iter_batches(table)` selects the exact expected schema, then follows the shard order declared in the manifest. Each shard is memory-mapped and opened as an Arrow IPC file. The stored schema must match exactly, including metadata, before any record batch is yielded.
+`DataReader` resolves the package root, loads the validated manifest, and
+records the Raw or Embedded kind. Before opening a shard, `_resolve_shard()`
+rejects empty or remote paths, NUL bytes, backslashes, absolute paths, parent
+traversal, paths outside the package, and paths outside the requested table.
 
-Convenience methods expose the three tables:
-
-```python
-reader.iter_base()
-reader.iter_queries()
-reader.iter_ground_truth()
-```
-
-This design keeps memory proportional to a record batch rather than the full
-collection size.
-
-## Materialized reads
-
-`read_table(table)` collects all streamed batches into one `pyarrow.Table`. It
-is convenient for small packages and analysis code, but callers working with
-benchmark-scale data should retain the iterator API to avoid unnecessary
-memory use.
+`iter_batches()` follows manifest shard order, memory-maps each Arrow IPC file,
+and requires its schema—including metadata—to match the canonical expected
+schema before yielding record batches. Memory usage therefore stays
+proportional to a batch rather than the complete table. `read_table()` simply
+collects the same iterator into one Arrow table.

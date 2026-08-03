@@ -1,23 +1,26 @@
-## Module responsibility
+## APIs
 
-`src/mvr_data/checksums.py` implements whole-package SHA-256 integrity records in `checksums.sha256`.
+The package root exports two checksum functions:
 
-## Hashing and file discovery
+| API | Role |
+| --- | --- |
+| `write_checksums(root)` | Regenerates `checksums.sha256` and returns its path. |
+| `verify_checksums(root)` | Returns all integrity errors; an empty list means success. |
 
-`sha256_file()` streams files in one-megabyte chunks and returns both the hexadecimal digest and byte size. `package_files()` recursively discovers regular files, ignores symlinks and the checksum file itself, and sorts paths by their POSIX package-relative spelling. The stable ordering makes generated checksum files reproducible.
+`sha256_file()`, `package_files()`, and `read_checksums()` support the
+implementation but are not part of the stable package-level API.
 
-## Writing checksums
+## Implementation
 
-`write_checksums()` emits the conventional format:
+File discovery recursively selects regular package files, excludes symlinks
+and `checksums.sha256` itself, and sorts POSIX-relative paths for reproducible
+output. Files are hashed in one-megabyte chunks and written as:
 
 ```text
 <64-character-sha256>  <relative/path>
 ```
 
-It writes through a temporary file and uses `os.replace()` so readers never observe a partial checksum list.
-
-## Parsing and verification
-
-The parser requires lowercase hexadecimal digests, two spaces between digest and path, unique entries, and safe relative POSIX paths without parent traversal.
-
-`verify_checksums()` compares the expected and actual path sets before hashing shared files. It returns human-readable errors for missing files, unlisted files, and digest mismatches; an empty list means success. Returning all errors lets both the Python API and CLI present a complete integrity report.
+Writing uses a temporary file followed by `os.replace()`. Verification requires
+lowercase SHA-256 values, two spaces before each safe relative path, and unique
+entries. It compares expected and actual path sets before hashing common files,
+then reports missing, unlisted, and modified files together.

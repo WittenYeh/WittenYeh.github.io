@@ -1,23 +1,23 @@
-## Module responsibility
+## APIs
 
-`src/mvr_data/packaging.py` transports a directory package as a reproducible `.tar.zst` archive while treating extraction as a security boundary.
+The package root exports two transport functions:
 
-## Reproducible packing
+| API | Role |
+| --- | --- |
+| `pack_data(source, destination, compression_level=10, validate=True)` | Creates a reproducible `.tar.zst` archive and returns its path. |
+| `unpack_data(source, destination)` | Safely extracts an archive and returns the package directory. |
 
-`pack_data()` performs detailed data validation by default and refuses to overwrite an existing destination. Archive entries are sorted, and symlinks or special files are rejected.
+Both functions refuse to overwrite existing non-empty targets.
 
-For reproducibility, every tar entry receives normalized metadata:
+## Implementation
 
-- user and group IDs are zero;
-- user and group names are empty;
-- timestamps are zero;
-- modes are fixed to `0755` for directories and `0644` for files;
-- PAX headers are cleared.
+Packing performs detailed validation by default, sorts entries, and rejects
+symlinks and special files. It normalizes user/group IDs and names, timestamps,
+modes, and PAX headers, then streams the tar archive through Zstandard. A
+temporary file plus `os.replace()` provides atomic publication.
 
-The tar stream is compressed with Zstandard and written to a temporary file before atomic publication. If any step fails, the temporary archive is removed.
-
-## Safe extraction
-
-`unpack_data()` requires an empty destination. `_safe_member_path()` rejects absolute paths, parent traversal, NUL bytes, and resolved paths outside the destination. Duplicate archive entries, links, devices, and other special members are forbidden.
-
-Regular files are created with exclusive mode so existing files cannot be silently replaced. If extraction fails, the newly created destination is removed, preventing callers from mistaking a partial package for a complete one.
+Extraction treats the archive as untrusted input. It rejects absolute paths,
+parent traversal, NUL bytes, duplicate members, links, devices, special files,
+and paths escaping the destination. Files are created exclusively. On failure,
+the newly created destination is removed so callers cannot mistake a partial
+extraction for a complete package.
