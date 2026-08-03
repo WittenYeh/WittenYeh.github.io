@@ -64,6 +64,34 @@ been completed:
 | `judgment_source` | `string` | How the label was produced, such as `human` or `adjudicated`. |
 | `pool_id` | `string` | Candidate annotation pool that produced the pair, such as `pool_v1`. |
 
+## Manifest
+
+Every package includes a `manifest.yaml`. Arrow files store object and
+ground-truth rows, while the manifest stores package-wide settings and indexes
+the Arrow shards.
+
+| Field | Meaning |
+| --- | --- |
+| `format`, `format_version` | Identify the MVR-Data format and version. |
+| `kind` | Selects a `raw` or `embedded` package. |
+| `data_name`, `data_version` | Identify the logical collection and its version. |
+| `tables.<name>` | Records each table's total rows and shard paths, row counts, and SHA-256 digests. |
+| `vector` | Required only for Embedded data; stores `dimension`, `dtype`, and `scoring`. |
+
+For example, the writer arguments `dimension=2`, `dtype="float32"`, and
+`scoring={"scheme": "chamfer"}` produce:
+
+```yaml
+vector:
+  dimension: 2
+  dtype: float32
+  scoring:
+    scheme: chamfer
+```
+
+The dimension and dtype are also reflected in each Embedded Arrow shard's
+physical vector schema; scoring remains package-level metadata in the manifest.
+
 ## Install
 
 ```bash
