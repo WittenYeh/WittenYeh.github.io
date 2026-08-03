@@ -55,13 +55,6 @@ kind. All listed fields are required.
 Each row represents one query-object pair for which a relevance judgment has
 been completed:
 
-| `query_id` | `object_id` | `relevance` | `split_type` | `judgment_source` | `pool_id` |
-| --- | --- | ---: | --- | --- | --- |
-| `q001` | `obj_17` | 2 | `test` | `human` | `pool_v1` |
-| `q001` | `obj_23` | 1 | `test` | `human` | `pool_v1` |
-| `q001` | `obj_41` | 0 | `test` | `human` | `pool_v1` |
-| `q002` | `obj_93` | 2 | `test` | `adjudicated` | `pool_v1` |
-
 | Field | Arrow type | Meaning |
 | --- | --- | --- |
 | `query_id` | `string` | Unique ID of the query object, such as `q001`. |
