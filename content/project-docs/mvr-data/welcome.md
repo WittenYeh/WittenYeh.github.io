@@ -75,9 +75,9 @@ the Arrow shards.
 | `format`, `format_version` | String | Identify the MVR-Data format and version. |
 | `kind` | String | Selects a `raw` or `embedded` package. |
 | `data_name`, `data_version` | String | Identify the logical collection and its version. |
-| `tables` | Mapping (object) | Contains exactly the `base`, `query`, and `ground_truth` table entries. |
-| `tables.<name>` | Mapping (object) | Records the table's total row count and, for each shard, its path, row count, and SHA-256 digest. |
-| `vector` | Mapping (object) | Required only for Embedded data; stores `dimension`, `dtype`, and `scoring`, plus optional `quantization`. |
+| `tables` | Mapping | Contains exactly the `base`, `query`, and `ground_truth` table entries. |
+| `tables.<name>` | Mapping | Records the table's total row count and, for each shard, its path, row count, and SHA-256 digest. |
+| `vector` | Mapping | Required only for Embedded data; stores `dimension`, `dtype`, and `scoring`, plus optional `quantization`. |
 
 Here, `<name>` means one of the three fixed keys: `base`, `query`, or
 `ground_truth`. Both `tables.<name>` and `vector` are YAML mappings validated as
