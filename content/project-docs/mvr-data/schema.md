@@ -4,7 +4,13 @@
 
 ## Canonical definitions
 
-`RAW_OBJECT_SCHEMA` defines raw base and query objects. `embedded_object_schema(dimension, dtype)` constructs the vector-only equivalent from manifest settings, allowing a variable vector count while fixing every vector's width and numeric type. `GROUND_TRUTH_SCHEMA` is shared by both package kinds and stores `query_id`, `base_id`, one-based `rank`, `score`, and an optional `relevance_grade`.
+`RAW_OBJECT_SCHEMA` defines raw base and query objects. `embedded_object_schema(dimension, dtype)` constructs the vector-only equivalent from manifest settings, allowing a variable vector count while fixing every vector's width and numeric type.
+
+`GROUND_TRUTH_SCHEMA` is shared by both package kinds. Its non-null fields are
+`query_id`, `document_id`, `relevance`, `split_type`, `judgment_source`, and
+`pool_id`. Each row is one completed relevance judgment for a query-document
+pair; it is not a ranked retrieval result. `document_id` references the
+`object_id` of a document in the `base` table.
 
 `object_id` is the logical link between the two representations. When a Raw
 and an Embedded package describe the same collection, the same object must keep

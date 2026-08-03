@@ -18,14 +18,15 @@ For example, a Raw base object named `doc-42` must also be `doc-42` in the
 Embedded base table. Row positions do not need to match; `object_id` is the
 link between original content and its vectors.
 
-Both kinds contain an object-level, ranked ground-truth table. Tables are
-sharded Arrow IPC files; packages can optionally be transported as reproducible
-`tar.zst` archives.
+Both kinds use the same long-form ground-truth table. Each row is one judged
+query-document pair and records its relevance level, data split, judgment
+source, and annotation pool. Tables are sharded Arrow IPC files; packages can
+optionally be transported as reproducible `tar.zst` archives.
 
 ## Data schemas
 
 The `base` and `query` tables use the same object schema within each package
-kind. All listed fields are required unless noted otherwise.
+kind. All listed fields are required.
 
 ### Raw data
 
@@ -45,6 +46,27 @@ kind. All listed fields are required unless noted otherwise.
 | `object_id` | `string` | Unique object identifier within the table. |
 | `vectors` | `large_list<fixed_size_list<T, dimension>>` | One or more ordered vectors; their numeric dtype `T` and dimension are fixed package-wide by the manifest. |
 
+### Ground-truth data
+
+Each row represents one query-document pair for which a relevance judgment has
+been completed:
+
+| `query_id` | `document_id` | `relevance` | `split_type` | `judgment_source` | `pool_id` |
+| --- | --- | ---: | --- | --- | --- |
+| `q001` | `doc_17` | 2 | `test` | `human` | `pool_v1` |
+| `q001` | `doc_23` | 1 | `test` | `human` | `pool_v1` |
+| `q001` | `doc_41` | 0 | `test` | `human` | `pool_v1` |
+| `q002` | `doc_93` | 2 | `test` | `adjudicated` | `pool_v1` |
+
+| Field | Arrow type | Meaning |
+| --- | --- | --- |
+| `query_id` | `string` | Unique ID of the query object, such as `q001`. |
+| `document_id` | `string` | Unique ID of a corpus document in the `base` table, such as `doc_17`. |
+| `relevance` | `int16` | Non-negative relevance level; for example, `2` means highly relevant. |
+| `split_type` | `string` | Data split containing the judgment, such as `test`. |
+| `judgment_source` | `string` | How the label was produced, such as `human` or `adjudicated`. |
+| `pool_id` | `string` | Candidate annotation pool that produced the pair, such as `pool_v1`. |
+
 ## Install
 
 ```bash
@@ -62,7 +84,7 @@ may be absolute on your machine.
 It does not add base objects, queries, vectors, or ground truth.
 
 ```command
-$ mvrdata init raw-example --kind raw --data-name example/raw --top-k 10
+$ mvrdata init raw-example --kind raw --data-name example/raw
 ```
 
 ```output
@@ -71,7 +93,7 @@ raw-example
 
 ```command
 $ mvrdata init embedded-example --kind embedded --data-name example/embedded \
-    --dimension 128 --dtype float32 --scoring-scheme chamfer --top-k 10
+    --dimension 128 --dtype float32 --scoring-scheme chamfer
 ```
 
 ```output
@@ -105,8 +127,8 @@ example/embedded @ 1
 ### 3. Validate the package
 
 `validate` checks the manifest, Arrow schemas, row counts, object IDs, and
-ground-truth references and rankings. `--deep` additionally hashes every shard,
-raw payload, and package file to verify stored integrity data.
+ground-truth judgments and references. `--deep` additionally hashes every
+shard, raw payload, and package file to verify stored integrity data.
 
 ```command
 $ mvrdata validate embedded-example
@@ -187,11 +209,17 @@ with EmbeddedDataWriter(
     dimension=2,
     dtype="float32",
     scoring={"scheme": "chamfer"},
-    top_k=1,
 ) as writer:
     writer.add_base("doc-1", [[1.0, 0.0], [0.5, 0.5]])
     writer.add_query("query-1", [[1.0, 0.0]])
-    writer.add_ground_truth("query-1", [("doc-1", 0.98)])
+    writer.add_ground_truth(
+        "query-1",
+        "doc-1",
+        2,
+        split_type="test",
+        judgment_source="human",
+        pool_id="pool_v1",
+    )
 ```
 
 See [the v1 format specification](https://github.com/WittenYeh/MVR-Data/blob/main/docs/format-v1.md), the

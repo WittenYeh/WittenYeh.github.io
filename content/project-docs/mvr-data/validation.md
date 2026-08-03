@@ -13,7 +13,9 @@ This model supports both human CLI output and JSON automation.
 3. Verify Arrow schemas and declared row counts.
 4. Check object IDs and non-empty vectors or components.
 5. Validate raw component IDs, modalities, MIME types, asset URIs, and asset presence.
-6. Validate ground-truth references, canonical ordering, result counts, ranks, duplicate candidates, finite scores, and score order.
+6. Validate ground-truth query/document references, non-negative relevance,
+   non-empty judgment annotations, unique pair/pool identities, and per-query
+   judgment coverage.
 
 The validator continues where safe, allowing one run to expose multiple independent problems.
 

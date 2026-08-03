@@ -36,7 +36,7 @@
       "slug": "schema",
       "title": "Schema Implementation",
       "file": "schema.md",
-      "description": "How schema.py defines the canonical Arrow representation for objects, vectors, components, and ranked ground truth."
+      "description": "How schema.py defines the canonical Arrow representation for objects, vectors, components, and relevance judgments."
     },
     {
       "slug": "manifest",
@@ -60,7 +60,7 @@
       "slug": "validation",
       "title": "Validation Implementation",
       "file": "validation.md",
-      "description": "How validation.py reports structural, semantic, referential, ranking, and optional deep-integrity errors."
+      "description": "How validation.py reports structural, semantic, referential, judgment, and optional deep-integrity errors."
     },
     {
       "slug": "checksums",
