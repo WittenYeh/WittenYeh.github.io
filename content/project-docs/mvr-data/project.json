@@ -34,9 +34,9 @@
     },
     {
       "slug": "schema",
-      "title": "Schema Implementation",
+      "title": "Schema API & Impl",
       "file": "schema.md",
-      "description": "How schema.py defines the canonical Arrow representation for objects, vectors, components, and relevance judgments."
+      "description": "The schema module's callable surface and how it defines canonical Arrow representations for objects, vectors, components, and relevance judgments."
     },
     {
       "slug": "manifest",
