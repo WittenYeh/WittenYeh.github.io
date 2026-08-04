@@ -47,8 +47,8 @@ const HeroSection = ({ title, avatar }: HeroSectionProps) => {
   )
   const magnetEdge = useColorModeValue('#aeb8c4', '#687386')
   const magnetShadow = useColorModeValue(
-    '0 24px 30px -17px rgba(45, 55, 72, 0.58), 0 10px 16px -12px rgba(45, 55, 72, 0.42)',
-    '0 26px 34px -16px rgba(0, 0, 0, 0.88), 0 12px 18px -12px rgba(0, 0, 0, 0.72)',
+    '0 18px 24px -17px rgba(45, 55, 72, 0.48), 0 7px 12px -10px rgba(45, 55, 72, 0.34)',
+    '0 19px 26px -17px rgba(0, 0, 0, 0.78), 0 8px 13px -10px rgba(0, 0, 0, 0.58)',
   )
   const subtitleCount = siteOwner.rotatingSubtitles.length
   const [subtitleIndex, setSubtitleIndex] = useState(0)
@@ -288,7 +288,7 @@ const HeroSection = ({ title, avatar }: HeroSectionProps) => {
                   zIndex: 0,
                   borderRadius: ['18px', '21px', '25px'],
                   bg: magnetEdge,
-                  transform: 'translate3d(8px, 10px, -1px)',
+                  transform: 'translate3d(4px, 5px, -1px)',
                   boxShadow: magnetShadow,
                 }}
                 _hover={{
