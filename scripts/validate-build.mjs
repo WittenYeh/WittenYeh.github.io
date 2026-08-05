@@ -64,10 +64,10 @@ const lazyJavascript = javascriptFiles
   .map((file) => readFileSync(resolve(assetsDir, file), 'utf8'))
   .join('\n')
 for (const signal of [
-  'data-language="python"',
-  'data-language="yaml"',
-  'hljs language-python',
-  'hljs language-yaml',
+  'data-language="cpp"',
+  'data-language="json"',
+  'hljs language-cpp',
+  'hljs language-json',
   'hljs-keyword',
 ]) {
   if (!lazyJavascript.includes(signal)) {

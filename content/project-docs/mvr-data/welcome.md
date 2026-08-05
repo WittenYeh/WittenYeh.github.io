@@ -1,65 +1,61 @@
-> **Rewrite in progress.** The previous Python reference implementation and
-> its `src/` directory have been removed. The repository currently provides no
-> installable library, CLI, C++ API, or Python API. Its format specification,
-> schemas, examples, and behavioral tests remain as inputs to the new design.
+MVR-Data is a package format and reference library for multi-vector retrieval
+data. It keeps original multimodal objects, vector representations, and
+long-form relevance judgments in explicit Arrow tables so publishers and
+consumers share the same identities and physical schemas.
 
-MVR-Data defines how multi-vector retrieval data is organized at runtime and
-packaged for interchange using Apache Arrow. It covers Raw multimodal content,
-Embedded multi-vector representations, and long-form relevance judgments.
+## Package model
 
-## Target architecture
+Every package is a self-contained directory with a `manifest.json`, zero or
+more Arrow IPC File shards for each table binding, and a
+`checksums.sha256` file. A package has exactly one physical kind:
 
-The replacement implementation will have one shared native core:
+- **Raw** packages store ordered components for each base and query object.
+  Component payloads are content-addressed files below `assets/`.
+- **Embedded** packages store one or more ordered vectors for each base and
+  query object. Dimension and numeric dtype are fixed package-wide.
+- Both kinds store **ground truth** as long-form query-object judgments with a
+  relevance level, split, judgment source, and annotation pool.
 
-- a **header-only C++ API** under `include/mvr_data/`;
-- a compiled **pybind11 Python extension** that exposes the same behavior to
-  Python without invoking a subprocess;
-- Apache Arrow C++ for schemas, arrays, record batches, IPC, and memory sharing;
-- a CMake `INTERFACE` target for C++ consumers;
-- Doxygen comments in the public C++ headers and generated C++ API reference;
-- Python modules that remain thin adapters rather than a second implementation.
+Raw and Embedded packages remain independent. When they describe the same
+logical collection, matching objects use the same `object_id`; consumers join
+the two representations by ID rather than row position.
 
-MVR-Data will remain a reference implementation rather than a distributed data
-engine. Exact object-ID and ground-truth indexes may be held in memory, and the
-documentation will state those assumptions explicitly.
+## Available now
 
-Although MVR-Data itself will be header-only for C++ consumers, Apache Arrow is
-a compiled dependency, and the Python extension must still be built as a native
-module.
+The repository currently provides a header-only C++20 interface under
+`include/mvr_data/`:
 
-The intended language symmetry looks like the following. This is a design
-sketch only—the names below are not available during the rewrite and are not
-yet a stable API:
+- canonical Raw, Embedded, and ground-truth Arrow schema factories;
+- conversion between manifest dtype names and Arrow numeric types;
+- convention-based JSON Manifest loading into strongly typed metadata;
+- package readers that stream validated RecordBatches or materialize a table;
+- sorted whole-package SHA-256 checksum generation and verification;
+- safe package-relative path validation and symlink-aware file resolution;
+- the CMake interface target `MVRData::mvr_data`.
 
-```python
-from mvr_data import open_data
+MVR-Data itself is header-only, but Apache Arrow and LibRHash are compiled
+dependencies. The current CMake project fetches pinned dependency sources and
+builds them locally.
 
-reader = open_data("example-data")
-```
+## Current boundaries
 
-## What remains in the repository
+The native API is a compact reference implementation, not a distributed data
+engine. It reads existing packages but does not yet provide a public writer or
+full semantic validator. In particular, opening a package validates Manifest
+shape, vector settings, shard path spelling, and canonical schemas; it does not
+by itself verify `checksums.sha256`, object-ID uniqueness, ground-truth foreign
+keys, or every format-level row constraint.
 
-| Path | Purpose during the rewrite |
-| --- | --- |
-| `docs/` | Normative and explanatory format documentation. |
-| `schemas/` | Manifest JSON Schema. |
-| `examples/` | Example Raw and Embedded Manifests. |
-| `tests/` | Behavioral requirements retained from the previous implementation. |
-| `include/` | Planned header-only C++ API location; not created yet. |
-| `python/` | Planned pybind11 binding location; not created yet. |
+Python bindings and repository installation/export rules are still planned.
+The retained Python tests describe intended future behavior and are not a
+currently importable Python API. Use the C++ reference chapters for the API
+that exists today.
 
-The retained tests are not expected to run until the replacement Python module
-is introduced.
+## Documentation map
 
-## Rewrite sequence
-
-1. Define public C++ types, the status/error model, and a CMake `INTERFACE`
-   target.
-2. Implement schemas, Manifest handling, and Arrow IPC reading in headers.
-3. Add Raw and Embedded writers plus exact in-memory validation.
-4. Bind the C++ API through pybind11 while preserving a concise Python surface.
-5. Re-enable the behavioral tests and publish installation and API references.
-
-Until those steps land, MVR-Data should be treated as a format and design
-workspace rather than a usable software release. The [Data Format](./schema)
-chapter records the concepts that remain stable during the rewrite.
+- [Getting Started](/projects/mvr-data/getting-started) configures and uses the current C++
+  target.
+- [Data Format](/projects/mvr-data/schema) describes the interoperable package contract.
+- [Schema API](/projects/mvr-data/schema-api), [Manifest API](/projects/mvr-data/manifest-api), [Reader
+  API](/projects/mvr-data/reader-api), and [Integrity & Filesystem API](/projects/mvr-data/utilities-api) document
+  every explicitly declared public native interface.

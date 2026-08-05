@@ -2,13 +2,13 @@
   "slug": "mvr-data",
   "legacySlugs": ["mvr-datasets"],
   "title": "MVR-Data",
-  "description": "An Arrow-based multi-vector data format being rebuilt as a header-only C++ reference library with Python bindings.",
+  "description": "An Arrow-based multi-vector data format with a header-only C++20 reference API for schemas, manifests, readers, and package integrity.",
   "repository": "https://github.com/WittenYeh/MVR-Data",
   "repositoryLabel": "View MVR-Data on GitHub",
-  "updated": "2026-08-03",
+  "updated": "2026-08-05",
   "badges": [
-    { "label": "Rewrite in Progress", "colorScheme": "orange" },
-    { "label": "Header-only C++", "colorScheme": "blue" },
+    { "label": "C++ API Available", "colorScheme": "green" },
+    { "label": "Header-only C++20", "colorScheme": "blue" },
     { "label": "Apache Arrow", "colorScheme": "purple" }
   ],
   "hero": {
@@ -26,27 +26,87 @@
   "chapters": [
     {
       "slug": "welcome",
-      "title": "MVR-Data Rewrite",
+      "title": "MVR-Data",
       "shortTitle": "Overview",
       "file": "welcome.md",
-      "description": "Current rewrite status and the planned header-only C++ core with Python bindings.",
+      "description": "What MVR-Data provides today, its package model, and the current scope of its header-only C++20 implementation.",
       "overview": [
-        "Why the previous Python implementation has been removed.",
-        "The target header-only C++ and pybind11 architecture.",
-        "Which specification artifacts remain stable during the rewrite."
+        "How Raw, Embedded, and ground-truth data fit together.",
+        "Which header-only C++20 capabilities are available now.",
+        "Which validation and Python features are still planned."
       ],
       "hideTitle": true
+    },
+    {
+      "slug": "getting-started",
+      "title": "Getting Started",
+      "shortTitle": "Getting Started",
+      "file": "getting-started.md",
+      "description": "Configure the header-only C++20 library, link its CMake target, and read an MVR-Data package with Apache Arrow.",
+      "overview": [
+        "Current prerequisites and build behavior.",
+        "How to consume the CMake interface target.",
+        "How to open, stream, materialize, and verify a package."
+      ]
     },
     {
       "slug": "schema",
       "title": "Data Format",
       "shortTitle": "Data Format",
       "file": "schema.md",
-      "description": "Stable Raw, Embedded, ground-truth, object-ID, and Manifest concepts retained during the implementation rewrite.",
+      "description": "The MVR-Data v1 package layout, Manifest contract, canonical Arrow schemas, integrity rules, and compatibility policy.",
       "overview": [
-        "The stable Raw, Embedded, and ground-truth Arrow layouts.",
-        "How object IDs connect original content with its vector representation.",
-        "The package-wide role of the Manifest."
+        "The Raw, Embedded, and ground-truth Arrow layouts.",
+        "How manifest bindings and object IDs connect the package.",
+        "The path, integrity, and versioning requirements for format v1."
+      ]
+    },
+    {
+      "slug": "schema-api",
+      "title": "Schema API",
+      "shortTitle": "Schema API",
+      "file": "schema-api.md",
+      "description": "C++ reference for constructing canonical MVR-Data Arrow schemas and converting Embedded vector dtypes.",
+      "overview": [
+        "Factories for Raw, Embedded, and ground-truth schemas.",
+        "Validation of vector dimensions and Arrow numeric types.",
+        "Canonical manifest spellings for all supported vector dtypes."
+      ]
+    },
+    {
+      "slug": "manifest-api",
+      "title": "Manifest API",
+      "shortTitle": "Manifest API",
+      "file": "manifest-api.md",
+      "description": "C++ reference for loading validated manifests and reading typed package, table, vector, and extension metadata.",
+      "overview": [
+        "Package-kind and table-role value types.",
+        "Typed table and vector configuration records.",
+        "Manifest loading, validation, and read-only accessors."
+      ]
+    },
+    {
+      "slug": "reader-api",
+      "title": "Reader API",
+      "shortTitle": "Reader API",
+      "file": "reader-api.md",
+      "description": "C++ reference for opening packages and reading validated Arrow record batches or materialized tables.",
+      "overview": [
+        "Factory-based reader construction and ownership.",
+        "Lazy shard streaming in manifest order.",
+        "Full-table materialization and its memory tradeoff."
+      ]
+    },
+    {
+      "slug": "utilities-api",
+      "title": "Integrity & Filesystem API",
+      "shortTitle": "Utilities API",
+      "file": "utilities-api.md",
+      "description": "C++ reference for package SHA-256 checksum maintenance and traversal-safe filesystem resolution.",
+      "overview": [
+        "Refreshing and verifying whole-package checksums.",
+        "Recognizing portable package-relative paths.",
+        "Canonical path resolution with symlink-escape protection."
       ]
     }
   ]
