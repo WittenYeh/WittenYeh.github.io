@@ -2,12 +2,12 @@
   "slug": "mvr-data",
   "legacySlugs": ["mvr-datasets"],
   "title": "MVR-Data",
-  "description": "An Arrow-based multi-vector data format with a header-only C++20 reference API for schemas, manifests, readers, and package integrity.",
+  "description": "An Arrow-based multi-vector data format with matching C++20 and native Python APIs for schemas, manifests, readers, and package integrity.",
   "repository": "https://github.com/WittenYeh/MVR-Data",
   "repositoryLabel": "View MVR-Data on GitHub",
   "updated": "2026-08-05",
   "badges": [
-    { "label": "C++ API Available", "colorScheme": "green" },
+    { "label": "C++ & Python APIs", "colorScheme": "green" },
     { "label": "Header-only C++20", "colorScheme": "blue" },
     { "label": "Apache Arrow", "colorScheme": "purple" }
   ],
@@ -29,11 +29,11 @@
       "title": "MVR-Data",
       "shortTitle": "Overview",
       "file": "welcome.md",
-      "description": "What MVR-Data provides today, its package model, and the current scope of its header-only C++20 implementation.",
+      "description": "What MVR-Data provides today, its package model, and the current scope of its matching C++20 and native Python APIs.",
       "overview": [
         "How Raw, Embedded, and ground-truth data fit together.",
-        "Which header-only C++20 capabilities are available now.",
-        "Which validation and Python features are still planned."
+        "Which C++20 and native Python capabilities are available now.",
+        "Which validation and writing features remain outside the current scope."
       ],
       "hideTitle": true
     },
@@ -47,6 +47,18 @@
         "Current prerequisites and build behavior.",
         "How to consume the CMake interface target.",
         "How to open, stream, materialize, and verify a package."
+      ]
+    },
+    {
+      "slug": "python-binding",
+      "title": "Python Binding",
+      "shortTitle": "Python Binding",
+      "file": "python-binding.md",
+      "description": "Build and use the native mvr_data package through the same public names as the C++ API and native PyArrow values.",
+      "overview": [
+        "How to reproduce the supported Conda build environment and install a wheel.",
+        "How C++ Arrow objects cross the binding as native PyArrow values.",
+        "How API names, exceptions, streaming, and static typing behave in Python."
       ]
     },
     {

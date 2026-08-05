@@ -1,7 +1,7 @@
-This chapter summarizes the normative format-v1 contract implemented by the
-current C++ headers. The repository's `docs/` directory remains the detailed
-format specification when interoperability requirements and implementation
-behavior differ in scope.
+This chapter records the normative format-v1 contract implemented by the
+current C++ headers and exposed by both language bindings. It is the maintained
+format specification after the repository documentation was migrated to this
+site.
 
 ## Package layout
 

@@ -23,7 +23,7 @@ the two representations by ID rather than row position.
 ## Available now
 
 The repository currently provides a header-only C++20 interface under
-`include/mvr_data/`:
+`include/mvr_data/` and a compiled `mvr_data` Python package under `python/`:
 
 - canonical Raw, Embedded, and ground-truth Arrow schema factories;
 - conversion between manifest dtype names and Arrow numeric types;
@@ -31,7 +31,12 @@ The repository currently provides a header-only C++20 interface under
 - package readers that stream validated RecordBatches or materialize a table;
 - sorted whole-package SHA-256 checksum generation and verification;
 - safe package-relative path validation and symlink-aware file resolution;
-- the CMake interface target `MVRData::mvr_data`.
+- the CMake interface target `MVRData::mvr_data`;
+- same-named Python classes and methods implemented by a native pybind11
+  extension;
+- native PyArrow schemas, dtypes, readers, and tables exchanged through
+  Arrow's C Data and C Stream capsule protocols;
+- inline Python type stubs and a `py.typed` marker.
 
 MVR-Data itself is header-only, but Apache Arrow and LibRHash are compiled
 dependencies. The current CMake project fetches pinned dependency sources and
@@ -46,15 +51,18 @@ shape, vector settings, shard path spelling, and canonical schemas; it does not
 by itself verify `checksums.sha256`, object-ID uniqueness, ground-truth foreign
 keys, or every format-level row constraint.
 
-Python bindings and repository installation/export rules are still planned.
-The retained Python tests describe intended future behavior and are not a
-currently importable Python API. Use the C++ reference chapters for the API
-that exists today.
+The current C++ and Python APIs are read-only: neither provides a public package
+writer, CLI, or full semantic validator. Python package installation builds a
+platform-specific extension from source; a prebuilt package index release is
+not published yet. Some retained Python tests continue to describe the future
+writer and CLI behavior rather than the active binding.
 
 ## Documentation map
 
 - [Getting Started](/projects/mvr-data/getting-started) configures and uses the current C++
   target.
+- [Python Binding](/projects/mvr-data/python-binding) builds and uses the native
+  `mvr_data` package.
 - [Data Format](/projects/mvr-data/schema) describes the interoperable package contract.
 - [Schema API](/projects/mvr-data/schema-api), [Manifest API](/projects/mvr-data/manifest-api), [Reader
   API](/projects/mvr-data/reader-api), and [Integrity & Filesystem API](/projects/mvr-data/utilities-api) document

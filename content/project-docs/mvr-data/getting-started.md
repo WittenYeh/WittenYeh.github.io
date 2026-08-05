@@ -10,8 +10,9 @@ The current native project requires:
 
 CMake currently pins Apache Arrow 24.0.0, nlohmann/json 3.12.0, and LibRHash
 1.4.6. It deliberately builds those sources locally instead of discovering
-system packages. There is not yet an install target or a packaged binary
-release.
+system packages. The C++ interface target does not yet have export/install
+rules. The Python build does install its native extension into a wheel, but no
+prebuilt package index release is published yet.
 
 ## Build and test the repository
 
@@ -29,6 +30,10 @@ ctest --test-dir build --output-on-failure
 The first configure downloads and prepares the pinned dependencies. Later
 builds reuse CMake's populated dependency tree unless the build directory is
 recreated.
+
+Set `MVR_DATA_BUILD_PYTHON=ON` to compile the native Python module as part of a
+development build. The reproducible compiler environment, source-install
+command, and Python examples are in [Python Binding](/projects/mvr-data/python-binding).
 
 ## Consume the CMake target
 
