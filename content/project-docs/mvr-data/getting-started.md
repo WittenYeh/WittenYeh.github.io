@@ -150,5 +150,5 @@ ARROW_RETURN_NOT_OK(mvr_data::Checksum::refresh(package_root));
 ```
 
 Both operations cover every regular non-symlink package file except the
-checksum list itself. The [Integrity & Filesystem API](/projects/mvr-data/utilities-api) records
+checksum list itself. The [Integrity API](/projects/mvr-data/utilities-api) records
 their complete contracts.

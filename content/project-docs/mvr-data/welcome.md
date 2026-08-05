@@ -65,5 +65,5 @@ writer and CLI behavior rather than the active binding.
   `mvr_data` package.
 - [Data Format](/projects/mvr-data/schema) describes the interoperable package contract.
 - [Schema API](/projects/mvr-data/schema-api), [Manifest API](/projects/mvr-data/manifest-api), [Reader
-  API](/projects/mvr-data/reader-api), and [Integrity & Filesystem API](/projects/mvr-data/utilities-api) document
+  API](/projects/mvr-data/reader-api), and [Integrity API](/projects/mvr-data/utilities-api) document
   every explicitly declared public native interface.

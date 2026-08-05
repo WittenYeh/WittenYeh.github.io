@@ -49,15 +49,15 @@ PYTHONPATH="$PWD/build/python" python -m pytest -q tests/test_python_bindings.py
 ## Same-named public surface
 
 Importing `mvr_data` exposes `PackageKind`, `TableRole`, `TableInfo`,
-`VectorConfig`, `Manifest`, `Schema`, `DataReader`, `Checksum`, and
-`FileSystem`. Each corresponds directly to the C++ type with that name, and
+`VectorConfig`, `Manifest`, `Schema`, `DataReader`, and `Checksum`. Each
+corresponds directly to the C++ type with that name, and
 methods such as `Manifest.load`, `DataReader.open`,
 `DataReader.get_batched_scanner`, `DataReader.read_table`,
 `Checksum.refresh`, and `Checksum.verify` retain their C++ method names.
 
 The source-linked [Schema API](/projects/mvr-data/schema-api), [Manifest
 API](/projects/mvr-data/manifest-api), [Reader API](/projects/mvr-data/reader-api),
-and [Integrity & Filesystem API](/projects/mvr-data/utilities-api) define the
+and [Integrity API](/projects/mvr-data/utilities-api) define the
 shared behavioral contracts. Python signatures and return annotations are
 kept in the package's [inline type stubs](https://github.com/WittenYeh/MVR-Data/blob/main/python/mvr_data/__init__.pyi).
 

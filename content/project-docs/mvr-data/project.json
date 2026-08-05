@@ -111,14 +111,14 @@
     },
     {
       "slug": "utilities-api",
-      "title": "Integrity & Filesystem API",
-      "shortTitle": "Utilities API",
+      "title": "Integrity API",
+      "shortTitle": "Integrity API",
       "file": "utilities-api.md",
-      "description": "C++ reference for package SHA-256 checksum maintenance and traversal-safe filesystem resolution.",
+      "description": "C++ reference for refreshing and verifying the whole-package SHA-256 checksum list.",
       "overview": [
         "Refreshing and verifying whole-package checksums.",
-        "Recognizing portable package-relative paths.",
-        "Canonical path resolution with symlink-escape protection."
+        "Deterministic coverage of the complete regular-file set.",
+        "The explicit integrity boundary around package opening and reading."
       ]
     }
   ]
