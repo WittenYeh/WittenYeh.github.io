@@ -112,6 +112,47 @@ Shard paths are resolved before the scanner is returned. Shard files are then
 memory-mapped one at a time and batches are emitted in Manifest shard order.
 I/O or schema failures discovered while streaming are returned by the scanner.
 
+## Build a package by batch and shard
+
+`DataWriter` keeps each role's current Arrow IPC shard open while batches are
+appended. Call `finish_shard` when a shard boundary is reached, or pass a
+complete `RecordBatchReader` to `write_shard`:
+
+```cpp
+mvr_data::PackageConfig config;
+config.package_kind = mvr_data::PackageKind::embedded;
+config.data_name = "example/embeddings";
+config.data_version = "1";
+config.vector_config = mvr_data::VectorConfig{
+    128,
+    arrow::float32(),
+    "chamfer"
+};
+
+ARROW_ASSIGN_OR_RAISE(
+    auto writer,
+    mvr_data::DataWriter::open(output_root, std::move(config))
+);
+ARROW_RETURN_NOT_OK(
+    writer->write_batch(mvr_data::TableRole::base(), base_batch)
+);
+ARROW_ASSIGN_OR_RAISE(
+    auto base_shard,
+    writer->finish_shard(mvr_data::TableRole::base())
+);
+ARROW_ASSIGN_OR_RAISE(
+    auto query_shard,
+    writer->write_shard(mvr_data::TableRole::query(), query_batches)
+);
+ARROW_RETURN_NOT_OK(writer->finish());
+```
+
+The final output path must not exist. It stays absent while the writer uses a
+sibling staging directory; `finish` closes remaining shards, writes the final
+Manifest and checksum list, and publishes the directory with a same-parent
+rename. The [Writer API](/projects/mvr-data/writer-api) documents exact schema,
+lifecycle, and error contracts.
+
 ## Inspect typed Manifest metadata
 
 The reader owns a typed, read-only `Manifest`:
@@ -143,7 +184,8 @@ ARROW_RETURN_NOT_OK(mvr_data::Checksum::verify(package_root));
 ARROW_ASSIGN_OR_RAISE(auto reader, mvr_data::DataReader::open(package_root));
 ```
 
-Publishers can replace the checksum list after all package files are finalized:
+Publishers modifying an existing package can replace the checksum list after
+all package files are finalized:
 
 ```cpp
 ARROW_RETURN_NOT_OK(mvr_data::Checksum::refresh(package_root));
@@ -151,4 +193,5 @@ ARROW_RETURN_NOT_OK(mvr_data::Checksum::refresh(package_root));
 
 Both operations cover every regular non-symlink package file except the
 checksum list itself. The [Integrity API](/projects/mvr-data/utilities-api) records
-their complete contracts.
+their complete contracts. `DataWriter::finish` performs checksum refresh
+automatically for a newly built package.

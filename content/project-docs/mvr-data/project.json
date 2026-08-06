@@ -2,7 +2,7 @@
   "slug": "mvr-data",
   "legacySlugs": ["mvr-datasets"],
   "title": "MVR-Data",
-  "description": "An Arrow-based multi-vector data format with matching C++20 and native Python APIs for schemas, manifests, readers, and package integrity.",
+  "description": "An Arrow-based multi-vector data format with matching C++20 and native Python APIs for schemas, manifests, readers, writers, and package integrity.",
   "repository": "https://github.com/WittenYeh/MVR-Data",
   "repositoryLabel": "View MVR-Data on GitHub",
   "updated": "2026-08-05",
@@ -33,7 +33,7 @@
       "overview": [
         "How Raw, Embedded, and ground-truth data fit together.",
         "Which C++20 and native Python capabilities are available now.",
-        "Which validation and writing features remain outside the current scope."
+        "Which semantic validation and Raw-payload features remain outside the current scope."
       ],
       "hideTitle": true
     },
@@ -42,11 +42,11 @@
       "title": "Getting Started",
       "shortTitle": "Getting Started",
       "file": "getting-started.md",
-      "description": "Configure the header-only C++20 library, link its CMake target, and read an MVR-Data package with Apache Arrow.",
+      "description": "Configure the header-only C++20 library, link its CMake target, and read or build an MVR-Data package with Apache Arrow.",
       "overview": [
         "Current prerequisites and build behavior.",
         "How to consume the CMake interface target.",
-        "How to open, stream, materialize, and verify a package."
+        "How to open, stream, materialize, build, and verify a package."
       ]
     },
     {
@@ -107,6 +107,18 @@
         "Factory-based reader construction and ownership.",
         "Lazy shard streaming in manifest order.",
         "Full-table materialization and its memory tradeoff."
+      ]
+    },
+    {
+      "slug": "writer-api",
+      "title": "Writer API",
+      "shortTitle": "Writer API",
+      "file": "writer-api.md",
+      "description": "C++ reference for building package tables by batch or shard and atomically publishing their manifests, Arrow files, and checksums.",
+      "overview": [
+        "Package metadata, Arrow IPC options, and completed-shard summaries.",
+        "Batch-oriented and RecordBatchReader-oriented shard construction.",
+        "Final Manifest generation, whole-package checksums, and atomic publication."
       ]
     },
     {

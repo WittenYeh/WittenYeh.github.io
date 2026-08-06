@@ -29,6 +29,9 @@ The repository currently provides a header-only C++20 interface under
 - conversion between manifest dtype names and Arrow numeric types;
 - convention-based JSON Manifest loading into strongly typed metadata;
 - package readers that stream validated RecordBatches or materialize a table;
+- package writers that assemble each table by batch or complete batch stream;
+- explicit shard boundaries plus staged Manifest and checksum generation;
+- atomic publication of a completed new package directory;
 - sorted whole-package SHA-256 checksum generation and verification;
 - safe package-relative path validation and symlink-aware file resolution;
 - the CMake interface target `MVRData::mvr_data`;
@@ -45,17 +48,21 @@ builds them locally.
 ## Current boundaries
 
 The native API is a compact reference implementation, not a distributed data
-engine. It reads existing packages but does not yet provide a public writer or
-full semantic validator. In particular, opening a package validates Manifest
-shape, vector settings, shard path spelling, and canonical schemas; it does not
-by itself verify `checksums.sha256`, object-ID uniqueness, ground-truth foreign
-keys, or every format-level row constraint.
+engine or full semantic validator. Opening or writing a package validates
+Manifest shape, vector settings, canonical schemas, and Arrow batch invariants;
+it does not enforce object-ID uniqueness, ground-truth foreign keys, relevance
+semantics, or every format-level row constraint. Reader opening also does not
+implicitly verify `checksums.sha256`.
 
-The current C++ and Python APIs are read-only: neither provides a public package
-writer, CLI, or full semantic validator. Python package installation builds a
+`DataWriter` writes Raw and Embedded Arrow tables, but the current interface
+does not copy the package-local payload files referenced by Raw
+`components[].payload_uri`. A higher-level Raw dataset workflow must add those
+assets after publication and refresh `checksums.sha256`, so the current writer
+does not provide one-step atomic publication of a populated Raw package. There
+is no public CLI or full semantic validator. Python package installation builds a
 platform-specific extension from source; a prebuilt package index release is
 not published yet. Some retained Python tests continue to describe the future
-writer and CLI behavior rather than the active binding.
+CLI and higher-level object-by-object writer rather than the active binding.
 
 ## Documentation map
 
@@ -65,5 +72,5 @@ writer and CLI behavior rather than the active binding.
   `mvr_data` package.
 - [Data Format](/projects/mvr-data/schema) describes the interoperable package contract.
 - [Schema API](/projects/mvr-data/schema-api), [Manifest API](/projects/mvr-data/manifest-api), [Reader
-  API](/projects/mvr-data/reader-api), and [Integrity API](/projects/mvr-data/utilities-api) document
+  API](/projects/mvr-data/reader-api), [Writer API](/projects/mvr-data/writer-api), and [Integrity API](/projects/mvr-data/utilities-api) document
   every explicitly declared public native interface.

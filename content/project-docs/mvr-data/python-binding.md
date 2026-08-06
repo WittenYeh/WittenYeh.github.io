@@ -49,15 +49,19 @@ PYTHONPATH="$PWD/build/python" python -m pytest -q tests/test_python_bindings.py
 ## Same-named public surface
 
 Importing `mvr_data` exposes `PackageKind`, `TableRole`, `TableInfo`,
-`VectorConfig`, `Manifest`, `Schema`, `DataReader`, and `Checksum`. Each
-corresponds directly to the C++ type with that name, and
+`VectorConfig`, `PackageConfig`, `WriterOptions`, `ShardInfo`, `Manifest`,
+`Schema`, `DataReader`, `DataWriter`, and `Checksum`. Each corresponds directly
+to the C++ type with that name, and
 methods such as `Manifest.load`, `DataReader.open`,
 `DataReader.get_batched_scanner`, `DataReader.read_table`,
+`DataWriter.open`, `DataWriter.write_batch`, `DataWriter.finish_shard`,
+`DataWriter.write_shard`, `DataWriter.finish`,
 `Checksum.refresh`, and `Checksum.verify` retain their C++ method names.
 
 The source-linked [Schema API](/projects/mvr-data/schema-api), [Manifest
 API](/projects/mvr-data/manifest-api), [Reader API](/projects/mvr-data/reader-api),
-and [Integrity API](/projects/mvr-data/utilities-api) define the
+[Writer API](/projects/mvr-data/writer-api), and [Integrity
+API](/projects/mvr-data/utilities-api) define the
 shared behavioral contracts. Python signatures and return annotations are
 kept in the package's [inline type stubs](https://github.com/WittenYeh/MVR-Data/blob/main/python/mvr_data/__init__.pyi).
 
@@ -74,6 +78,7 @@ The binding maps Arrow values without a Python-side schema model:
 | --- | --- |
 | `arrow::DataType` | `pyarrow.DataType` |
 | `arrow::Schema` | `pyarrow.Schema` |
+| `arrow::RecordBatch` | `pyarrow.RecordBatch` |
 | `arrow::RecordBatchReader` | `pyarrow.RecordBatchReader` |
 | `arrow::Table` | `pyarrow.Table` |
 
@@ -98,6 +103,10 @@ schema = mvr_data.Schema.make_embedded_object_schema(
 )
 assert isinstance(schema, pa.Schema)
 ```
+
+RecordBatches passed to `DataWriter.write_batch` use the Arrow C Array capsule
+protocol. Readers passed to `DataWriter.write_shard` use the C Stream protocol,
+so neither path serializes through Python objects first.
 
 ## Stream or materialize a table
 
@@ -133,6 +142,45 @@ print(base.num_rows)
 
 The result is a `pyarrow.Table`, so downstream PyArrow operations work without
 an MVR-Data-specific adapter.
+
+## Build a package
+
+The same batch and shard lifecycle is available from Python. Construct input
+batches with the canonical PyArrow schema, then publish once all roles are
+complete:
+
+```python
+import pyarrow as pa
+
+import mvr_data
+
+schema = mvr_data.Schema.make_embedded_object_schema(2, pa.float32())
+base_batch = pa.record_batch(
+    [
+        pa.array(["base-1"], type=pa.string()),
+        pa.array([[[1.0, 0.0]]], type=schema.field("vectors").type),
+    ],
+    schema=schema,
+)
+
+config = mvr_data.PackageConfig(
+    mvr_data.PackageKind.embedded,
+    "example/embeddings",
+    "1",
+    vector_config=mvr_data.VectorConfig(2, pa.float32(), "chamfer"),
+)
+writer = mvr_data.DataWriter.open("/data/new-package", config)
+writer.write_batch(mvr_data.TableRole.base(), base_batch)
+base_info = writer.finish_shard(mvr_data.TableRole.base())
+writer.finish()
+
+print(base_info.path, base_info.num_record_batches, base_info.num_rows)
+```
+
+`write_shard(role, batches)` accepts a `pyarrow.RecordBatchReader` and consumes
+it as one shard. `finish()` also closes any role still active, writes
+`manifest.json` and `checksums.sha256`, and atomically publishes the final
+directory. A published package can immediately be opened with `DataReader`.
 
 ## Read typed Manifest metadata
 
@@ -182,5 +230,7 @@ checkers therefore see concrete PyArrow return types, optional Manifest fields,
 path-like inputs, and the same-named class methods without separate stub
 installation.
 
-The current package remains read-only. A package writer, CLI, and full semantic
-validator are outside this binding's public surface.
+The package does not yet provide a CLI, full semantic validator, or a
+higher-level object-by-object writer. `DataWriter` operates on complete Arrow
+RecordBatches and RecordBatchReaders; Raw payload files referenced by those
+batches must be added separately and followed by `Checksum.refresh`.
