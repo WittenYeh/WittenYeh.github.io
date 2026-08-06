@@ -6,7 +6,7 @@ consumers share the same identities and physical schemas.
 ## Package model
 
 Every package is a self-contained directory with a `manifest.json`, zero or
-more Arrow IPC File shards for each table binding, and a
+more Arrow IPC File shards in each fixed table-role directory, and a
 `checksums.sha256` file. A package has exactly one physical kind:
 
 - **Raw** packages store ordered components for each base and query object.
@@ -28,9 +28,11 @@ The repository currently provides a header-only C++20 interface under
 - canonical Raw, Embedded, and ground-truth Arrow schema factories;
 - conversion between manifest dtype names and Arrow numeric types;
 - convention-based JSON Manifest loading into strongly typed metadata;
-- package readers that stream validated RecordBatches or materialize a table;
+- package readers that discover fixed-layout shards, stream validated
+  RecordBatches, or materialize a table;
 - package writers that assemble each table by batch or complete batch stream;
-- explicit shard boundaries plus staged Manifest and checksum generation;
+- automatic contiguous shard naming plus explicit batch-to-shard boundaries;
+- byte-preserving semantic Manifest copying and whole-package checksum generation;
 - atomic publication of a completed new package directory;
 - sorted whole-package SHA-256 checksum generation and verification;
 - safe package-relative path validation and symlink-aware file resolution;
@@ -59,10 +61,13 @@ does not copy the package-local payload files referenced by Raw
 `components[].payload_uri`. A higher-level Raw dataset workflow must add those
 assets after publication and refresh `checksums.sha256`, so the current writer
 does not provide one-step atomic publication of a populated Raw package. There
-is no public CLI or full semantic validator. Python package installation builds a
-platform-specific extension from source; a prebuilt package index release is
-not published yet. Some retained Python tests continue to describe the future
-CLI and higher-level object-by-object writer rather than the active binding.
+is no public CLI or full semantic validator. Its Manifest input is a semantic
+document without a `tables` field; shard paths are generated while writing and
+discovered from fixed role directories while reading. Python package
+installation builds a platform-specific extension from source; a prebuilt
+package index release is not published yet. Some retained Python tests continue
+to describe the future CLI and higher-level object-by-object writer rather than
+the active binding.
 
 ## Documentation map
 

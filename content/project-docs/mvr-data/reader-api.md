@@ -32,15 +32,56 @@ auto scan_base(const std::filesystem::path& root) -> arrow::Status {
 }
 ```
 
+## `mvr_data::TableInfo` [source](https://github.com/WittenYeh/MVR-Data/blob/main/include/mvr_data/data_reader.hpp "View source on GitHub")
+
+```cpp
+struct TableInfo;
+```
+
+Aggregate containing the canonical Arrow schema and the shard paths discovered
+for one fixed package table. `DataReader` owns one instance for each role.
+
+**Parameters**
+
+None.
+
+## `mvr_data::TableInfo::schema` [source](https://github.com/WittenYeh/MVR-Data/blob/main/include/mvr_data/data_reader.hpp "View source on GitHub")
+
+```cpp
+std::shared_ptr<arrow::Schema> schema;
+```
+
+Canonical, non-null Arrow schema required of every shard in this table. It is
+derived from the Manifest's package kind and vector configuration.
+
+**Parameters**
+
+None.
+
+## `mvr_data::TableInfo::shards` [source](https://github.com/WittenYeh/MVR-Data/blob/main/include/mvr_data/data_reader.hpp "View source on GitHub")
+
+```cpp
+std::vector<std::string> shards;
+```
+
+Portable package-relative Arrow shard paths discovered from the role directory
+and stored in numeric index order. The vector is a snapshot created by
+`DataReader::open`; it is not read from the Manifest.
+
+**Parameters**
+
+None.
+
 ## `mvr_data::DataReader` [source](https://github.com/WittenYeh/MVR-Data/blob/main/include/mvr_data/data_reader.hpp "View source on GitHub")
 
 ```cpp
 class DataReader final;
 ```
 
-Factory-created handle for a canonical package root and its validated typed
-Manifest. It exposes table bindings as either a streaming Arrow
-`RecordBatchReader` or a fully materialized Arrow `Table`.
+Factory-created handle for a canonical package root, its validated typed
+Manifest, and the three discovered fixed tables. It exposes each table as
+either a streaming Arrow `RecordBatchReader` or a fully materialized Arrow
+`Table`.
 
 Reader objects are movable but not copyable. `open` normally returns a
 `std::shared_ptr<DataReader>`, so copying that smart pointer shares the same
@@ -57,13 +98,17 @@ static auto open(const std::filesystem::path& root)
     -> arrow::Result<std::shared_ptr<DataReader>>;
 ```
 
-Canonicalizes an existing package directory and loads its `manifest.json`
-through `Manifest::load`. A successful reader therefore owns an absolute,
-symlink-resolved root plus convention-valid typed metadata.
+Canonicalizes an existing package directory, loads its `manifest.json` through
+`Manifest::load`, and scans the fixed `base/`, `query/`, and `ground_truth/`
+directories once. A missing role directory is an empty table. Existing role
+directories must contain only canonical regular shard files; names are parsed
+as numeric indices, sorted, and required to form a contiguous sequence from
+zero.
 
-Opening does not resolve Arrow shard files, read their schemas, validate row
-contents, or verify `checksums.sha256`; those operations are deferred or
-explicit as documented by the scanner and checksum APIs.
+Opening records package-relative shard paths but does not open Arrow IPC files,
+read their schemas, validate row contents, or verify `checksums.sha256`; those
+operations are deferred or explicit as documented by the scanner and checksum
+APIs.
 
 **Parameters**
 
@@ -74,8 +119,8 @@ explicit as documented by the scanner and checksum APIs.
 **Returns**
 
 `arrow::Result<std::shared_ptr<mvr_data::DataReader>>` — a shared reader
-handle, or a non-OK Arrow status when the root cannot be canonicalized or the
-Manifest cannot be loaded.
+handle, or a non-OK Arrow status when the root cannot be canonicalized, the
+Manifest cannot be loaded, or a fixed role directory violates the shard layout.
 
 ## `mvr_data::DataReader::root_path` [source](https://github.com/WittenYeh/MVR-Data/blob/main/include/mvr_data/data_reader.hpp "View source on GitHub")
 
@@ -113,6 +158,28 @@ None.
 `const mvr_data::Manifest&` — a read-only reference valid for the lifetime of
 this reader.
 
+## `mvr_data::DataReader::table_info` [source](https://github.com/WittenYeh/MVR-Data/blob/main/include/mvr_data/data_reader.hpp "View source on GitHub")
+
+```cpp
+auto table_info(TableRole role) const noexcept
+    -> const TableInfo&;
+```
+
+Returns the canonical schema and the numerically ordered shard-path snapshot
+for one fixed table. Empty roles return an empty `shards` vector while retaining
+their canonical schema.
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `role` | `mvr_data::TableRole` | Fixed table role created by `TableRole::base()`, `query()`, or `ground_truth()`. Passed by value. |
+
+**Returns**
+
+`const mvr_data::TableInfo&` — a reference valid for the lifetime of this
+reader.
+
 ## `mvr_data::DataReader::get_batched_scanner` [source](https://github.com/WittenYeh/MVR-Data/blob/main/include/mvr_data/data_reader.hpp "View source on GitHub")
 
 ```cpp
@@ -120,10 +187,10 @@ auto get_batched_scanner(TableRole role) const
     -> arrow::Result<std::shared_ptr<arrow::RecordBatchReader>>;
 ```
 
-Creates a streaming Arrow reader for one bound table. Before returning, it
-resolves every listed shard to a canonical regular file below the package
+Creates a streaming Arrow reader for one fixed table. Before returning, it
+resolves every discovered shard to a canonical regular file below the package
 root. During iteration it memory-maps one shard at a time, emits RecordBatches
-in Manifest shard order, requires metadata-aware equality with the canonical
+in numeric shard order, requires metadata-aware equality with the canonical
 table schema, and runs `ValidateFull()` on each batch.
 
 An empty shard list produces a valid scanner that immediately reaches the end
@@ -134,7 +201,7 @@ encountered after construction are returned by `ReadNext()`.
 
 | Name | Type | Description |
 | --- | --- | --- |
-| `role` | `mvr_data::TableRole` | Manifest binding to scan: base, query, or ground truth. Passed by value. |
+| `role` | `mvr_data::TableRole` | Fixed table to scan: base, query, or ground truth. Passed by value. |
 
 **Returns**
 
@@ -158,12 +225,12 @@ table must fit in memory.
 
 | Name | Type | Description |
 | --- | --- | --- |
-| `role` | `mvr_data::TableRole` | Manifest binding to materialize: base, query, or ground truth. Passed by value. |
+| `role` | `mvr_data::TableRole` | Fixed table to materialize: base, query, or ground truth. Passed by value. |
 
 **Returns**
 
 `arrow::Result<std::shared_ptr<arrow::Table>>` — the complete table, including
-a zero-row table for an empty binding, or the first path, I/O, IPC, schema,
+a zero-row table for an empty role, or the first path, I/O, IPC, schema,
 batch-validation, or materialization error.
 
 ## `mvr_data::DataReader::DataReader(const DataReader&)` [source](https://github.com/WittenYeh/MVR-Data/blob/main/include/mvr_data/data_reader.hpp "View source on GitHub")
@@ -204,9 +271,10 @@ smart pointer or use move assignment.
 DataReader(DataReader&& other) noexcept = default;
 ```
 
-Move-constructs a reader by transferring its canonical root and Manifest
-without reopening the package. The moved-from object remains destructible and
-assignable but should not be used for reading until assigned a new value.
+Move-constructs a reader by transferring its canonical root, Manifest, and
+discovered table snapshots without reopening the package. The moved-from
+object remains destructible and assignable but should not be used for reading
+until assigned a new value.
 
 **Parameters**
 
@@ -221,8 +289,8 @@ auto operator=(DataReader&& other) noexcept
     -> DataReader& = default;
 ```
 
-Replaces this reader's state by moving the canonical root and Manifest from
-`other`, without reopening either package.
+Replaces this reader's state by moving the canonical root, Manifest, and table
+snapshots from `other`, without reopening either package.
 
 **Parameters**
 
@@ -240,8 +308,8 @@ Replaces this reader's state by moving the canonical root and Manifest from
 ~DataReader() = default;
 ```
 
-Releases the reader-owned path and Manifest using their normal destructors.
-The reader itself does not keep every shard open.
+Releases the reader-owned path, Manifest, and table snapshots using their
+normal destructors. The reader itself does not keep every shard open.
 
 **Parameters**
 

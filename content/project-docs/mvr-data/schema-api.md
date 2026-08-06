@@ -42,7 +42,7 @@ static auto make_raw_object_schema()
     -> std::shared_ptr<arrow::Schema>;
 ```
 
-Constructs the canonical schema shared by the base and query bindings of a Raw
+Constructs the canonical schema shared by the base and query roles of a Raw
 package. Both top-level fields are non-nullable. `components` is an ordered
 Arrow list whose non-null struct items contain non-null `component_id`,
 `modality`, `media_type`, and `payload_uri` strings.
@@ -65,7 +65,7 @@ static auto make_embedded_object_schema(
 ) -> arrow::Result<std::shared_ptr<arrow::Schema>>;
 ```
 
-Builds the canonical schema shared by the base and query bindings of an
+Builds the canonical schema shared by the base and query roles of an
 Embedded package. Each row contains a non-null object ID and a non-null
 `large_list` of non-null fixed-size vectors. Every vector contains exactly
 `dimension` non-null scalar values of `dtype`; vector count may vary by row.

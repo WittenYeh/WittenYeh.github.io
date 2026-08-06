@@ -82,10 +82,10 @@ auto read_base(const std::filesystem::path& package_root)
 }
 ```
 
-`DataReader::open` canonicalizes the package root and reads `manifest.json`.
-`read_table` then resolves the bound shard paths, checks each shard's exact
-Arrow schema, validates each RecordBatch, and holds the complete table in
-memory.
+`DataReader::open` canonicalizes the package root, reads `manifest.json`, and
+discovers the fixed role directories. `read_table` then resolves the discovered
+shard paths, checks each shard's exact Arrow schema, validates each RecordBatch,
+and holds the complete table in memory.
 
 ## Stream record batches
 
@@ -109,29 +109,21 @@ while (true) {
 ```
 
 Shard paths are resolved before the scanner is returned. Shard files are then
-memory-mapped one at a time and batches are emitted in Manifest shard order.
+memory-mapped one at a time and batches are emitted in numeric filename order.
 I/O or schema failures discovered while streaming are returned by the scanner.
 
 ## Build a package by batch and shard
 
 `DataWriter` keeps each role's current Arrow IPC shard open while batches are
 appended. Call `finish_shard` when a shard boundary is reached, or pass a
-complete `RecordBatchReader` to `write_shard`:
+complete `RecordBatchReader` to `write_shard`. The input Manifest contains only
+semantic metadata and no `tables` field; the writer generates fixed-layout
+shard paths as data is supplied:
 
 ```cpp
-mvr_data::PackageConfig config;
-config.package_kind = mvr_data::PackageKind::embedded;
-config.data_name = "example/embeddings";
-config.data_version = "1";
-config.vector_config = mvr_data::VectorConfig{
-    128,
-    arrow::float32(),
-    "chamfer"
-};
-
 ARROW_ASSIGN_OR_RAISE(
     auto writer,
-    mvr_data::DataWriter::open(output_root, std::move(config))
+    mvr_data::DataWriter::open(output_root, manifest_path)
 );
 ARROW_RETURN_NOT_OK(
     writer->write_batch(mvr_data::TableRole::base(), base_batch)
@@ -148,10 +140,11 @@ ARROW_RETURN_NOT_OK(writer->finish());
 ```
 
 The final output path must not exist. It stays absent while the writer uses a
-sibling staging directory; `finish` closes remaining shards, writes the final
-Manifest and checksum list, and publishes the directory with a same-parent
-rename. The [Writer API](/projects/mvr-data/writer-api) documents exact schema,
-lifecycle, and error contracts.
+sibling staging directory. `open` copies and validates the user-authored
+Manifest. `finish` preserves that file byte-for-byte, validates the generated
+`role/part-NNNNN.arrow` layout, writes the checksum list, and publishes the
+directory with a same-parent rename. The [Writer API](/projects/mvr-data/writer-api)
+documents exact schema, lifecycle, and error contracts.
 
 ## Inspect typed Manifest metadata
 
@@ -167,12 +160,14 @@ if (manifest.package_kind() == mvr_data::PackageKind::embedded) {
     const auto& scoring = vector.scoring;
 }
 
-const auto& base = manifest.table_info(mvr_data::TableRole::base());
+const auto& base_schema = manifest.table_schema(mvr_data::TableRole::base());
+const auto& base = reader->table_info(mvr_data::TableRole::base());
 ```
 
-String views, optionals, and table information returned by accessors refer to
-storage owned by the Manifest. Do not retain those references after the
-Manifest or its owning reader is destroyed.
+String views, optionals, and schema references returned by Manifest accessors
+refer to Manifest-owned storage. `DataReader::table_info` instead returns a
+reader-owned discovery snapshot. Do not retain either reference after its
+owning object is destroyed.
 
 ## Verify package integrity
 

@@ -49,10 +49,11 @@ PYTHONPATH="$PWD/build/python" python -m pytest -q tests/test_python_bindings.py
 ## Same-named public surface
 
 Importing `mvr_data` exposes `PackageKind`, `TableRole`, `TableInfo`,
-`VectorConfig`, `PackageConfig`, `WriterOptions`, `ShardInfo`, `Manifest`,
-`Schema`, `DataReader`, `DataWriter`, and `Checksum`. Each corresponds directly
-to the C++ type with that name, and
+`VectorConfig`, `WriterOptions`, `ShardInfo`, `Manifest`, `Schema`, `DataReader`,
+`DataWriter`, and `Checksum`. Each corresponds directly to the C++ type with
+that name, and
 methods such as `Manifest.load`, `DataReader.open`,
+`Manifest.table_schema`, `DataReader.table_info`,
 `DataReader.get_batched_scanner`, `DataReader.read_table`,
 `DataWriter.open`, `DataWriter.write_batch`, `DataWriter.finish_shard`,
 `DataWriter.write_shard`, `DataWriter.finish`,
@@ -67,8 +68,9 @@ kept in the package's [inline type stubs](https://github.com/WittenYeh/MVR-Data/
 
 Python accepts `str`, `os.PathLike[str]`, and `pathlib.Path` wherever the C++
 API accepts `std::filesystem::path`. C++ `std::optional` results become either
-their value or `None`, table shard vectors become `list[str]`, and Manifest
-extensions become ordinary nested Python dictionaries and values.
+their value or `None`, discovered `TableInfo.shards` vectors become
+`list[str]`, and Manifest extensions become ordinary nested Python dictionaries
+and values.
 
 ## Arrow interoperability
 
@@ -128,9 +130,9 @@ for batch in reader.get_batched_scanner(base_role):
 ```
 
 `get_batched_scanner` returns a `pyarrow.RecordBatchReader`. It preserves
-Manifest shard order and keeps the C++ reader's lazy, one-shard-at-a-time I/O
-behavior. Errors discovered while advancing the stream are raised by the
-PyArrow reader.
+numeric shard order discovered from the fixed role directory and keeps the C++
+reader's lazy, one-shard-at-a-time I/O behavior. Errors discovered while
+advancing the stream are raised by the PyArrow reader.
 
 Use `read_table` only when the complete table fits in memory:
 
@@ -163,13 +165,10 @@ base_batch = pa.record_batch(
     schema=schema,
 )
 
-config = mvr_data.PackageConfig(
-    mvr_data.PackageKind.embedded,
-    "example/embeddings",
-    "1",
-    vector_config=mvr_data.VectorConfig(2, pa.float32(), "chamfer"),
+writer = mvr_data.DataWriter.open(
+    "/data/new-package",
+    "/data/manifests/embeddings.json",
 )
-writer = mvr_data.DataWriter.open("/data/new-package", config)
 writer.write_batch(mvr_data.TableRole.base(), base_batch)
 base_info = writer.finish_shard(mvr_data.TableRole.base())
 writer.finish()
@@ -177,10 +176,13 @@ writer.finish()
 print(base_info.path, base_info.num_record_batches, base_info.num_rows)
 ```
 
-`write_shard(role, batches)` accepts a `pyarrow.RecordBatchReader` and consumes
-it as one shard. `finish()` also closes any role still active, writes
-`manifest.json` and `checksums.sha256`, and atomically publishes the final
-directory. A published package can immediately be opened with `DataReader`.
+The input Manifest contains semantic metadata and no `tables` field.
+`write_shard(role, batches)` accepts a `pyarrow.RecordBatchReader`, consumes it
+as one shard, and assigns the next `role/part-NNNNN.arrow` path. `finish()`
+closes any role still active, preserves the Manifest byte-for-byte, writes
+`checksums.sha256`, and atomically publishes the final directory. A published
+package can immediately be opened with `DataReader`, which discovers the shard
+paths from the fixed directories.
 
 ## Read typed Manifest metadata
 
@@ -190,7 +192,8 @@ Manifest accessors use the same names as their C++ counterparts:
 manifest = reader.manifest()
 
 print(manifest.data_name(), manifest.data_version())
-print(manifest.table_info(mvr_data.TableRole.query()).shards)
+print(manifest.table_schema(mvr_data.TableRole.query()))
+print(reader.table_info(mvr_data.TableRole.query()).shards)
 
 if manifest.package_kind() == mvr_data.PackageKind.embedded:
     vector = manifest.vector_config()
@@ -198,9 +201,9 @@ if manifest.package_kind() == mvr_data.PackageKind.embedded:
     print(vector.dimension, vector.dtype, vector.scoring)
 ```
 
-`TableInfo.schema` and `VectorConfig.dtype` are PyArrow values. Optional
-description, license, source, vector configuration, and extensions accessors
-return `None` when their Manifest fields are absent.
+`Manifest.table_schema()`, `TableInfo.schema`, and `VectorConfig.dtype` return
+PyArrow values. Optional description, license, source, vector configuration,
+and extensions accessors return `None` when their Manifest fields are absent.
 
 ## Python exceptions
 

@@ -12,9 +12,13 @@ shards, and a whole-package checksum list:
 data/
   manifest.json
   checksums.sha256
-  base/part-00000.arrow
-  query/part-00000.arrow
-  ground_truth/part-00000.arrow
+  base/
+    part-00000.arrow
+    part-00001.arrow
+  query/
+    part-00000.arrow
+  ground_truth/
+    part-00000.arrow
   assets/sha256/ab/ab...       # Raw packages only
 ```
 
@@ -22,13 +26,12 @@ A package is either `raw` or `embedded`; it never mixes both object schemas and
 does not depend on another package. Compression and transport containers are
 outside the format.
 
-Paths stored in Manifests and Arrow rows use `/` separators and are relative to
-the package root. Empty components, `.`, `..`, absolute paths, backslashes, NUL
-bytes, URI schemes, and symlinks that escape the package are forbidden. Raw
-payloads live below `assets/`, so a valid package never requires a remote
-download.
+Paths stored in Arrow rows use `/` separators and are relative to the package
+root. Empty components, `.`, `..`, absolute paths, backslashes, NUL bytes, URI
+schemes, and symlinks that escape the package are forbidden. Raw payloads live
+below `assets/`, so a valid package never requires a remote download.
 
-## Objects and table bindings
+## Objects and table roles
 
 An **object** is one retrievable item: for example, an illustrated article,
 audio recording, video clip, or another multimodal unit. Format v1 defines
@@ -38,8 +41,8 @@ three physical Arrow schemas:
 2. Embedded objects;
 3. Ground-truth judgments.
 
-The Manifest keys `base`, `query`, and `ground_truth` are fixed logical table
-bindings, not additional schema kinds. Base and query shards share the object
+The directories `base`, `query`, and `ground_truth` are fixed logical table
+roles, not additional schema kinds. Base and query shards share the object
 schema selected by the package kind. Ground-truth shards always use the
 ground-truth schema.
 
@@ -57,19 +60,13 @@ Its required core shape is:
   "format_version": "1.0.0",
   "kind": "raw",
   "data_name": "example/raw",
-  "data_version": "1",
-  "tables": {
-    "base": ["base/part-00000.arrow"],
-    "query": ["query/part-00000.arrow"],
-    "ground_truth": ["ground_truth/part-00000.arrow"]
-  }
+  "data_version": "1"
 }
 ```
 
-Each table value is an ordered array of portable, package-relative Arrow shard
-paths. Empty arrays are allowed. Shards conventionally use
-`part-NNNNN.arrow`; row counts come from Arrow, and digests appear only in
-`checksums.sha256`.
+The Manifest contains semantic metadata only. It does not declare table paths,
+shard counts, row counts, or digests. The legacy `tables` field is rejected so
+publishers cannot accidentally create a physical index that readers ignore.
 
 `data_name` and `data_version` are non-empty publisher-defined identifiers.
 Raw and Embedded packages for the same logical collection should use the same
@@ -98,6 +95,25 @@ scoring calculation.
 
 `format_version` is descriptive metadata: the current reader preserves it but
 does not reject a Manifest solely because of its value.
+
+## Fixed shard layout
+
+Each table role owns one reserved top-level directory with the same name:
+`base/`, `query/`, or `ground_truth/`. A missing role directory and an empty
+role directory both represent an empty table.
+
+Shard filenames are the canonical zero-based sequence
+`part-00000.arrow`, `part-00001.arrow`, and so on. Five digits are the minimum;
+indices above `99999` grow naturally. Readers parse the numeric index, require
+the exact canonical spelling, reject gaps, and read files in numeric order.
+This makes the directory itself the table index without relying on filesystem
+iteration order or Manifest metadata.
+
+Every entry inside a role directory must be a regular non-symlink file with a
+canonical shard name. Nested directories, symbolic links, temporary files, and
+unrecognized names are errors rather than silently ignored data. Other
+top-level directories such as Raw `assets/` are outside shard discovery and
+are covered by the checksum list.
 
 ## Raw object schema
 
@@ -166,7 +182,7 @@ meaning.
 ## Arrow shard requirements
 
 Every shard uses the Arrow IPC **file** format, not the IPC stream format.
-Shards may use IPC body compression. All shards bound to one table have the
+Shards may use IPC body compression. All shards in one table role have the
 exact canonical schema, including field nullability and metadata. Core tables
 do not accept arbitrary additional columns in format v1.
 
@@ -187,6 +203,11 @@ non-symlink package file except itself:
 Verification requires the list and package file set to match exactly and each
 digest to match the current bytes. Raw publishers also ensure that every
 `payload_uri` embeds the digest of its referenced payload.
+
+The checksum list is therefore the authoritative physical inventory for
+integrity purposes. It proves that the published file set and bytes have not
+changed; it does not attempt to infer whether a publisher intended to append
+another trailing shard before publication.
 
 Checksum verification is explicit. `Manifest::load` and `DataReader::open` do
 not invoke it automatically.

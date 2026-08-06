@@ -69,7 +69,7 @@
       "description": "The MVR-Data v1 package layout, Manifest contract, canonical Arrow schemas, integrity rules, and compatibility policy.",
       "overview": [
         "The Raw, Embedded, and ground-truth Arrow layouts.",
-        "How manifest bindings and object IDs connect the package.",
+        "How fixed table-role directories and object IDs connect the package.",
         "The path, integrity, and versioning requirements for format v1."
       ]
     },
@@ -90,10 +90,10 @@
       "title": "Manifest API",
       "shortTitle": "Manifest API",
       "file": "manifest-api.md",
-      "description": "C++ reference for loading validated manifests and reading typed package, table, vector, and extension metadata.",
+      "description": "C++ reference for loading semantic manifests and reading typed package, schema, vector, and extension metadata.",
       "overview": [
         "Package-kind and table-role value types.",
-        "Typed table and vector configuration records.",
+        "Typed vector configuration and role-schema access.",
         "Manifest loading, validation, and read-only accessors."
       ]
     },
@@ -104,8 +104,8 @@
       "file": "reader-api.md",
       "description": "C++ reference for opening packages and reading validated Arrow record batches or materialized tables.",
       "overview": [
-        "Factory-based reader construction and ownership.",
-        "Lazy shard streaming in manifest order.",
+        "Factory ownership and discovered TableInfo snapshots.",
+        "Fixed-directory discovery and lazy streaming in numeric shard order.",
         "Full-table materialization and its memory tradeoff."
       ]
     },
@@ -116,9 +116,9 @@
       "file": "writer-api.md",
       "description": "C++ reference for building package tables by batch or shard and atomically publishing their manifests, Arrow files, and checksums.",
       "overview": [
-        "Package metadata, Arrow IPC options, and completed-shard summaries.",
-        "Batch-oriented and RecordBatchReader-oriented shard construction.",
-        "Final Manifest generation, whole-package checksums, and atomic publication."
+        "User-authored semantic Manifests, Arrow IPC options, and completed-shard summaries.",
+        "Automatic shard naming with batch-oriented and RecordBatchReader-oriented construction.",
+        "Byte-preserving Manifest copying, whole-package checksums, and atomic publication."
       ]
     },
     {

@@ -5,7 +5,7 @@ owning objects.
 
 ## Example
 
-Load an Embedded Manifest and inspect its base-table binding:
+Load an Embedded Manifest and inspect its base-table schema:
 
 ```cpp
 #include <mvr_data/manifest.hpp>
@@ -22,9 +22,11 @@ auto inspect(const std::filesystem::path& root) -> arrow::Status {
     }
 
     const auto& vector = manifest.vector_config().value();
-    const auto& base = manifest.table_info(mvr_data::TableRole::base());
-    // Use vector.dimension, vector.dtype, vector.scoring, base.schema, and
-    // base.shards while `manifest` remains alive.
+    const auto& base_schema = manifest.table_schema(
+        mvr_data::TableRole::base()
+    );
+    // Use vector.dimension, vector.dtype, vector.scoring, and base_schema
+    // while `manifest` remains alive.
     return arrow::Status::OK();
 }
 ```
@@ -52,7 +54,7 @@ None.
 class TableRole final;
 ```
 
-Immutable value object for one of the three fixed Manifest table bindings. It
+Immutable value object for one of the three fixed package table roles. It
 cannot be constructed from arbitrary strings; use `base()`, `query()`, or
 `ground_truth()` so downstream role dispatch remains exhaustive.
 
@@ -66,7 +68,8 @@ None.
 static constexpr auto base() noexcept -> TableRole;
 ```
 
-Creates the role for retrieval-candidate objects and the Manifest `base` key.
+Creates the role for retrieval-candidate objects and the fixed `base/`
+directory.
 
 **Parameters**
 
@@ -82,7 +85,7 @@ None.
 static constexpr auto query() noexcept -> TableRole;
 ```
 
-Creates the role for retrieval-query objects and the Manifest `query` key.
+Creates the role for retrieval-query objects and the fixed `query/` directory.
 
 **Parameters**
 
@@ -98,8 +101,8 @@ None.
 static constexpr auto ground_truth() noexcept -> TableRole;
 ```
 
-Creates the role for long-form relevance judgments and the Manifest
-`ground_truth` key.
+Creates the role for long-form relevance judgments and the fixed
+`ground_truth/` directory.
 
 **Parameters**
 
@@ -115,8 +118,8 @@ None.
 constexpr auto name() const -> std::string_view;
 ```
 
-Returns the role's canonical Manifest key. Every value produced by the public
-factories maps to exactly one of `base`, `query`, or `ground_truth`.
+Returns the role's canonical package directory name. Every value produced by
+the public factories maps to exactly one of `base`, `query`, or `ground_truth`.
 
 **Parameters**
 
@@ -124,7 +127,7 @@ None.
 
 **Returns**
 
-`std::string_view` — a view of a static canonical key. It does not depend on
+`std::string_view` — a view of a static canonical name. It does not depend on
 the lifetime of this `TableRole`.
 
 ## `mvr_data::operator==(TableRole, TableRole)` [source](https://github.com/WittenYeh/MVR-Data/blob/main/include/mvr_data/manifest.hpp "View source on GitHub")
@@ -148,49 +151,7 @@ corresponding `operator!=` rewrite from this equality operator.
 
 **Returns**
 
-`bool` — `true` when both operands designate the same table binding.
-
-## `mvr_data::TableInfo` [source](https://github.com/WittenYeh/MVR-Data/blob/main/include/mvr_data/manifest.hpp "View source on GitHub")
-
-```cpp
-struct TableInfo;
-```
-
-Aggregate containing the canonical Arrow schema and ordered shard paths for
-one resolved Manifest table binding. A `Manifest` owns one instance for each
-fixed table role.
-
-**Parameters**
-
-None.
-
-## `mvr_data::TableInfo::schema` [source](https://github.com/WittenYeh/MVR-Data/blob/main/include/mvr_data/manifest.hpp "View source on GitHub")
-
-```cpp
-std::shared_ptr<arrow::Schema> schema;
-```
-
-Canonical, non-null Arrow schema required of every shard in this binding.
-Manifest loading selects the Raw or Embedded object schema for base and query,
-and the ground-truth schema for ground truth.
-
-**Parameters**
-
-None.
-
-## `mvr_data::TableInfo::shards` [source](https://github.com/WittenYeh/MVR-Data/blob/main/include/mvr_data/manifest.hpp "View source on GitHub")
-
-```cpp
-std::vector<std::string> shards;
-```
-
-Portable package-relative Arrow shard paths in logical read order. Manifest
-loading validates each spelling but does not check that the file exists;
-`DataReader::get_batched_scanner` resolves the files later.
-
-**Parameters**
-
-None.
+`bool` — `true` when both operands designate the same table role.
 
 ## `mvr_data::VectorConfig` [source](https://github.com/WittenYeh/MVR-Data/blob/main/include/mvr_data/manifest.hpp "View source on GitHub")
 
@@ -255,8 +216,8 @@ class Manifest final;
 
 Read-only, strongly typed view of a convention-valid `manifest.json`.
 Construction is factory-only: `load` parses metadata, constructs canonical
-schemas, and validates package-relative shard path spellings before returning
-the value.
+schemas, and rejects the legacy physical `tables` index before returning the
+value.
 
 **Parameters**
 
@@ -270,9 +231,10 @@ static auto load(const std::filesystem::path& root)
 ```
 
 Opens `root / "manifest.json"`, parses JSON, converts required and optional
-fields to their declared types, selects canonical table schemas, and rejects
-unsafe shard path strings. Embedded loading additionally validates a positive
-dimension, a supported exact dtype spelling, and a non-empty scoring string.
+fields to their declared types, and selects canonical table schemas. Embedded
+loading additionally validates a positive dimension, a supported exact dtype
+spelling, and a non-empty scoring string. A `tables` field is invalid because
+physical shards are discovered from fixed role directories by `DataReader`.
 
 The loader intentionally treats `format_version` as descriptive, ignores
 unknown fields, and does not resolve shard files, verify package checksums, or
@@ -289,7 +251,7 @@ validate Arrow row contents. It does not canonicalize `root`; use
 
 `arrow::Result<mvr_data::Manifest>` — the typed Manifest, or a non-OK Arrow
 status for an unreadable file, malformed JSON, missing or mistyped fields,
-invalid Embedded settings, or unsafe shard paths.
+invalid Embedded settings, or a legacy `tables` field.
 
 ## `mvr_data::Manifest::format_version` [source](https://github.com/WittenYeh/MVR-Data/blob/main/include/mvr_data/manifest.hpp "View source on GitHub")
 
@@ -418,16 +380,17 @@ None.
 otherwise `std::nullopt`; the reference is valid for the lifetime of this
 Manifest.
 
-## `mvr_data::Manifest::table_info` [source](https://github.com/WittenYeh/MVR-Data/blob/main/include/mvr_data/manifest.hpp "View source on GitHub")
+## `mvr_data::Manifest::table_schema` [source](https://github.com/WittenYeh/MVR-Data/blob/main/include/mvr_data/manifest.hpp "View source on GitHub")
 
 ```cpp
-auto table_info(TableRole role) const noexcept
-    -> const TableInfo&;
+auto table_schema(TableRole role) const noexcept
+    -> const std::shared_ptr<arrow::Schema>&;
 ```
 
-Returns the canonical schema and ordered shard paths bound to one fixed role.
-Base and query use the package-kind object schema; ground truth always uses the
-canonical judgment schema.
+Returns the canonical schema assigned to one fixed role. Base and query share
+the Raw or Embedded object schema selected by `kind`; ground truth always uses
+the canonical judgment schema. Physical shard discovery belongs to
+`DataReader::table_info`, not the Manifest.
 
 **Parameters**
 
@@ -437,8 +400,8 @@ canonical judgment schema.
 
 **Returns**
 
-`const mvr_data::TableInfo&` — a reference valid for the lifetime of this
-Manifest.
+`const std::shared_ptr<arrow::Schema>&` — a non-null shared-pointer reference
+valid for the lifetime of this Manifest.
 
 ## `mvr_data::Manifest::vector_config` [source](https://github.com/WittenYeh/MVR-Data/blob/main/include/mvr_data/manifest.hpp "View source on GitHub")
 
