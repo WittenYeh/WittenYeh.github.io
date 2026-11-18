@@ -24,7 +24,7 @@ const usage = `Usage:
   npm run deploy
 
 Options:
-  --dry-run       Run all local checks without committing, pushing, or using the network.
+  --dry-run       Run all local checks with the cached project sources, without committing or pushing.
   --message, -m   Commit the currently staged changes with this message.
   --all           Stage every worktree change after checks. Requires --message.
   --help, -h      Show this help.
@@ -191,9 +191,7 @@ const collectLiveTargets = () => {
   routes.push(...projectDocs.flatMap((project) => project.chapters.map((chapter) => chapter.route)))
   routes.push(...projectDocs.flatMap((project) =>
     (project.legacySlugs ?? []).flatMap((legacySlug) =>
-      project.chapters.map((chapter, chapterIndex) => chapterIndex === 0
-        ? `projects/${legacySlug}`
-        : `projects/${legacySlug}/${chapter.slug}`),
+      project.chapters.map((chapter) => chapter.route.replace(`projects/${project.slug}`, `projects/${legacySlug}`)),
     ),
   ))
 
@@ -207,12 +205,12 @@ const collectLiveTargets = () => {
   targets.set('/robots.txt', resolve(ROOT, 'dist', 'robots.txt'))
   targets.set('/sitemap.xml', resolve(ROOT, 'dist', 'sitemap.xml'))
 
-  const markdownImagePattern = /(?:src=["']|\]\()(?<path>\/images\/[^"')\s>]+)/g
+  const imagePattern = /src="(?<path>\/images\/[^"?#]+)(?:[?#][^"]*)?"/g
   for (const project of projectDocs) {
     for (const chapter of project.chapters) {
-      for (const match of chapter.markdown.matchAll(markdownImagePattern)) {
+      for (const match of chapter.body.matchAll(imagePattern)) {
         const publicPath = match.groups?.path
-        if (publicPath) targets.set(publicPath, resolve(ROOT, 'dist', publicPath.slice(1)))
+        if (publicPath) targets.set(publicPath, resolve(ROOT, 'dist', decodeURIComponent(publicPath.slice(1))))
       }
     }
   }
@@ -282,6 +280,7 @@ const main = async () => {
   ensureRepositoryState()
 
   console.log('Running content validation, lint, and production build...')
+  if (options.dryRun) process.env.PROJECT_DOCS_OFFLINE = '1'
   run('npm', ['run', 'check'])
 
   if (options.dryRun) {

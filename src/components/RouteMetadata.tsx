@@ -43,8 +43,8 @@ const RouteMetadata: React.FC = () => {
     const normalizedPath = pathname.length > 1 ? pathname.replace(/\/$/, '') : pathname
     const projectDocRoute = resolveProjectDocMetadataRoute(normalizedPath)
     const projectDocMetadata = projectDocRoute ? {
-      title: projectDocRoute.chapterIndex === 0
-        ? `${projectDocRoute.project.title} Documentation | Weitang Ye`
+      title: !projectDocRoute.chapter.slug
+        ? `${projectDocRoute.project.title} | Weitang Ye`
         : `${projectDocRoute.chapter.title} | ${projectDocRoute.project.title} | Weitang Ye`,
       description: projectDocRoute.chapter.description,
       index: !projectDocRoute.isLegacy,
@@ -55,9 +55,7 @@ const RouteMetadata: React.FC = () => {
       index: false,
     }
     const canonicalPath = projectDocRoute
-      ? (projectDocRoute.chapterIndex === 0
-          ? `/projects/${projectDocRoute.project.slug}`
-          : `/projects/${projectDocRoute.project.slug}/${projectDocRoute.chapter.slug}`)
+      ? `/${projectDocRoute.chapter.route}`
       : normalizedPath
     const canonicalUrl = canonicalPath === '/' ? `${baseUrl}/` : `${baseUrl}${canonicalPath}/`
 

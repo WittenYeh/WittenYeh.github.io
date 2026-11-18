@@ -10,7 +10,6 @@ import {
   Link,
   Text,
   useColorMode,
-  VisuallyHidden,
 } from '@chakra-ui/react'
 import { Navigate, Link as RouterLink, useParams } from 'react-router-dom'
 import { FaArrowLeft, FaArrowRight, FaGithub } from 'react-icons/fa'
@@ -45,31 +44,20 @@ const copyText = async (text: string) => {
 }
 
 const ProjectDocs: React.FC = () => {
-  const { projectSlug = '', chapterSlug } = useParams()
+  const { projectSlug = '', '*': rest = '' } = useParams()
+  const chapterSlug = rest.replace(/\/+$/, '')
   const isDark = useColorMode().colorMode === 'dark'
   const tc = terminalPalette.colors(isDark)
   const project = getProjectDocs(projectSlug)
 
-  if (!project) return <Navigate to="/projects" replace />
-  if (projectSlug !== project.slug) {
-    const legacyChapter = chapterSlug
-      ? project.chapters.find((chapter) => chapter.slug === chapterSlug)
-      : project.chapters[0]
-    return <Navigate to={legacyChapter?.path ?? `/projects/${project.slug}`} replace />
-  }
-  if (chapterSlug === project.chapters[0].slug) {
-    return <Navigate to={`/projects/${project.slug}`} replace />
-  }
-
-  const chapterIndex = chapterSlug
-    ? project.chapters.findIndex((chapter) => chapter.slug === chapterSlug)
-    : 0
-  if (chapterIndex < 0) return <Navigate to={`/projects/${project.slug}`} replace />
-
+  if (!project?.chapters.length) return <Navigate to="/projects" replace />
+  const chapterIndex = project.chapters.findIndex((item) => item.slug === chapterSlug)
+  if (chapterIndex < 0) return <Navigate to={project.chapters[0].path} replace />
   const chapter = project.chapters[chapterIndex]
+  if (projectSlug !== project.slug) return <Navigate to={chapter.path} replace />
+  const docs = project.chapters.filter((item) => item.slug)
   const previous = project.chapters[chapterIndex - 1]
   const next = project.chapters[chapterIndex + 1]
-  const showAsciiHero = chapter.hideTitle && project.hero?.type === 'ascii'
 
   const handleCodeCopy = async (event: React.MouseEvent<HTMLElement>) => {
     if (!(event.target instanceof Element)) return
@@ -113,8 +101,8 @@ const ProjectDocs: React.FC = () => {
           Back to projects
         </Link>
 
-        <Grid templateColumns={{ base: 'minmax(0, 1fr)', lg: '230px minmax(0, 1fr)' }} gap={5} alignItems="start">
-          <Box
+        <Grid templateColumns={{ base: 'minmax(0, 1fr)', lg: docs.length ? '230px minmax(0, 1fr)' : 'minmax(0, 1fr)' }} gap={5} alignItems="start">
+          {docs.length > 0 && <Box
             as="aside"
             aria-label={`${project.title} documentation chapters`}
             position={{ base: 'static', lg: 'sticky' }}
@@ -141,7 +129,7 @@ const ProjectDocs: React.FC = () => {
               gap={1}
               p={2}
             >
-              {project.chapters.map((item, index) => {
+              {project.chapters.map((item) => {
                 const isActive = chapter.slug === item.slug
                 return (
                   <Link
@@ -163,15 +151,12 @@ const ProjectDocs: React.FC = () => {
                     lineHeight="1.45"
                     _hover={{ color: tc.command, bg: tc.touchBar }}
                   >
-                    <Text as="span" color={isActive ? tc.prompt : tc.muted} flexShrink={0}>
-                      {String(index + 1).padStart(2, '0')}
-                    </Text>
                     <Text as="span">{item.shortTitle ?? item.title}</Text>
                   </Link>
                 )
               })}
             </Grid>
-          </Box>
+          </Box>}
 
           <Box
             minW={0}
@@ -218,58 +203,13 @@ const ProjectDocs: React.FC = () => {
                   </Badge>
                 ))}
               </HStack>
-              <Text color={tc.prompt} fontSize="xs" mb={2}>
-                Chapter {String(chapterIndex + 1).padStart(2, '0')} / {String(project.chapters.length).padStart(2, '0')}
-              </Text>
-              {showAsciiHero ? (
-                <>
-                  <VisuallyHidden as="h1">{project.hero?.ariaLabel ?? project.title}</VisuallyHidden>
-                  <Box
-                    as="pre"
-                    role="img"
-                    aria-label={project.hero?.ariaLabel ?? project.title}
-                    m={0}
-                    p={0}
-                    maxW="full"
-                    overflowX="auto"
-                    bg="transparent"
-                    border="0"
-                    borderRadius="0"
-                    color={tc.command}
-                    fontSize={['5px', '6px', '7px', '8px']}
-                    lineHeight="1.25"
-                  >
-                    {project.hero?.lines.join('\n')}
-                  </Box>
-                </>
-              ) : (
-                <Heading as="h1" fontSize={['xl', '2xl', '3xl']} lineHeight="1.3" color={tc.text} mb={4}>
-                  {chapter.title}
-                </Heading>
-              )}
-              {chapter.overview?.length ? (
-                <Box maxW="780px" mt={showAsciiHero ? 5 : 0} color={tc.secondary} fontSize={['sm', 'md']} lineHeight="1.8">
-                  <Text mb={2}>
-                    The{' '}
-                    <Text as="span" color={tc.text} fontWeight={700}>
-                      {chapter.shortTitle ?? chapter.title}
-                    </Text>{' '}
-                    chapter includes:
-                  </Text>
-                  <Box
-                    as="ul"
-                    m={0}
-                    pl={5}
-                    sx={{ '& li::marker': { color: tc.command } }}
-                  >
-                    {chapter.overview.map((item) => (
-                      <Text as="li" key={item} mb={1}>
-                        {item}
-                      </Text>
-                    ))}
-                  </Box>
-                </Box>
-              ) : (
+              {chapter.slug && <Text color={tc.prompt} fontSize="xs" mb={2}>
+                Chapter {docs.indexOf(chapter) + 1} / {docs.length}
+              </Text>}
+              <Heading as="h1" id={chapter.headingId} fontSize={['xl', '2xl', '3xl']} lineHeight="1.3" color={tc.text} mb={4}>
+                {chapter.title}
+              </Heading>
+              {!chapter.slug && (
                 <Text maxW="780px" color={tc.secondary} fontSize={['sm', 'md']} lineHeight="1.8">
                   {chapter.description}
                 </Text>

@@ -36,7 +36,7 @@ Codex 和其他代码 Agent 在修改仓库前必须阅读根目录的英文规�
 | 学校、职位、教育和工作经历 | `content/experience.json` |
 | 研究方向 | `content/research.json` |
 | 论文列表 | `content/publications/*.md` |
-| 项目列表 | `content/projects/*.md` |
+| 项目磁贴和上游文档来源 | `content/project-docs/<project-slug>/project.json` |
 | 最新动态 | `content/news.json` |
 | CV 页面说明 | `content/cv.json` |
 | Benchmark 入口卡片 | `content/benchmarks.json` |
@@ -133,124 +133,42 @@ Write the abstract here.
 
 可用的 `venueType`：`conference`、`workshop`、`demo`、`preprint`。
 
-### 项目
+### 项目磁贴、README 与文档
 
-每个项目也是一个 Markdown 文件：
-
-```markdown
----
-title: Project name
-category: data
-date: 2026-01-01
-tags: [Graph, Database, Benchmark]
-link: "https://..."
-isOpenSource: true
-featuredImage: /images/projects/project-name-preview.webp
----
-
-项目简介。
-
-- 项目亮点一
-- 项目亮点二
-```
-
-`featuredImage` 是 Projects 列表中的预览缩略图，也支持点击放大。图片应保存在 `content/images/projects/`（可复用 `content/images/logos/` 中已有的优化 Logo），并使用 `/images/...` 路径引用；`npm run validate` 会检查文件是否存在。
-
-### 为项目添加 README 或多页文档
-
-项目文档使用统一的内容驱动结构。不要为单个项目创建专用 React 组件；所有项目共用 `src/components/ProjectDocs.tsx`，路由、侧边栏、上一章/下一章、SEO 页面和 sitemap 均根据内容配置自动生成。
-
-若项目暂时只需要展示 GitHub README，仍然使用同一套结构，但只登记一个章节：
-
-```text
-content/project-docs/<project-slug>/
-├── project.json
-└── readme.md
-```
-
-在 `project.json` 的 `chapters` 中仅添加 `readme.md`，并把 `shortTitle` 设置为 `README`。项目会发布在 `/projects/<project-slug>/`，侧边栏只有一个 README 入口；以后需要正式文档时，只需继续添加章节文件和配置，无需新增组件或路由。GitHub README 中的仓库相对链接必须改为完整 URL，图片应保存到 `content/images/projects/<project-slug>/` 并使用 `/images/projects/<project-slug>/...` 引用，以保证构建和部署不依赖外部仓库。
-
-每个带文档的项目使用以下目录：
-
-```text
-content/project-docs/<project-slug>/
-├── project.json
-├── welcome.md
-├── module-one.md
-└── module-two.md
-```
-
-`<project-slug>` 必须使用小写 kebab-case，并与 `project.json` 中的 `slug` 完全一致。`project.json` 示例：
+每个项目在 `content/project-docs/<project-slug>/project.json` 中登记一次。`slug` 与目录名一致。`card` 控制 Projects 磁贴的分类、标签、简介、缩略图和亮点，`repository` 指向公开 GitHub 仓库。下面沿用 ARTEA 的字段。
 
 ```json
 {
-  "slug": "my-project",
-  "legacySlugs": [],
-  "title": "My Project",
-  "description": "A short project description.",
-  "repository": "https://github.com/user/my-project",
-  "repositoryLabel": "View repository",
-  "updated": "2026-08-01",
-  "badges": [
-    { "label": "Python 3.10+", "colorScheme": "blue" }
-  ],
-  "hero": {
-    "type": "ascii",
-    "ariaLabel": "My Project",
-    "lines": ["ASCII art line 1", "ASCII art line 2"]
-  },
-  "chapters": [
-    {
-      "slug": "welcome",
-      "title": "Welcome & Usage",
-      "shortTitle": "Welcome",
-      "file": "welcome.md",
-      "description": "Install and use the project.",
-      "overview": [
-        "What the project provides.",
-        "How to install and use it."
-      ],
-      "hideTitle": true
-    },
-    {
-      "slug": "api-reference",
-      "title": "API Reference",
-      "file": "api-reference.md",
-      "description": "Public interfaces for the main module."
-    }
-  ]
+  "slug": "artea",
+  "title": "ARTEA",
+  "description": "Theory-Guided Hierarchical Graph Index for High-Performance ANN Search.",
+  "repository": "https://github.com/NTU-Siqiang-Group/Artea",
+  "card": {
+    "category": "data",
+    "date": "2026-08-01",
+    "tags": ["Graph Index", "Vector Search"],
+    "featuredImage": "/images/logos/artea.webp"
+  }
 }
 ```
 
-编写规则：
+| 上游仓库中的文件 | 本站生成的内容 |
+| --- | --- |
+| 根目录 `README.md` | 独立的 `/projects/<project-slug>/` 概览页，磁贴显示 Overview |
+| `docs/` 及子目录中的 `.md` 或 `.markdown` 文件 | 每个文件生成一个章节，磁贴的 Documentation 入口指向第一章 |
+| 仅有根 README | 磁贴和概览页 |
+| 没有 README，`docs/` 也没有 Markdown | 项目磁贴及 GitHub 链接 |
 
-1. `chapters` 数组顺序就是侧边栏和上一篇/下一篇的顺序。
-2. 第一章发布在 `/projects/<project-slug>/`；后续章节发布在 `/projects/<project-slug>/<chapter-slug>/`。
-3. 章节的 `slug` 和 Markdown 文件名必须使用小写 kebab-case，并且在项目内唯一。
-4. 每个 Markdown 文件只写一个小章节的正文；页面标题和说明来自 `project.json`，正文建议从 `##` 开始。`description` 是用于 SEO 的简短摘要；可选的 `overview` 是非空字符串数组，会在章节标题下渲染为 “The **Chapter** chapter includes:” 和无序列表。
-5. 目录中的每个 Markdown 文件都必须在 `chapters` 中登记；缺失文件、重复 slug、未登记文件会使 `npm run validate` 或构建失败。
-6. `hero` 是可选配置。若某一章设置 `hideTitle: true`，该项目必须提供 `hero`；页面会隐藏可见的大标题并在相同位置显示 ASCII 字符画，同时保留屏幕阅读器可访问的 `h1`。
-7. 在 `content/projects/<project-slug>.md` 的 `extraLinks` 中加入文档入口：
+文档保留子目录层次。例如 `docs/tutorial/Quick_Start.md` 发布在 `/projects/<project-slug>/docs/tutorial/quick-start/`。`docs/index.md` 或 `docs/README.md` 优先作为第一章，其他文件按路径排序。Markdown 互链指向站内对应页面，其他仓库相对链接指向同一 Git 提交中的文件。仓库内引用的栅格图片随网站发布。可选的 `imageAssets` 将某张上游图片的 Git blob SHA 映射到本站已有的优化图片，上游修改图片后会使用新版本。
 
-```yaml
-extraLinks:
-  - label: Documentation
-    url: /projects/my-project
-```
-
-8. 终端示例应把用户输入写在 <code>```command</code> fenced block 中，把程序输出写在紧随其后的 <code>```output</code> fenced block 中。共享文档组件会把两者拼成一组，以分隔线区分，并在右下角显示不同颜色的 `COMMAND` / `OUTPUT` 标识；不要再把命令与输出混写在同一个 `console` block 中。
-9. 普通代码块应在 fenced block 中指定标准语言，例如 `python`、`yaml`、`toml`、`bash` 或 `typescript`；Markdown 渲染器会自动应用语法高亮、语言标签和一键复制图标。
-10. 公开 API 参考应采用类似 PyTorch/Sphinx 的结构，不要把每个 API 压缩为汇总表格中的一行。每个公开构造方法、函数、CLI 命令或实例方法分别使用二级标题，并依次提供 fenced prototype、简短说明和 `Parameters` 表格或无序列表；需要明确返回约定时再添加 `Returns`。标题末尾按照 `AGENTS.md` 规定的 Markdown 语法添加 GitHub source link，共享渲染器会自动显示 GitHub logo 和 API 分隔栏。不要为章节单独添加 `Implementation` 部分；只有复杂 API 的内部机制确实有助于理解其行为时，才紧接该 API 添加简短的三级 `Implementation` 小节。不要介绍非公开 helper，也不要在多个章节重复维护完整签名。
-
-若项目改名并更换 slug，应移动项目卡片、文档目录和预览图片，并把旧 slug 加入 `project.json` 的 `legacySlugs`。构建会为旧章节路径生成 `noindex` 页面和新地址的 canonical URL，浏览器访问旧路径时也会自动跳转；sitemap 只保留新路径。
-
-新增项目文档不需要修改 `App.tsx`、模板组件或 SEO 脚本。完成后运行：
+`npm run dev` 和 `npm run build` 启动时读取上游默认分支，对每个项目固定一次提交，再根据同一份内容生成网页、导航和 sitemap。上游的新提交在主页仓库的下一次构建部署后上线，也可以手动运行 Pages 工作流触发更新。GitHub 请求失败会中止构建，成功抓取到的源文件缓存于忽略提交的 `.cache/project-docs/`。
 
 ```bash
-npm run validate
-npm run lint
-npm run build
+npm run projects:sync
+PROJECT_DOCS_OFFLINE=1 npm run check
 ```
+
+本地缓存也供 `npm run deploy -- --dry-run` 使用。在新工作区先运行一次 `npm run projects:sync`。如需保留改名前的项目地址，在 `project.json` 的 `legacySlugs` 中列出先前的 slug。终端示例、代码块和公开 API 的文档排版约定见 `AGENTS.md`。
 
 ## 更新 CV
 

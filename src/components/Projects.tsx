@@ -90,6 +90,7 @@ const FlowNode: React.FC<{
   const res: { label: string; url: string }[] = []
   if (item.link) res.push({ label: t('projects.source'), url: item.link })
   item.extraLinks?.forEach(l => { if (!res.some(r => r.url === l.url)) res.push(l) })
+  const overview = res.find((link) => link.url === `/projects/${item.id}/`)
   const hasExpandable = (item.highlights && item.highlights.length > 0) || item.story
 
   return (
@@ -137,8 +138,8 @@ const FlowNode: React.FC<{
             cursor={hasExpandable ? 'pointer' : undefined}
             transition="color 0.15s"
             _hover={hasExpandable ? { color: ct.color } : undefined}
-            onClick={hasExpandable ? () => setExpanded(p => !p) : undefined}>
-            {item.title}
+            onClick={!overview && hasExpandable ? () => setExpanded(p => !p) : undefined}>
+            {overview ? <Link href={overview.url}>{item.title}</Link> : item.title}
             {item.featured && (
               <Text as="span" ml={2} fontSize="xs" color={hlc.num}>★</Text>
             )}

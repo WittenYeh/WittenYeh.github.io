@@ -28,17 +28,12 @@ worktree changes.
 - Education and experience: `content/experience.json`
 - Research and news: `content/research.json` and `content/news.json`
 - Publications: `content/publications/*.md`
-- Project cards: `content/projects/*.md`
-- Project pages: `content/project-docs/<project-slug>/`
+- Project cards and repository URLs: `content/project-docs/<project-slug>/project.json`
+- Project overview and chapter sources: the upstream repository's root README and Markdown under `docs/`
 - Content images: `content/images/`
 - CV and benchmark entry data: `content/cv.json` and `content/benchmarks.json`
 
-Project pages are content-driven. Do not create a project-specific React component. Use `project.json` plus Markdown chapters under `content/project-docs/<project-slug>/`; the shared `src/components/ProjectDocs.tsx` supplies routing, sidebar navigation, previous/next navigation, theming, SEO entry points, and sitemap entries. A README-only project uses one chapter named `README` and can grow into multiple chapters later.
-
-Keep each chapter's `description` as a concise plain-text SEO summary. When a
-chapter needs a structured introduction below its title, add `overview` as a
-non-empty array of list-item strings; the shared renderer and static SEO output
-generate the lead sentence and unordered list.
+Maintain project tiles in the `card` object. The build reads each repository at one commit on its default branch. Its root README provides the overview page, and Markdown files under `docs/` provide documentation chapters. Projects with neither keep their tile. The shared renderer, SEO generator and sitemap use the same discovered routes. Use concise titles and put structured introductions in the upstream chapter body.
 
 For terminal examples in project documentation, put user input in a
 <code>```command</code> fence and captured output in an immediately following
@@ -94,15 +89,15 @@ Use a PyTorch/Sphinx-style reference layout for every project's public APIs:
    source and confirm that the static SEO HTML contains the headings,
    prototypes, parameters, and source links.
 
-When renaming a project-doc slug, move its content directory and project card, update its preview asset and repository links, and list prior slugs in `project.json` under `legacySlugs`. The shared routing and SEO pipeline preserves old chapter URLs as `noindex` compatibility pages that canonicalize and redirect to the current slug.
+When renaming a project slug, move its configuration directory, update its preview asset and repository URL, and list prior slugs in `project.json` under `legacySlugs`. The shared routing and SEO pipeline preserves old chapter URLs as `noindex` compatibility pages that canonicalize and redirect to the current slug.
 
-When copying a GitHub README, pin the source commit, preserve the wording, rewrite repository-relative links to stable absolute URLs, and host important raster images under `content/images/projects/<project-slug>/`. Prefer an existing optimized site asset when it is visually equivalent. Do not silently rewrite technical claims.
+Preserve upstream wording when rendering a GitHub README. Resolve repository-relative links against the selected commit, link between imported pages locally and serve repository raster images with the site. An `imageAssets` entry can associate an upstream blob SHA with a visually equivalent optimized site image.
 
 ## Deployment
 
 Use the repository deployment script instead of manually chaining validation, commit, push, workflow polling, and live HTTP checks.
 
-For local verification only:
+For local verification using the source cache from `npm run projects:sync`:
 
 ```bash
 npm run deploy -- --dry-run

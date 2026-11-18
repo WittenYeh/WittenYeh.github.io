@@ -5,7 +5,7 @@ import { mkdirSync, readFileSync, readdirSync, writeFileSync } from 'fs'
 import { resolve } from 'path'
 import matter from 'gray-matter'
 import { marked } from 'marked'
-import { loadProjectDocs } from './project-docs.mjs'
+import { loadProjectDocs, projectCard } from './project-docs.mjs'
 
 const root = resolve(import.meta.dirname, '..')
 const distDir = resolve(root, 'dist')
@@ -41,13 +41,7 @@ const publications = readdirSync(publicationDir)
   })
   .sort((a, b) => Number(b.year) - Number(a.year))
 
-const projectDir = resolve(root, 'content/projects')
-const projects = readdirSync(projectDir)
-  .filter((file) => file.endsWith('.md'))
-  .map((file) => {
-    const { data, content } = matter(readFileSync(resolve(projectDir, file), 'utf8'))
-    return { ...data, body: content.trim() }
-  })
+const projects = projectDocs.map(projectCard)
   .sort((a, b) => Date.parse(b.date ?? '') - Date.parse(a.date ?? ''))
 
 const staticStyle = `
@@ -112,7 +106,7 @@ const selectedPublicationHtml = publications
   .join('')
 
 const projectHtml = projects.map((project) => {
-  const summary = project.summary || project.body
+  const summary = project.summary
   const links = [
     ...(project.link ? [{ label: 'Project', url: project.link }] : []),
     ...(project.extraLinks ?? []),
@@ -142,23 +136,21 @@ const homeStaticContent = `${staticStyle}
   </main>`
 
 const projectDocRouteConfigs = Object.fromEntries(projectDocs.flatMap((project) =>
-  project.chapters.map((chapter, chapterIndex) => {
-    const showAsciiHero = chapter.hideTitle && project.hero?.type === 'ascii'
-    const heading = showAsciiHero
-      ? `<h1 class="seo-visually-hidden">${escapeHtml(project.hero.ariaLabel ?? project.title)}</h1><pre class="seo-ascii" role="img" aria-label="${escapeHtml(project.hero.ariaLabel ?? project.title)}">${escapeHtml(project.hero.lines.join('\n'))}</pre>`
-      : `<h1>${escapeHtml(chapter.title)}</h1>`
-    const overview = chapter.overview?.length
-      ? `<p>The <strong>${escapeHtml(chapter.shortTitle ?? chapter.title)}</strong> chapter includes:</p><ul>${chapter.overview.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`
-      : `<p>${escapeHtml(chapter.description)}</p>`
+  project.chapters.map((chapter) => {
+    const id = chapter.headingId ? ` id="${escapeHtml(chapter.headingId)}"` : ''
+    const heading = `<h1${id}>${escapeHtml(chapter.title)}</h1>`
+    const navigation = project.chapters.some((item) => item.slug)
+      ? `<nav aria-label="Project documentation">${project.chapters.map((item) =>
+        `<a href="/${item.route}/">${escapeHtml(item.shortTitle)}</a>`).join(' · ')}</nav>` : ''
     return [
       chapter.route,
       {
-        title: chapterIndex === 0
-          ? `${project.title} Documentation | Weitang Ye`
+        title: !chapter.slug
+          ? `${project.title} | Weitang Ye`
           : `${chapter.title} | ${project.title} | Weitang Ye`,
         description: chapter.description,
         index: true,
-        content: `<main id="seo-static-content"><p><a href="/projects/">Projects</a> / ${escapeHtml(project.title)}</p>${heading}${overview}<article>${marked.parse(chapter.markdown)}</article></main>`,
+        content: `<main id="seo-static-content"><p><a href="/projects/">Projects</a> / ${escapeHtml(project.title)}</p>${heading}${navigation}<article>${chapter.body}</article></main>`,
       },
     ]
   }),
@@ -166,10 +158,8 @@ const projectDocRouteConfigs = Object.fromEntries(projectDocs.flatMap((project) 
 
 const legacyProjectDocRouteConfigs = Object.fromEntries(projectDocs.flatMap((project) =>
   (project.legacySlugs ?? []).flatMap((legacySlug) =>
-    project.chapters.map((chapter, chapterIndex) => {
-      const legacyRoute = chapterIndex === 0
-        ? `projects/${legacySlug}`
-        : `projects/${legacySlug}/${chapter.slug}`
+    project.chapters.map((chapter) => {
+      const legacyRoute = chapter.route.replace(`projects/${project.slug}`, `projects/${legacySlug}`)
       return [
         legacyRoute,
         {
@@ -214,18 +204,18 @@ const routeConfigs = {
 }
 
 const replaceMetadata = (html, { title, description, canonical, index, type = 'website' }) => html
-  .replace(/<title>.*?<\/title>/, `<title>${escapeHtml(title)}</title>`)
-  .replace(/<meta name="description" content="[^"]*"\s*\/>/, `<meta name="description" content="${escapeHtml(description)}" />`)
-  .replace(/<meta name="robots" content="[^"]*"\s*\/>/, `<meta name="robots" content="${index ? 'index, follow, max-image-preview:large, max-snippet:-1' : 'noindex, follow'}" />`)
-  .replace(/<link rel="canonical" href="[^"]*"\s*\/>/, `<link rel="canonical" href="${canonical}" />`)
-  .replace(/<meta property="og:type" content="[^"]*"\s*\/>/, `<meta property="og:type" content="${type}" />`)
-  .replace(/<meta property="og:url" content="[^"]*"\s*\/>/, `<meta property="og:url" content="${canonical}" />`)
-  .replace(/<meta property="og:title" content="[^"]*"\s*\/>/, `<meta property="og:title" content="${escapeHtml(title)}" />`)
-  .replace(/<meta property="og:description" content="[^"]*"\s*\/>/, `<meta property="og:description" content="${escapeHtml(description)}" />`)
-  .replace(/<meta name="twitter:title" content="[^"]*"\s*\/>/, `<meta name="twitter:title" content="${escapeHtml(title)}" />`)
-  .replace(/<meta name="twitter:description" content="[^"]*"\s*\/>/, `<meta name="twitter:description" content="${escapeHtml(description)}" />`)
+  .replace(/<title>.*?<\/title>/, () => `<title>${escapeHtml(title)}</title>`)
+  .replace(/<meta name="description" content="[^"]*"\s*\/>/, () => `<meta name="description" content="${escapeHtml(description)}" />`)
+  .replace(/<meta name="robots" content="[^"]*"\s*\/>/, () => `<meta name="robots" content="${index ? 'index, follow, max-image-preview:large, max-snippet:-1' : 'noindex, follow'}" />`)
+  .replace(/<link rel="canonical" href="[^"]*"\s*\/>/, () => `<link rel="canonical" href="${canonical}" />`)
+  .replace(/<meta property="og:type" content="[^"]*"\s*\/>/, () => `<meta property="og:type" content="${type}" />`)
+  .replace(/<meta property="og:url" content="[^"]*"\s*\/>/, () => `<meta property="og:url" content="${canonical}" />`)
+  .replace(/<meta property="og:title" content="[^"]*"\s*\/>/, () => `<meta property="og:title" content="${escapeHtml(title)}" />`)
+  .replace(/<meta property="og:description" content="[^"]*"\s*\/>/, () => `<meta property="og:description" content="${escapeHtml(description)}" />`)
+  .replace(/<meta name="twitter:title" content="[^"]*"\s*\/>/, () => `<meta name="twitter:title" content="${escapeHtml(title)}" />`)
+  .replace(/<meta name="twitter:description" content="[^"]*"\s*\/>/, () => `<meta name="twitter:description" content="${escapeHtml(description)}" />`)
 
-const replaceRoot = (html, content) => html.replace('<div id="root"></div>', `<div id="root">${content}</div>`)
+const replaceRoot = (html, content) => html.replace('<div id="root"></div>', () => `<div id="root">${content}</div>`)
 const removeProfileJsonLd = (html) => html.replace(/\s*<script type="application\/ld\+json">[\s\S]*?<\/script>/, '')
 
 const homepage = replaceRoot(baseHtml, homeStaticContent)
@@ -241,11 +231,11 @@ for (const [route, config] of Object.entries(routeConfigs)) {
     description: config.description,
     about: { '@id': `${baseUrl}/#person` },
     isPartOf: { '@type': 'WebSite', name: "Weitang Ye's Academic Homepage", url: `${baseUrl}/` },
-  })}</script>`
+  }).replaceAll('<', '\\u003c')}</script>`
 
   let html = removeProfileJsonLd(baseHtml)
   html = replaceMetadata(html, { ...config, canonical })
-  html = html.replace('</head>', `  ${pageJsonLd}\n  </head>`)
+  html = html.replace('</head>', () => `  ${pageJsonLd}\n  </head>`)
   html = replaceRoot(html, `${staticStyle}${config.content}`)
 
   const routeDir = resolve(distDir, route)

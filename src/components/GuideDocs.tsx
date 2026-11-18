@@ -76,7 +76,7 @@ npm run dev` },
         { name: 'about.md', desc: 'Your bio text and career timeline (journeyPhases)', depth: 1 },
         { name: 'experience.json', desc: 'Work history and education', depth: 1 },
         { name: 'publications/', isFolder: true, desc: 'One file per paper', depth: 1 },
-        { name: 'projects/', isFolder: true, desc: 'One file per project', depth: 1 },
+        { name: 'project-docs/', isFolder: true, desc: 'One project.json per project', depth: 1 },
         { name: 'articles/', isFolder: true, desc: 'One file per blog post', depth: 1 },
         { name: 'news.json', desc: 'Announcements and updates', depth: 1 },
         { name: 'awards.json', desc: 'Awards and honors', depth: 1 },
@@ -215,34 +215,27 @@ Optional longer description goes here. Supports **Markdown**.` },
     icon: FaLaptopCode,
     accent: '#d08770',
     title: 'Edit Projects',
-    subtitle: 'Showcase your portfolio work — one Markdown file per project',
+    subtitle: 'Manage the project tile and its GitHub documentation',
     blocks: [
-      { type: 'text', content: 'Create a .md file in content/projects/ for each project. The structure is similar to publications.' },
+      { type: 'text', content: 'Create content/project-docs/<slug>/project.json. The root README in the linked repository supplies the overview. Each Markdown file in docs/ supplies a chapter.' },
       { type: 'fields', fields: [
+        { name: 'slug', required: true, desc: 'Project directory name and URL segment' },
         { name: 'title', required: true, desc: 'Project name' },
-        { name: 'description', required: true, desc: 'Short one-line description' },
-        { name: 'tags', desc: 'Technology tags', example: 'React, Python, Docker' },
-        { name: 'year', desc: 'Year of the project', example: '2025' },
-        { name: 'links', desc: 'List of links (demo, GitHub, docs, etc.)' },
-        { name: 'featured', desc: 'Set to true to highlight this project' },
-        { name: 'featuredImage', desc: 'Path to a screenshot', example: '/images/projects/demo.png' },
+        { name: 'description', required: true, desc: 'Short project description' },
+        { name: 'repository', required: true, desc: 'Public GitHub repository URL' },
+        { name: 'card', required: true, desc: 'Category, tags, and optional preview image, highlights or additional links' },
       ] },
-      { type: 'code', label: 'Example: content/projects/my-app.md', content: `---
-title: "AI Study Buddy"
-description: "An AI-powered study assistant for students."
-tags: [React, OpenAI, Node.js]
-year: 2025
-featured: true
-links:
-  - text: Demo
-    url: https://study-buddy.app
-    icon: FaExternalLinkAlt
-  - text: GitHub
-    url: https://github.com/user/study-buddy
-    icon: FaGithub
----
-
-Longer description in Markdown. Explain what it does and why.` },
+      { type: 'code', label: 'content/project-docs/artea/project.json', content: `{
+  "slug": "artea",
+  "title": "ARTEA",
+  "description": "Theory-Guided Hierarchical Graph Index for High-Performance ANN Search.",
+  "repository": "https://github.com/NTU-Siqiang-Group/Artea",
+  "card": {
+    "category": "data",
+    "tags": ["Vector Search", "Graph Index"],
+    "featuredImage": "/images/logos/artea.webp"
+  }
+}` },
     ],
   },
   {

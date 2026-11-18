@@ -11,19 +11,13 @@ const site = JSON.parse(readFileSync(resolve(root, 'content/site.json'), 'utf8')
 const distIndexPath = resolve(root, 'dist/index.html')
 const distIndex = readFileSync(distIndexPath, 'utf8')
 const projectDocs = loadProjectDocs(root)
-const projectDir = resolve(root, 'content/projects')
-const projectTitles = readdirSync(projectDir)
-  .filter((file) => file.endsWith('.md'))
-  .map((file) => matter(readFileSync(resolve(projectDir, file), 'utf8')).data.title)
 const assetsDir = resolve(root, 'dist/assets')
 const javascriptFiles = readdirSync(assetsDir).filter((file) => file.endsWith('.js'))
 const projectDocRoutes = projectDocs.flatMap((project) => project.chapters.map((chapter) => chapter.route))
 const legacyProjectDocRoutes = projectDocs.flatMap((project) =>
   (project.legacySlugs ?? []).flatMap((legacySlug) =>
-    project.chapters.map((chapter, chapterIndex) => ({
-      route: chapterIndex === 0
-        ? `projects/${legacySlug}`
-        : `projects/${legacySlug}/${chapter.slug}`,
+    project.chapters.map((chapter) => ({
+      route: chapter.route.replace(`projects/${project.slug}`, `projects/${legacySlug}`),
       canonicalRoute: chapter.route,
     })),
   ),
@@ -63,18 +57,6 @@ const lazyJavascript = javascriptFiles
   .filter((file) => file !== mainBundleName)
   .map((file) => readFileSync(resolve(assetsDir, file), 'utf8'))
   .join('\n')
-for (const signal of [
-  'data-language="cpp"',
-  'data-language="json"',
-  'hljs language-cpp',
-  'hljs language-json',
-  'hljs-keyword',
-]) {
-  if (!lazyJavascript.includes(signal)) {
-    throw new Error(`Build validation failed: Markdown syntax highlighting is missing ${signal}`)
-  }
-}
-
 const publicationFiles = readdirSync(resolve(root, 'content/publications'))
   .filter((file) => file.endsWith('.md'))
 const publicationBodySignature = publicationFiles.length === 0
@@ -95,23 +77,22 @@ if (publicationBodySignature) {
   }
 }
 
-const projectFiles = readdirSync(projectDir).filter((file) => file.endsWith('.md'))
-const projectBodySignature = projectFiles.length === 0
-  ? ''
-  : matter(readFileSync(resolve(projectDir, projectFiles[0]), 'utf8'))
-      .content.replace(/\s+/g, ' ').trim().slice(0, 80)
-if (projectBodySignature) {
-  const normalizedMainBundle = mainBundle.replace(/\s+/g, ' ')
-  const lazyBundles = javascriptFiles
-    .filter((file) => file !== mainBundleName)
-    .map((file) => readFileSync(resolve(assetsDir, file), 'utf8'))
-    .join('\n')
-    .replace(/\s+/g, ' ')
-  if (normalizedMainBundle.includes(projectBodySignature)) {
-    throw new Error('Build validation failed: full project bodies leaked into the main bundle')
+for (const project of projectDocs) {
+  const signature = project.card.highlights?.[0] || project.card.story
+  if (signature && (mainBundle.includes(signature) || !lazyJavascript.includes(signature))) {
+    throw new Error(`Build validation failed: ${project.slug} card details must load with the projects page`)
   }
-  if (!lazyBundles.includes(projectBodySignature)) {
-    throw new Error('Build validation failed: paged project content chunks are missing')
+  for (const chapter of project.chapters) {
+    const html = readFileSync(resolve(root, 'dist', chapter.route, 'index.html'), 'utf8')
+    if (!html.includes(`<article>${chapter.body}</article>`)) {
+      throw new Error(`Build validation failed: ${chapter.route} has different static and interactive content`)
+    }
+  }
+}
+const expectedPages = new Set([...projectDocRoutes, ...legacyProjectDocRoutes.map(({ route }) => route)])
+for (const file of readdirSync(resolve(root, 'dist/projects'), { recursive: true })) {
+  if (file.endsWith('/index.html') && !expectedPages.has('projects/' + file.slice(0, -'/index.html'.length))) {
+    throw new Error(`Build validation failed: unexpected project page ${file}`)
   }
 }
 
@@ -144,8 +125,9 @@ const projectsHtml = readFileSync(resolve(root, 'dist/projects/index.html'), 'ut
 if (!projectsHtml.includes('<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />')) {
   throw new Error('SEO validation failed: projects page must be indexable')
 }
-for (const title of projectTitles) {
-  if (!projectsHtml.includes(title)) {
+for (const { title } of projectDocs) {
+  const escaped = title.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;')
+  if (!projectsHtml.includes(escaped)) {
     throw new Error(`SEO validation failed: projects page is missing ${title}`)
   }
 }

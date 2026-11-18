@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import markdown from './plugins/vite-plugin-markdown'
 import contentImages from './plugins/vite-plugin-content-images'
+import projectDocs from './plugins/vite-plugin-project-docs.mjs'
 import { resolve } from 'path'
 import { copyFileSync, mkdirSync, writeFileSync } from 'fs'
 
@@ -12,6 +13,7 @@ export default defineConfig({
     react(),
     markdown(),
     contentImages(),
+    projectDocs(),
     {
       name: 'spa-fallback-postbuild',
       closeBundle() {

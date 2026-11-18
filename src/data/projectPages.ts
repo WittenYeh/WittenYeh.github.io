@@ -1,8 +1,5 @@
-import type { ProjectItem } from '@/types'
-
-interface MarkdownModule {
-  default: Record<string, unknown> & { body?: string }
-}
+import index from 'virtual:project-index'
+import type { ProjectItem, ProjectLink } from '@/types'
 
 export interface ProjectIndexItem {
   sourcePath: string
@@ -13,54 +10,27 @@ export interface ProjectIndexItem {
   role?: ProjectItem['role']
   featured?: boolean
   searchText: string
+  extraLinks: ProjectLink[]
 }
 
-export type LoadedProjectItem = ProjectItem & { id: string }
+export const projectIndex = index
 
-const projectIndexModules = import.meta.glob('/content/projects/*.md', {
-  eager: true,
-  query: '?content-index',
-}) as Record<string, { default: Omit<ProjectIndexItem, 'sourcePath' | 'id'> }>
-
-const projectLoaders = import.meta.glob('/content/projects/*.md') as Record<
-  string,
-  () => Promise<MarkdownModule>
->
-
-export const projectIndex: ProjectIndexItem[] = Object.entries(projectIndexModules)
-  .map(([sourcePath, module]) => ({
-    ...module.default,
-    sourcePath,
-    id: `project:${sourcePath}`,
-  }))
-
-const projectCache = new Map<string, Promise<LoadedProjectItem>>()
-const htmlToText = (html: string): string => html.replace(/<[^>]+>/g, '').trim()
-
-function loadProject(entry: ProjectIndexItem): Promise<LoadedProjectItem> {
-  const cached = projectCache.get(entry.sourcePath)
-  if (cached) return cached
-
-  const loader = projectLoaders[entry.sourcePath]
-  if (!loader) return Promise.reject(new Error(`Missing project content: ${entry.sourcePath}`))
-
-  const promise = loader()
-    .then(({ default: raw }) => {
-      const { body, ...frontmatter } = raw
-      const fallbackSummary = htmlToText(typeof body === 'string' ? body : '')
-      return {
-        summary: fallbackSummary,
-        ...frontmatter,
-        id: entry.id,
-      } as unknown as LoadedProjectItem
-    })
-    .catch((error) => {
-      projectCache.delete(entry.sourcePath)
-      throw error
-    })
-  projectCache.set(entry.sourcePath, promise)
-  return promise
+interface ProjectFile {
+  title: string
+  description: string
+  card: Omit<ProjectItem, 'title' | 'summary'> & { summary?: string }
 }
+
+const loaders = import.meta.glob<ProjectFile>('/content/project-docs/*/project.json', { import: 'default' })
 
 export const loadProjectPage = (entries: readonly ProjectIndexItem[]) =>
-  Promise.all(entries.map(loadProject))
+  Promise.all(entries.map(async (entry) => {
+    const config = await loaders[entry.sourcePath]()
+    return {
+      summary: config.description,
+      ...config.card,
+      id: entry.id,
+      title: config.title,
+      extraLinks: entry.extraLinks,
+    }
+  }))

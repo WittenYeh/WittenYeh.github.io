@@ -11,8 +11,7 @@
 import { readFileSync, existsSync, readdirSync } from 'fs'
 import { resolve, dirname } from 'path'
 import { fileURLToPath } from 'url'
-import matter from 'gray-matter'
-import { loadProjectDocs } from './project-docs.mjs'
+import { readProjectConfigs } from './project-docs.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = resolve(__dirname, '..')
@@ -140,7 +139,7 @@ for (const file of jsonFiles) {
 }
 
 // Check that Markdown directories have content
-const mdDirs = ['publications', 'projects', 'articles']
+const mdDirs = ['publications', 'articles']
 let mdCount = 0
 for (const dir of mdDirs) {
   const dirPath = resolve(ROOT, 'content', dir)
@@ -185,34 +184,6 @@ if (logos) {
   } else {
     warn(`${missing.length} institution(s) missing logo files (using placeholder)`)
   }
-}
-
-// ---------------------------------------------------------------------------
-// 6. Project preview image files check
-// ---------------------------------------------------------------------------
-
-const projectDir = resolve(ROOT, 'content', 'projects')
-if (existsSync(projectDir)) {
-  const projectFiles = readdirSync(projectDir).filter((file) => file.endsWith('.md'))
-  const previewImages = []
-  const invalidPreviews = []
-
-  for (const file of projectFiles) {
-    const { data } = matter(readFileSync(resolve(projectDir, file), 'utf-8'))
-    if (!data.featuredImage) continue
-
-    previewImages.push(data.featuredImage)
-    if (typeof data.featuredImage !== 'string' || !data.featuredImage.startsWith('/images/')) {
-      invalidPreviews.push(`${file}: featuredImage must start with /images/`)
-      continue
-    }
-
-    const previewPath = resolve(ROOT, 'content', data.featuredImage.replace(/^\//, ''))
-    if (!existsSync(previewPath)) invalidPreviews.push(`${file}: missing ${data.featuredImage}`)
-  }
-
-  if (invalidPreviews.length === 0) pass(`All ${previewImages.length} project preview image(s) valid`)
-  else invalidPreviews.forEach(fail)
 }
 
 // ---------------------------------------------------------------------------
@@ -276,9 +247,8 @@ if (benchmarks?.items && Array.isArray(benchmarks.items)) {
 // ---------------------------------------------------------------------------
 
 try {
-  const projectDocs = loadProjectDocs(ROOT)
-  const chapterCount = projectDocs.reduce((total, project) => total + project.chapters.length, 0)
-  pass(`${projectDocs.length} project documentation set(s), ${chapterCount} chapter(s) valid`)
+  const projects = readProjectConfigs(ROOT)
+  pass(`${projects.length} project card configuration(s) and preview images valid`)
 } catch (error) {
   fail(error.message)
 }

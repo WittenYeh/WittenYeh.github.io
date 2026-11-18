@@ -49,7 +49,7 @@ function App() {
                     <Route path="/projects" element={<pages.projects />} />
                   )}
                   {features.projects && pages.projectDocs && (
-                    <Route path="/projects/:projectSlug/:chapterSlug?" element={<pages.projectDocs />} />
+                    <Route path="/projects/:projectSlug/*" element={<pages.projectDocs />} />
                   )}
                   {features.articles && pages.articles && (
                     <Route path="/articles" element={<pages.articles />} />

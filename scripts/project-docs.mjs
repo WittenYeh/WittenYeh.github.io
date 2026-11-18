@@ -1,139 +1,61 @@
-import { existsSync, readFileSync, readdirSync } from 'fs'
-import { resolve } from 'path'
-import matter from 'gray-matter'
+import { existsSync, readFileSync, readdirSync } from 'node:fs'
+import { resolve } from 'node:path'
 
-const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+export const cacheDirectory = (root) => resolve(root, '.cache/project-docs')
 
-const requireString = (value, field, source) => {
-  if (typeof value !== 'string' || !value.trim()) {
-    throw new Error(`${source}: ${field} must be a non-empty string`)
-  }
+export function readProjectConfigs(root) {
+  const directory = resolve(root, 'content/project-docs')
+  if (!existsSync(directory)) return []
+  const slugs = new Set()
+  return readdirSync(directory, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .filter((entry) => readdirSync(resolve(directory, entry.name)).length > 0)
+    .sort((a, b) => a.name.localeCompare(b.name, 'en'))
+    .map(({ name }) => {
+      const path = resolve(directory, name, 'project.json')
+      const config = JSON.parse(readFileSync(path, 'utf8'))
+      if (name !== config.slug || !config.title?.trim() || !config.description?.trim()) {
+        throw new Error(`${path}: provide a matching slug, title and description`)
+      }
+      if (config.legacySlugs !== undefined && !Array.isArray(config.legacySlugs)) {
+        throw new Error(`${path}: legacySlugs must be an array`)
+      }
+      for (const slug of [config.slug, ...(config.legacySlugs ?? [])]) {
+        if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug) || slugs.has(slug)) {
+          throw new Error(`${path}: invalid or duplicate project slug ${slug}`)
+        }
+        slugs.add(slug)
+      }
+      if (!/^https:\/\/github\.com\/[\w-]+\/[\w.-]+$/.test(config.repository)) {
+        throw new Error(`${path}: repository must be a GitHub repository URL`)
+      }
+      const card = config.card
+      if (!['robotics', 'nlp', 'web-app', 'data', 'tooling', 'healthcare'].includes(card?.category)
+        || !Array.isArray(card.tags) || !card.tags.every((tag) => typeof tag === 'string')) {
+        throw new Error(`${path}: card requires a valid category and an array of tags`)
+      }
+      const images = Object.values(config.imageAssets ?? {})
+      if (card.featuredImage) images.push(card.featuredImage)
+      for (const image of images) {
+        if (typeof image !== 'string' || !image.startsWith('/images/') || image.split('/').includes('..')
+          || !existsSync(resolve(root, 'content', image.slice(1)))) {
+          throw new Error(`${path}: missing local project image ${image}`)
+        }
+      }
+      return config
+    })
 }
 
-export const projectDocRoute = (project, chapter, index) =>
-  index === 0
-    ? `projects/${project.slug}`
-    : `projects/${project.slug}/${chapter.slug}`
+export function loadProjectDocs(root) {
+  return JSON.parse(readFileSync(resolve(cacheDirectory(root), 'site.json'), 'utf8'))
+}
 
-export const loadProjectDocs = (root) => {
-  const docsRoot = resolve(root, 'content/project-docs')
-  if (!existsSync(docsRoot)) return []
-
-  const projects = readdirSync(docsRoot, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory())
-    .sort((left, right) => left.name.localeCompare(right.name))
-    .map((entry) => {
-      const projectDir = resolve(docsRoot, entry.name)
-      const configPath = resolve(projectDir, 'project.json')
-      if (!existsSync(configPath)) {
-        throw new Error(`content/project-docs/${entry.name}/project.json is missing`)
-      }
-
-      let config
-      try {
-        config = JSON.parse(readFileSync(configPath, 'utf8'))
-      } catch (error) {
-        throw new Error(`Invalid project docs config ${configPath}: ${error.message}`)
-      }
-
-      requireString(config.slug, 'slug', configPath)
-      requireString(config.title, 'title', configPath)
-      requireString(config.description, 'description', configPath)
-      if (config.slug !== entry.name) {
-        throw new Error(`${configPath}: slug must match its directory name`)
-      }
-      if (!slugPattern.test(config.slug)) {
-        throw new Error(`${configPath}: slug must use lowercase kebab-case`)
-      }
-      const legacySlugs = config.legacySlugs ?? []
-      if (!Array.isArray(legacySlugs)) {
-        throw new Error(`${configPath}: legacySlugs must be an array`)
-      }
-      const uniqueLegacySlugs = new Set()
-      for (const legacySlug of legacySlugs) {
-        requireString(legacySlug, 'legacySlugs entry', configPath)
-        if (!slugPattern.test(legacySlug)) {
-          throw new Error(`${configPath}: legacySlugs entries must use lowercase kebab-case`)
-        }
-        if (legacySlug === config.slug || uniqueLegacySlugs.has(legacySlug)) {
-          throw new Error(`${configPath}: duplicate project docs slug ${legacySlug}`)
-        }
-        uniqueLegacySlugs.add(legacySlug)
-      }
-      if (!Array.isArray(config.chapters) || config.chapters.length === 0) {
-        throw new Error(`${configPath}: chapters must be a non-empty array`)
-      }
-      if (config.hero !== undefined) {
-        if (config.hero?.type !== 'ascii') {
-          throw new Error(`${configPath}: hero.type must be "ascii"`)
-        }
-        if (!Array.isArray(config.hero.lines) || config.hero.lines.length === 0
-          || config.hero.lines.some((line) => typeof line !== 'string' || !line)) {
-          throw new Error(`${configPath}: hero.lines must be a non-empty string array`)
-        }
-      }
-
-      const slugs = new Set()
-      const files = new Set()
-      const chapters = config.chapters.map((chapter, index) => {
-        const source = `${configPath} chapter ${index + 1}`
-        requireString(chapter.slug, 'slug', source)
-        requireString(chapter.title, 'title', source)
-        requireString(chapter.description, 'description', source)
-        requireString(chapter.file, 'file', source)
-        if (chapter.overview !== undefined && (
-          !Array.isArray(chapter.overview)
-          || chapter.overview.length === 0
-          || chapter.overview.some((item) => typeof item !== 'string' || !item.trim())
-        )) {
-          throw new Error(`${source}: overview must be a non-empty string array`)
-        }
-        if (chapter.hideTitle !== undefined && typeof chapter.hideTitle !== 'boolean') {
-          throw new Error(`${source}: hideTitle must be a boolean`)
-        }
-        if (chapter.hideTitle && !config.hero) {
-          throw new Error(`${source}: hideTitle requires a project hero`)
-        }
-        if (!slugPattern.test(chapter.slug)) {
-          throw new Error(`${source}: slug must use lowercase kebab-case`)
-        }
-        if (slugs.has(chapter.slug)) throw new Error(`${source}: duplicate slug ${chapter.slug}`)
-        if (files.has(chapter.file)) throw new Error(`${source}: duplicate file ${chapter.file}`)
-        if (!/^[a-z0-9][a-z0-9-]*\.md$/.test(chapter.file)) {
-          throw new Error(`${source}: file must be a local kebab-case Markdown filename`)
-        }
-
-        const chapterPath = resolve(projectDir, chapter.file)
-        if (!existsSync(chapterPath)) throw new Error(`${source}: missing ${chapter.file}`)
-        const { content } = matter(readFileSync(chapterPath, 'utf8'))
-        if (!content.trim()) throw new Error(`${source}: ${chapter.file} has no content`)
-
-        slugs.add(chapter.slug)
-        files.add(chapter.file)
-        return {
-          ...chapter,
-          markdown: content.trim(),
-          route: projectDocRoute(config, chapter, index),
-        }
-      })
-
-      const unlistedMarkdown = readdirSync(projectDir)
-        .filter((file) => file.endsWith('.md') && !files.has(file))
-      if (unlistedMarkdown.length > 0) {
-        throw new Error(`${configPath}: unlisted Markdown file(s): ${unlistedMarkdown.join(', ')}`)
-      }
-
-      return { ...config, legacySlugs, chapters }
-    })
-
-  const registeredSlugs = new Map()
-  for (const project of projects) {
-    for (const slug of [project.slug, ...project.legacySlugs]) {
-      const owner = registeredSlugs.get(slug)
-      if (owner) throw new Error(`Project docs slug ${slug} is shared by ${owner} and ${project.slug}`)
-      registeredSlugs.set(slug, project.slug)
-    }
-  }
-
-  return projects
+export function projectCard(project) {
+  const overview = project.chapters.find((page) => page.slug === '')
+  const docs = project.chapters.find((page) => page.slug !== '')
+  const extraLinks = []
+  if (overview) extraLinks.push({ label: 'Overview', url: `/${overview.route}/` })
+  if (docs) extraLinks.push({ label: 'Documentation', url: `/${docs.route}/` })
+  extraLinks.push({ label: 'GitHub', url: project.repository }, ...(project.card.extraLinks ?? []))
+  return { summary: project.description, ...project.card, title: project.title, extraLinks }
 }

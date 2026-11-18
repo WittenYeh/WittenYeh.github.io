@@ -37,6 +37,7 @@ jobs:
         run: npm run check
         env:
           BASE_URL: /
+          GITHUB_TOKEN: ${{ github.token }}
 
       - name: Verify generated route entry points and Pages files
         run: |
