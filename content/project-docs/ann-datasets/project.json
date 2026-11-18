@@ -1,0 +1,12 @@
+{
+  "slug": "ann-datasets",
+  "title": "ANNDatasets",
+  "description": "GNU Make recipes for preparing base vectors, query sets, and ground truth for approximate nearest neighbor benchmarks.",
+  "repository": "https://github.com/WittenYeh/ann-datasets",
+  "card": {
+    "category": "data",
+    "date": "2025-10-09",
+    "role": "maintainer",
+    "tags": ["Approximate Nearest Neighbor", "Vector Search", "Benchmark Datasets"]
+  }
+}
